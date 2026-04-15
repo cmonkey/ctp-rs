@@ -94,10 +94,6 @@ struct CThostFtdcRspUserLoginField
 	TThostFtdcDRIdentityIDType	LoginDRIdentityID;
 	///用户所属中心号
 	TThostFtdcDRIdentityIDType	UserDRIdentityID;
-	///上次登陆时间
-	TThostFtdcDateTimeType	LastLoginTime;
-	///预留信息
-	TThostFtdcReserveInfoType	ReserveInfo;
 };
 
 ///用户登出请求
@@ -13291,8 +13287,6 @@ struct CThostFtdcOffsetSettingField
 	TThostFtdcUserIDType	ActiveUserID;
 	///经纪公司报单编号
 	TThostFtdcSequenceNoType	BrokerOffsetSettingSeq;
-	///申请来源
-	TThostFtdcApplySrcType	ApplySrc;
 };
 
 ///撤销对冲设置
@@ -13404,42 +13398,6 @@ struct CThostFtdcWechatUserSystemInfoField
 	TThostFtdcIPAddressType	ClientPublicIP;
 	///客户登录备注2
 	TThostFtdcClientLoginRemarkType	ClientLoginRemark;
-};
-
-///投资者预留信息
-struct CThostFtdcInvestorReserveInfoField
-{
-	///经纪公司代码
-	TThostFtdcBrokerIDType	BrokerID;
-	///用户代码
-	TThostFtdcUserIDType	UserID;
-	///预留信息
-	TThostFtdcReserveInfoType	ReserveInfo;
-};
-
-///查询组织架构投资者对应关系
-struct CThostFtdcQryInvestorDepartmentFlatField
-{
-	///经纪公司代码
-	TThostFtdcBrokerIDType	BrokerID;
-};
-
-///组织架构投资者对应关系
-struct CThostFtdcInvestorDepartmentFlatField
-{
-	///经纪公司代码
-	TThostFtdcBrokerIDType	BrokerID;
-	///投资者代码
-	TThostFtdcInvestorIDType	InvestorID;
-	///组织架构代码
-	TThostFtdcInvestorIDType	DepartmentID;
-};
-
-///查询操作员组织架构关系
-struct CThostFtdcQryDepartmentUserField
-{
-	///经纪公司代码
-	TThostFtdcBrokerIDType	BrokerID;
 };
 
 

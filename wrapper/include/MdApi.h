@@ -515,7 +515,7 @@ struct MdSpi;
 #include <memory>
 
 struct MdApi {
-    MdApi(const MdSpi &gateway, rust::String flow_path, bool is_using_udp, bool is_multicast, bool is_production_mode);
+    MdApi(const MdSpi &gateway, rust::String flow_path, bool is_using_udp, bool is_multicast);
 
     rust::String GetApiVersion() const;
     void Release() const;
@@ -538,4 +538,4 @@ struct MdApi {
     CMdSpi *spi;
 };
 
-std::unique_ptr<MdApi> CreateMdApi(const MdSpi &gateway, rust::String flow_path, bool is_using_udp, bool is_multicast, bool is_production_mode);
+std::unique_ptr<MdApi> CreateMdApi(const MdSpi &gateway, rust::String flow_path, bool is_using_udp, bool is_multicast);

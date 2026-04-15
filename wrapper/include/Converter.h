@@ -62,7 +62,7 @@ struct ExchangeOrderActionField;
 struct ExchangeOrderActionErrorField;
 struct ExchangeTradeField;
 struct TradeField;
-struct UserSessionField;
+// struct UserSessionField;  // v6.7.10: removed
 struct QryMaxOrderVolumeField;
 struct SettlementInfoConfirmField;
 struct SyncDepositField;
@@ -89,7 +89,7 @@ struct QryInstrumentTradingRightField;
 struct QryBrokerField;
 struct QryTraderField;
 struct QrySuperUserFunctionField;
-struct QryUserSessionField;
+// struct QryUserSessionField;  // v6.7.10: removed
 struct QryPartBrokerField;
 struct QryFrontStatusField;
 struct QryExchangeOrderField;
@@ -497,10 +497,11 @@ struct QryOffsetSettingField;
 struct AddrAppIDRelationField;
 struct QryAddrAppIDRelationField;
 struct WechatUserSystemInfoField;
-struct InvestorReserveInfoField;
-struct QryInvestorDepartmentFlatField;
-struct InvestorDepartmentFlatField;
-struct QryDepartmentUserField;
+// v6.7.10: removed structs
+// struct InvestorReserveInfoField;
+// struct QryInvestorDepartmentFlatField;
+// struct InvestorDepartmentFlatField;
+// struct QryDepartmentUserField;
 struct FrontInfoField;
 
 #include "ctp-rs/src/lib.rs.h"
@@ -642,8 +643,9 @@ public:
     static ExchangeTradeField CThostFtdcExchangeTradeFieldToRust(CThostFtdcExchangeTradeField* x);
     static CThostFtdcTradeField TradeFieldToCpp(TradeField x);
     static TradeField CThostFtdcTradeFieldToRust(CThostFtdcTradeField* x);
-    static CThostFtdcUserSessionField UserSessionFieldToCpp(UserSessionField x);
-    static UserSessionField CThostFtdcUserSessionFieldToRust(CThostFtdcUserSessionField* x);
+    // v6.7.10: CThostFtdcUserSessionField removed (OnRspQryUserSession removed)
+    // static CThostFtdcUserSessionField UserSessionFieldToCpp(UserSessionField x);
+    // static UserSessionField CThostFtdcUserSessionFieldToRust(CThostFtdcUserSessionField* x);
     static CThostFtdcQryMaxOrderVolumeField QryMaxOrderVolumeFieldToCpp(QryMaxOrderVolumeField x);
     static QryMaxOrderVolumeField CThostFtdcQryMaxOrderVolumeFieldToRust(CThostFtdcQryMaxOrderVolumeField* x);
     static CThostFtdcSettlementInfoConfirmField SettlementInfoConfirmFieldToCpp(SettlementInfoConfirmField x);
@@ -696,8 +698,9 @@ public:
     static QryTraderField CThostFtdcQryTraderFieldToRust(CThostFtdcQryTraderField* x);
     static CThostFtdcQrySuperUserFunctionField QrySuperUserFunctionFieldToCpp(QrySuperUserFunctionField x);
     static QrySuperUserFunctionField CThostFtdcQrySuperUserFunctionFieldToRust(CThostFtdcQrySuperUserFunctionField* x);
-    static CThostFtdcQryUserSessionField QryUserSessionFieldToCpp(QryUserSessionField x);
-    static QryUserSessionField CThostFtdcQryUserSessionFieldToRust(CThostFtdcQryUserSessionField* x);
+    // v6.7.10: CThostFtdcQryUserSessionField removed
+    // static CThostFtdcQryUserSessionField QryUserSessionFieldToCpp(QryUserSessionField x);
+    // static QryUserSessionField CThostFtdcQryUserSessionFieldToRust(CThostFtdcQryUserSessionField* x);
     static CThostFtdcQryPartBrokerField QryPartBrokerFieldToCpp(QryPartBrokerField x);
     static QryPartBrokerField CThostFtdcQryPartBrokerFieldToRust(CThostFtdcQryPartBrokerField* x);
     static CThostFtdcQryFrontStatusField QryFrontStatusFieldToCpp(QryFrontStatusField x);
@@ -1512,14 +1515,15 @@ public:
     static QryAddrAppIDRelationField CThostFtdcQryAddrAppIDRelationFieldToRust(CThostFtdcQryAddrAppIDRelationField* x);
     static CThostFtdcWechatUserSystemInfoField WechatUserSystemInfoFieldToCpp(WechatUserSystemInfoField x);
     static WechatUserSystemInfoField CThostFtdcWechatUserSystemInfoFieldToRust(CThostFtdcWechatUserSystemInfoField* x);
-    static CThostFtdcInvestorReserveInfoField InvestorReserveInfoFieldToCpp(InvestorReserveInfoField x);
-    static InvestorReserveInfoField CThostFtdcInvestorReserveInfoFieldToRust(CThostFtdcInvestorReserveInfoField* x);
-    static CThostFtdcQryInvestorDepartmentFlatField QryInvestorDepartmentFlatFieldToCpp(QryInvestorDepartmentFlatField x);
-    static QryInvestorDepartmentFlatField CThostFtdcQryInvestorDepartmentFlatFieldToRust(CThostFtdcQryInvestorDepartmentFlatField* x);
-    static CThostFtdcInvestorDepartmentFlatField InvestorDepartmentFlatFieldToCpp(InvestorDepartmentFlatField x);
-    static InvestorDepartmentFlatField CThostFtdcInvestorDepartmentFlatFieldToRust(CThostFtdcInvestorDepartmentFlatField* x);
-    static CThostFtdcQryDepartmentUserField QryDepartmentUserFieldToCpp(QryDepartmentUserField x);
-    static QryDepartmentUserField CThostFtdcQryDepartmentUserFieldToRust(CThostFtdcQryDepartmentUserField* x);
+    // v6.7.10: removed structs
+    // static CThostFtdcInvestorReserveInfoField InvestorReserveInfoFieldToCpp(InvestorReserveInfoField x);
+    // static InvestorReserveInfoField CThostFtdcInvestorReserveInfoFieldToRust(CThostFtdcInvestorReserveInfoField* x);
+    // static CThostFtdcQryInvestorDepartmentFlatField QryInvestorDepartmentFlatFieldToCpp(QryInvestorDepartmentFlatField x);
+    // static QryInvestorDepartmentFlatField CThostFtdcQryInvestorDepartmentFlatFieldToRust(CThostFtdcQryInvestorDepartmentFlatField* x);
+    // static CThostFtdcInvestorDepartmentFlatField InvestorDepartmentFlatFieldToCpp(InvestorDepartmentFlatField x);
+    // static InvestorDepartmentFlatField CThostFtdcInvestorDepartmentFlatFieldToRust(CThostFtdcInvestorDepartmentFlatField* x);
+    // static CThostFtdcQryDepartmentUserField QryDepartmentUserFieldToCpp(QryDepartmentUserField x);
+    // static QryDepartmentUserField CThostFtdcQryDepartmentUserFieldToRust(CThostFtdcQryDepartmentUserField* x);
     static CThostFtdcFrontInfoField FrontInfoFieldToCpp(FrontInfoField x);
     static FrontInfoField CThostFtdcFrontInfoFieldToRust(CThostFtdcFrontInfoField* x);
 };

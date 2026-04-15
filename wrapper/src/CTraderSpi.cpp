@@ -317,14 +317,7 @@ void CTraderSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommission
     );
 }
 
-void CTraderSpi::OnRspQryUserSession(CThostFtdcUserSessionField* pUserSession, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) {
-    this->gateway->gateway.OnRspQryUserSession(
-        Converter::CThostFtdcUserSessionFieldToRust(pUserSession),
-        Converter::CThostFtdcRspInfoFieldToRust(pRspInfo),
-        nRequestID,
-        bIsLast
-    );
-}
+// OnRspQryUserSession removed in v6.7.10
 
 void CTraderSpi::OnRspQryExchange(CThostFtdcExchangeField* pExchange, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) {
     this->gateway->gateway.OnRspQryExchange(

@@ -515,7 +515,7 @@ struct TraderSpi;
 #include <memory>
 
 struct TraderApi {
-    TraderApi(const TraderSpi &gateway, rust::String flow_path, bool is_production_mode);
+    TraderApi(const TraderSpi &gateway, rust::String flow_path);
     FrontInfoField GetFrontInfo() const;
 
     rust::String GetApiVersion() const;
@@ -568,7 +568,7 @@ struct TraderApi {
     int32_t ReqQryTradingCode(QryTradingCodeField pQryTradingCode, int32_t nRequestID) const;
     int32_t ReqQryInstrumentMarginRate(QryInstrumentMarginRateField pQryInstrumentMarginRate, int32_t nRequestID) const;
     int32_t ReqQryInstrumentCommissionRate(QryInstrumentCommissionRateField pQryInstrumentCommissionRate, int32_t nRequestID) const;
-    int32_t ReqQryUserSession(QryUserSessionField pQryUserSession, int32_t nRequestID) const;
+    // ReqQryUserSession removed in v6.7.10
     int32_t ReqQryExchange(QryExchangeField pQryExchange, int32_t nRequestID) const;
     int32_t ReqQryProduct(QryProductField pQryProduct, int32_t nRequestID) const;
     int32_t ReqQryInstrument(QryInstrumentField pQryInstrument, int32_t nRequestID) const;
@@ -656,4 +656,4 @@ struct TraderApi {
     CTraderSpi *spi;
 };
 
-std::unique_ptr<TraderApi> CreateTraderApi(const TraderSpi &gateway, rust::String flow_path, bool is_production_mode);
+std::unique_ptr<TraderApi> CreateTraderApi(const TraderSpi &gateway, rust::String flow_path);

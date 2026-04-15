@@ -1,14 +1,14 @@
 #include "ctp-rs/wrapper/include/TraderApi.h"
 #include "ctp-rs/wrapper/include/Converter.h"
 
-TraderApi::TraderApi(const TraderSpi &gateway, rust::String flow_path, bool is_production_mode) : gateway(gateway) {
+TraderApi::TraderApi(const TraderSpi &gateway, rust::String flow_path) : gateway(gateway) {
     spi = new CTraderSpi(this);
-    api = CThostFtdcTraderApi::CreateFtdcTraderApi(flow_path.c_str(), is_production_mode);
+    api = CThostFtdcTraderApi::CreateFtdcTraderApi(flow_path.c_str());
     api->RegisterSpi(spi);
 }
 
-std::unique_ptr<TraderApi> CreateTraderApi(const TraderSpi &gateway, rust::String flow_path, bool is_production_mode) {
-    return std::make_unique<TraderApi>(gateway, flow_path, is_production_mode);
+std::unique_ptr<TraderApi> CreateTraderApi(const TraderSpi &gateway, rust::String flow_path) {
+    return std::make_unique<TraderApi>(gateway, flow_path);
 }
 
 FrontInfoField TraderApi::GetFrontInfo() const {
@@ -390,13 +390,7 @@ int32_t TraderApi::ReqQryInstrumentCommissionRate(QryInstrumentCommissionRateFie
     );
 }
 
-int32_t TraderApi::ReqQryUserSession(QryUserSessionField pQryUserSession, int32_t nRequestID) const {
-    CThostFtdcQryUserSessionField req(Converter::QryUserSessionFieldToCpp(pQryUserSession));
-    return api->ReqQryUserSession(
-        &req,
-        nRequestID
-    );
-}
+// ReqQryUserSession removed in v6.7.10
 
 int32_t TraderApi::ReqQryExchange(QryExchangeField pQryExchange, int32_t nRequestID) const {
     CThostFtdcQryExchangeField req(Converter::QryExchangeFieldToCpp(pQryExchange));

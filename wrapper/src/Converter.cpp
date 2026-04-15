@@ -168,8 +168,9 @@ CThostFtdcRspUserLoginField Converter::RspUserLoginFieldToCpp(RspUserLoginField 
     strcpy(y.GFEXTime, x.GFEXTime.c_str());
     y.LoginDRIdentityID = x.LoginDRIdentityID;
     y.UserDRIdentityID = x.UserDRIdentityID;
-    strcpy(y.LastLoginTime, x.LastLoginTime.c_str());
-    strcpy(y.ReserveInfo, x.ReserveInfo.c_str());
+    /* v6.7.10: removed */
+    // strcpy(y.LastLoginTime, x.LastLoginTime.c_str());
+    // strcpy(y.ReserveInfo, x.ReserveInfo.c_str());
     return y;
 }
 
@@ -194,8 +195,9 @@ RspUserLoginField Converter::CThostFtdcRspUserLoginFieldToRust(CThostFtdcRspUser
     y.GFEXTime = Converter::Gb2312ToRustString(x->GFEXTime);
     y.LoginDRIdentityID = x->LoginDRIdentityID;
     y.UserDRIdentityID = x->UserDRIdentityID;
-    y.LastLoginTime = Converter::Gb2312ToRustString(x->LastLoginTime);
-    y.ReserveInfo = Converter::Gb2312ToRustString(x->ReserveInfo);
+    /* v6.7.10: removed */
+    // y.LastLoginTime = Converter::Gb2312ToRustString(x->LastLoginTime);
+    // y.ReserveInfo = Converter::Gb2312ToRustString(x->ReserveInfo);
     return y;
 }
 
@@ -2541,6 +2543,7 @@ TradeField Converter::CThostFtdcTradeFieldToRust(CThostFtdcTradeField* x) {
     return y;
 }
 
+/* v6.7.10: removed
 CThostFtdcUserSessionField Converter::UserSessionFieldToCpp(UserSessionField x) {
     CThostFtdcUserSessionField y;
     memset(&y, 0, sizeof(y));
@@ -2577,6 +2580,7 @@ UserSessionField Converter::CThostFtdcUserSessionFieldToRust(CThostFtdcUserSessi
     y.IPAddress = Converter::Gb2312ToRustString(x->IPAddress);
     return y;
 }
+*/
 
 CThostFtdcQryMaxOrderVolumeField Converter::QryMaxOrderVolumeFieldToCpp(QryMaxOrderVolumeField x) {
     CThostFtdcQryMaxOrderVolumeField y;
@@ -3384,6 +3388,7 @@ QrySuperUserFunctionField Converter::CThostFtdcQrySuperUserFunctionFieldToRust(C
     return y;
 }
 
+/* v6.7.10: removed
 CThostFtdcQryUserSessionField Converter::QryUserSessionFieldToCpp(QryUserSessionField x) {
     CThostFtdcQryUserSessionField y;
     memset(&y, 0, sizeof(y));
@@ -3404,6 +3409,7 @@ QryUserSessionField Converter::CThostFtdcQryUserSessionFieldToRust(CThostFtdcQry
     y.UserID = Converter::Gb2312ToRustString(x->UserID);
     return y;
 }
+*/
 
 CThostFtdcQryPartBrokerField Converter::QryPartBrokerFieldToCpp(QryPartBrokerField x) {
     CThostFtdcQryPartBrokerField y;
@@ -16994,7 +17000,7 @@ CThostFtdcOffsetSettingField Converter::OffsetSettingFieldToCpp(OffsetSettingFie
     strcpy(y.StatusMsg, x.StatusMsg.c_str());
     strcpy(y.ActiveUserID, x.ActiveUserID.c_str());
     y.BrokerOffsetSettingSeq = x.BrokerOffsetSettingSeq;
-    y.ApplySrc = x.ApplySrc;
+    /* v6.7.10: removed */ // y.ApplySrc = x.ApplySrc;
     return y;
 }
 
@@ -17036,7 +17042,7 @@ OffsetSettingField Converter::CThostFtdcOffsetSettingFieldToRust(CThostFtdcOffse
     y.StatusMsg = Converter::Gb2312ToRustString(x->StatusMsg);
     y.ActiveUserID = Converter::Gb2312ToRustString(x->ActiveUserID);
     y.BrokerOffsetSettingSeq = x->BrokerOffsetSettingSeq;
-    y.ApplySrc = x->ApplySrc;
+    /* v6.7.10: removed */ // y.ApplySrc = x->ApplySrc;
     return y;
 }
 
@@ -17192,6 +17198,7 @@ WechatUserSystemInfoField Converter::CThostFtdcWechatUserSystemInfoFieldToRust(C
     return y;
 }
 
+/* v6.7.10: removed
 CThostFtdcInvestorReserveInfoField Converter::InvestorReserveInfoFieldToCpp(InvestorReserveInfoField x) {
     CThostFtdcInvestorReserveInfoField y;
     memset(&y, 0, sizeof(y));
@@ -17259,6 +17266,7 @@ QryDepartmentUserField Converter::CThostFtdcQryDepartmentUserFieldToRust(CThostF
     y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
     return y;
 }
+*/
 
 CThostFtdcFrontInfoField Converter::FrontInfoFieldToCpp(FrontInfoField x) {
     CThostFtdcFrontInfoField y;

@@ -1348,12 +1348,12 @@ unsafe impl Send for MdApi {}
 unsafe impl Sync for MdApi {}
 
 impl MdApi {
-    pub fn CreateMdApiAndSpi(tx: Sender<MdSpiMsg>, flow_path: String, is_using_udp: bool, is_multicast: bool, is_production_mode: bool) -> UniquePtr<MdApi> {
+    pub fn CreateMdApiAndSpi(tx: Sender<MdSpiMsg>, flow_path: String, is_using_udp: bool, is_multicast: bool, _is_production_mode: bool) -> UniquePtr<MdApi> {
         if !Path::new(&flow_path).exists() {
             create_dir_all(&flow_path).unwrap();
         }
         let spi = Arc::pin(MdSpi { tx });
-        let api = CreateMdApi(&spi, flow_path, is_using_udp, is_multicast, is_production_mode);
+        let api = CreateMdApi(&spi, flow_path, is_using_udp, is_multicast);
         forget(spi); // 让 spi 一直存在，防止被释放
         api
     }
@@ -1400,12 +1400,12 @@ unsafe impl Send for TraderApi {}
 unsafe impl Sync for TraderApi {}
 
 impl TraderApi {
-    pub fn CreateTraderApiAndSpi(tx: Sender<TraderSpiMsg>, flow_path: String, is_production_mode: bool) -> UniquePtr<TraderApi> {
+    pub fn CreateTraderApiAndSpi(tx: Sender<TraderSpiMsg>, flow_path: String, _is_production_mode: bool) -> UniquePtr<TraderApi> {
         if !Path::new(&flow_path).exists() {
             create_dir_all(&flow_path).unwrap();
         }
         let spi = Arc::pin(TraderSpi { tx });
-        let api = CreateTraderApi(&spi, flow_path, is_production_mode);
+        let api = CreateTraderApi(&spi, flow_path);
         forget(spi); // 让 spi 一直存在，防止被释放
         api
     }
@@ -1449,7 +1449,7 @@ pub enum TraderSpiMsg {
     OnRspQryTradingCode(TradingCodeField, RspInfoField, i32, bool),
     OnRspQryInstrumentMarginRate(InstrumentMarginRateField, RspInfoField, i32, bool),
     OnRspQryInstrumentCommissionRate(InstrumentCommissionRateField, RspInfoField, i32, bool),
-    OnRspQryUserSession(UserSessionField, RspInfoField, i32, bool),
+    // OnRspQryUserSession removed in v6.7.10
     OnRspQryExchange(ExchangeField, RspInfoField, i32, bool),
     OnRspQryProduct(ProductField, RspInfoField, i32, bool),
     OnRspQryInstrument(InstrumentField, RspInfoField, i32, bool),
@@ -1620,7 +1620,7 @@ pub fn OnRspQryInvestor(&self, pInvestor: InvestorField, pRspInfo: RspInfoField,
 pub fn OnRspQryTradingCode(&self, pTradingCode: TradingCodeField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool) { self.tx.send(TraderSpiMsg::OnRspQryTradingCode(pTradingCode, pRspInfo, nRequestID, bIsLast)).ok(); }
 pub fn OnRspQryInstrumentMarginRate(&self, pInstrumentMarginRate: InstrumentMarginRateField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool) { self.tx.send(TraderSpiMsg::OnRspQryInstrumentMarginRate(pInstrumentMarginRate, pRspInfo, nRequestID, bIsLast)).ok(); }
 pub fn OnRspQryInstrumentCommissionRate(&self, pInstrumentCommissionRate: InstrumentCommissionRateField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool) { self.tx.send(TraderSpiMsg::OnRspQryInstrumentCommissionRate(pInstrumentCommissionRate, pRspInfo, nRequestID, bIsLast)).ok(); }
-pub fn OnRspQryUserSession(&self, pUserSession: UserSessionField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool) { self.tx.send(TraderSpiMsg::OnRspQryUserSession(pUserSession, pRspInfo, nRequestID, bIsLast)).ok(); }
+// OnRspQryUserSession removed in v6.7.10
 pub fn OnRspQryExchange(&self, pExchange: ExchangeField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool) { self.tx.send(TraderSpiMsg::OnRspQryExchange(pExchange, pRspInfo, nRequestID, bIsLast)).ok(); }
 pub fn OnRspQryProduct(&self, pProduct: ProductField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool) { self.tx.send(TraderSpiMsg::OnRspQryProduct(pProduct, pRspInfo, nRequestID, bIsLast)).ok(); }
 pub fn OnRspQryInstrument(&self, pInstrument: InstrumentField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool) { self.tx.send(TraderSpiMsg::OnRspQryInstrument(pInstrument, pRspInfo, nRequestID, bIsLast)).ok(); }
@@ -1774,7 +1774,7 @@ mod ffi {
         include!("ctp-rs/wrapper/include/MdApi.h");
         type MdApi;
 
-        fn CreateMdApi(spi: &MdSpi, flow_path: String, is_using_udp: bool, is_multicast: bool, is_production_mode: bool) -> UniquePtr<MdApi>;
+        fn CreateMdApi(spi: &MdSpi, flow_path: String, is_using_udp: bool, is_multicast: bool) -> UniquePtr<MdApi>;
 
         fn GetApiVersion(&self)-> String;
         fn Release(&self);
@@ -1832,7 +1832,7 @@ mod ffi {
         pub fn OnRspQryTradingCode(&self, pTradingCode: TradingCodeField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool);
         pub fn OnRspQryInstrumentMarginRate(&self, pInstrumentMarginRate: InstrumentMarginRateField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool);
         pub fn OnRspQryInstrumentCommissionRate(&self, pInstrumentCommissionRate: InstrumentCommissionRateField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool);
-        pub fn OnRspQryUserSession(&self, pUserSession: UserSessionField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool);
+        // OnRspQryUserSession removed in v6.7.10
         pub fn OnRspQryExchange(&self, pExchange: ExchangeField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool);
         pub fn OnRspQryProduct(&self, pProduct: ProductField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool);
         pub fn OnRspQryInstrument(&self, pInstrument: InstrumentField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool);
@@ -1966,7 +1966,7 @@ mod ffi {
         include!("ctp-rs/wrapper/include/TraderApi.h");
         type TraderApi;
 
-        fn CreateTraderApi(spi: &TraderSpi, flow_path: String, is_production_mode: bool) -> UniquePtr<TraderApi>;
+        fn CreateTraderApi(spi: &TraderSpi, flow_path: String) -> UniquePtr<TraderApi>;
         fn GetFrontInfo(&self) -> FrontInfoField;
 
         fn GetApiVersion(&self)-> String;
@@ -2019,7 +2019,7 @@ mod ffi {
         fn ReqQryTradingCode(&self, pQryTradingCode: QryTradingCodeField, nRequestID: i32)-> i32;
         fn ReqQryInstrumentMarginRate(&self, pQryInstrumentMarginRate: QryInstrumentMarginRateField, nRequestID: i32)-> i32;
         fn ReqQryInstrumentCommissionRate(&self, pQryInstrumentCommissionRate: QryInstrumentCommissionRateField, nRequestID: i32)-> i32;
-        fn ReqQryUserSession(&self, pQryUserSession: QryUserSessionField, nRequestID: i32)-> i32;
+        // ReqQryUserSession removed in v6.7.10
         fn ReqQryExchange(&self, pQryExchange: QryExchangeField, nRequestID: i32)-> i32;
         fn ReqQryProduct(&self, pQryProduct: QryProductField, nRequestID: i32)-> i32;
         fn ReqQryInstrument(&self, pQryInstrument: QryInstrumentField, nRequestID: i32)-> i32;
@@ -2145,8 +2145,8 @@ mod ffi {
         GFEXTime: String,
         LoginDRIdentityID: i32,
         UserDRIdentityID: i32,
-        LastLoginTime: String,
-        ReserveInfo: String,
+        // LastLoginTime: String,  // v6.7.10: removed
+        // ReserveInfo: String,    // v6.7.10: removed
     }
     #[derive(Debug, Clone, Default)]
     struct UserLogoutField {
@@ -3169,22 +3169,23 @@ mod ffi {
         InstrumentID: String,
         ExchangeInstID: String,
     }
-    #[derive(Debug, Clone, Default)]
-    struct UserSessionField {
-        is_null: bool,
-        FrontID: i32,
-        SessionID: i32,
-        BrokerID: String,
-        UserID: String,
-        LoginDate: String,
-        LoginTime: String,
-        UserProductInfo: String,
-        InterfaceProductInfo: String,
-        ProtocolInfo: String,
-        MacAddress: String,
-        LoginRemark: String,
-        IPAddress: String,
-    }
+    // v6.7.10: CThostFtdcUserSessionField removed
+    // #[derive(Debug, Clone, Default)]
+    // struct UserSessionField {
+    //     is_null: bool,
+    //     FrontID: i32,
+    //     SessionID: i32,
+    //     BrokerID: String,
+    //     UserID: String,
+    //     LoginDate: String,
+    //     LoginTime: String,
+    //     UserProductInfo: String,
+    //     InterfaceProductInfo: String,
+    //     ProtocolInfo: String,
+    //     MacAddress: String,
+    //     LoginRemark: String,
+    //     IPAddress: String,
+    // }
     #[derive(Debug, Clone, Default)]
     struct QryMaxOrderVolumeField {
         is_null: bool,
@@ -3522,14 +3523,15 @@ mod ffi {
         is_null: bool,
         UserID: String,
     }
-    #[derive(Debug, Clone, Default)]
-    struct QryUserSessionField {
-        is_null: bool,
-        FrontID: i32,
-        SessionID: i32,
-        BrokerID: String,
-        UserID: String,
-    }
+    // v6.7.10: CThostFtdcQryUserSessionField removed
+    // #[derive(Debug, Clone, Default)]
+    // struct QryUserSessionField {
+    //     is_null: bool,
+    //     FrontID: i32,
+    //     SessionID: i32,
+    //     BrokerID: String,
+    //     UserID: String,
+    // }
     #[derive(Debug, Clone, Default)]
     struct QryPartBrokerField {
         is_null: bool,
@@ -9339,30 +9341,31 @@ mod ffi {
         ClientPublicIP: String,
         ClientLoginRemark: String,
     }
-    #[derive(Debug, Clone, Default)]
-    struct InvestorReserveInfoField {
-        is_null: bool,
-        BrokerID: String,
-        UserID: String,
-        ReserveInfo: String,
-    }
-    #[derive(Debug, Clone, Default)]
-    struct QryInvestorDepartmentFlatField {
-        is_null: bool,
-        BrokerID: String,
-    }
-    #[derive(Debug, Clone, Default)]
-    struct InvestorDepartmentFlatField {
-        is_null: bool,
-        BrokerID: String,
-        InvestorID: String,
-        DepartmentID: String,
-    }
-    #[derive(Debug, Clone, Default)]
-    struct QryDepartmentUserField {
-        is_null: bool,
-        BrokerID: String,
-    }
+    // v6.7.10: removed structs
+    // #[derive(Debug, Clone, Default)]
+    // struct InvestorReserveInfoField {
+    //     is_null: bool,
+    //     BrokerID: String,
+    //     UserID: String,
+    //     ReserveInfo: String,
+    // }
+    // #[derive(Debug, Clone, Default)]
+    // struct QryInvestorDepartmentFlatField {
+    //     is_null: bool,
+    //     BrokerID: String,
+    // }
+    // #[derive(Debug, Clone, Default)]
+    // struct InvestorDepartmentFlatField {
+    //     is_null: bool,
+    //     BrokerID: String,
+    //     InvestorID: String,
+    //     DepartmentID: String,
+    // }
+    // #[derive(Debug, Clone, Default)]
+    // struct QryDepartmentUserField {
+    //     is_null: bool,
+    //     BrokerID: String,
+    // }
     #[derive(Debug, Clone, Default)]
     struct FrontInfoField {
         is_null: bool,
