@@ -62,7 +62,9 @@ struct ExchangeOrderActionField;
 struct ExchangeOrderActionErrorField;
 struct ExchangeTradeField;
 struct TradeField;
+#ifdef CTP_6_7_11
 struct UserSessionField;
+#endif
 struct QryMaxOrderVolumeField;
 struct SettlementInfoConfirmField;
 struct SyncDepositField;
@@ -89,7 +91,9 @@ struct QryInstrumentTradingRightField;
 struct QryBrokerField;
 struct QryTraderField;
 struct QrySuperUserFunctionField;
+#ifdef CTP_6_7_11
 struct QryUserSessionField;
+#endif
 struct QryPartBrokerField;
 struct QryFrontStatusField;
 struct QryExchangeOrderField;
@@ -497,10 +501,12 @@ struct QryOffsetSettingField;
 struct AddrAppIDRelationField;
 struct QryAddrAppIDRelationField;
 struct WechatUserSystemInfoField;
+#ifdef CTP_6_7_11
 struct InvestorReserveInfoField;
 struct QryInvestorDepartmentFlatField;
 struct InvestorDepartmentFlatField;
 struct QryDepartmentUserField;
+#endif
 struct FrontInfoField;
 
 struct MdApi;
@@ -515,7 +521,7 @@ struct MdSpi;
 #include <memory>
 
 struct MdApi {
-    MdApi(const MdSpi &gateway, rust::String flow_path, bool is_using_udp, bool is_multicast);
+    MdApi(const MdSpi &gateway, rust::String flow_path, bool is_using_udp, bool is_multicast, bool is_production_mode);
 
     rust::String GetApiVersion() const;
     void Release() const;
@@ -538,4 +544,4 @@ struct MdApi {
     CMdSpi *spi;
 };
 
-std::unique_ptr<MdApi> CreateMdApi(const MdSpi &gateway, rust::String flow_path, bool is_using_udp, bool is_multicast);
+std::unique_ptr<MdApi> CreateMdApi(const MdSpi &gateway, rust::String flow_path, bool is_using_udp, bool is_multicast, bool is_production_mode);

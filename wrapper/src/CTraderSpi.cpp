@@ -317,7 +317,11 @@ void CTraderSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommission
     );
 }
 
-// OnRspQryUserSession removed in v6.7.10
+#ifdef CTP_6_7_11
+void CTraderSpi::OnRspQryUserSession(CThostFtdcUserSessionField*, CThostFtdcRspInfoField*, int32_t, bool) {
+    // Not forwarded to Rust — not used by our system
+}
+#endif
 
 void CTraderSpi::OnRspQryExchange(CThostFtdcExchangeField* pExchange, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) {
     this->gateway->gateway.OnRspQryExchange(

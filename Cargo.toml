@@ -10,6 +10,11 @@ readme = "README.md"
 repository = "https://github.com/rn7s2/ctp-rs"
 version = "6.7.11+refined.20251214"
 
+[features]
+default = ["ctp-6-7-11"]
+ctp-6-7-11 = []
+ctp-6-7-10 = []
+
 [dependencies]
 cxx = "1.0"
 
