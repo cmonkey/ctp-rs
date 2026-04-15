@@ -62,9 +62,7 @@ struct ExchangeOrderActionField;
 struct ExchangeOrderActionErrorField;
 struct ExchangeTradeField;
 struct TradeField;
-#ifdef CTP_6_7_11
 struct UserSessionField;
-#endif
 struct QryMaxOrderVolumeField;
 struct SettlementInfoConfirmField;
 struct SyncDepositField;
@@ -91,9 +89,7 @@ struct QryInstrumentTradingRightField;
 struct QryBrokerField;
 struct QryTraderField;
 struct QrySuperUserFunctionField;
-#ifdef CTP_6_7_11
 struct QryUserSessionField;
-#endif
 struct QryPartBrokerField;
 struct QryFrontStatusField;
 struct QryExchangeOrderField;
@@ -501,12 +497,10 @@ struct QryOffsetSettingField;
 struct AddrAppIDRelationField;
 struct QryAddrAppIDRelationField;
 struct WechatUserSystemInfoField;
-#ifdef CTP_6_7_11
 struct InvestorReserveInfoField;
 struct QryInvestorDepartmentFlatField;
 struct InvestorDepartmentFlatField;
 struct QryDepartmentUserField;
-#endif
 struct FrontInfoField;
 
 struct TraderApi;
@@ -574,9 +568,7 @@ struct TraderApi {
     int32_t ReqQryTradingCode(QryTradingCodeField pQryTradingCode, int32_t nRequestID) const;
     int32_t ReqQryInstrumentMarginRate(QryInstrumentMarginRateField pQryInstrumentMarginRate, int32_t nRequestID) const;
     int32_t ReqQryInstrumentCommissionRate(QryInstrumentCommissionRateField pQryInstrumentCommissionRate, int32_t nRequestID) const;
-#ifdef CTP_6_7_11
     int32_t ReqQryUserSession(QryUserSessionField pQryUserSession, int32_t nRequestID) const;
-#endif
     int32_t ReqQryExchange(QryExchangeField pQryExchange, int32_t nRequestID) const;
     int32_t ReqQryProduct(QryProductField pQryProduct, int32_t nRequestID) const;
     int32_t ReqQryInstrument(QryInstrumentField pQryInstrument, int32_t nRequestID) const;

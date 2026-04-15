@@ -1449,7 +1449,7 @@ pub enum TraderSpiMsg {
     OnRspQryTradingCode(TradingCodeField, RspInfoField, i32, bool),
     OnRspQryInstrumentMarginRate(InstrumentMarginRateField, RspInfoField, i32, bool),
     OnRspQryInstrumentCommissionRate(InstrumentCommissionRateField, RspInfoField, i32, bool),
-    // OnRspQryUserSession: v6.7.11 only, not used by our system
+    OnRspQryUserSession(UserSessionField, RspInfoField, i32, bool),
     OnRspQryExchange(ExchangeField, RspInfoField, i32, bool),
     OnRspQryProduct(ProductField, RspInfoField, i32, bool),
     OnRspQryInstrument(InstrumentField, RspInfoField, i32, bool),
@@ -1620,7 +1620,7 @@ pub fn OnRspQryInvestor(&self, pInvestor: InvestorField, pRspInfo: RspInfoField,
 pub fn OnRspQryTradingCode(&self, pTradingCode: TradingCodeField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool) { self.tx.send(TraderSpiMsg::OnRspQryTradingCode(pTradingCode, pRspInfo, nRequestID, bIsLast)).ok(); }
 pub fn OnRspQryInstrumentMarginRate(&self, pInstrumentMarginRate: InstrumentMarginRateField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool) { self.tx.send(TraderSpiMsg::OnRspQryInstrumentMarginRate(pInstrumentMarginRate, pRspInfo, nRequestID, bIsLast)).ok(); }
 pub fn OnRspQryInstrumentCommissionRate(&self, pInstrumentCommissionRate: InstrumentCommissionRateField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool) { self.tx.send(TraderSpiMsg::OnRspQryInstrumentCommissionRate(pInstrumentCommissionRate, pRspInfo, nRequestID, bIsLast)).ok(); }
-// OnRspQryUserSession: v6.7.11 only, not used by our system
+pub fn OnRspQryUserSession(&self, pUserSession: UserSessionField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool) { self.tx.send(TraderSpiMsg::OnRspQryUserSession(pUserSession, pRspInfo, nRequestID, bIsLast)).ok(); }
 pub fn OnRspQryExchange(&self, pExchange: ExchangeField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool) { self.tx.send(TraderSpiMsg::OnRspQryExchange(pExchange, pRspInfo, nRequestID, bIsLast)).ok(); }
 pub fn OnRspQryProduct(&self, pProduct: ProductField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool) { self.tx.send(TraderSpiMsg::OnRspQryProduct(pProduct, pRspInfo, nRequestID, bIsLast)).ok(); }
 pub fn OnRspQryInstrument(&self, pInstrument: InstrumentField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool) { self.tx.send(TraderSpiMsg::OnRspQryInstrument(pInstrument, pRspInfo, nRequestID, bIsLast)).ok(); }
@@ -1832,7 +1832,7 @@ mod ffi {
         pub fn OnRspQryTradingCode(&self, pTradingCode: TradingCodeField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool);
         pub fn OnRspQryInstrumentMarginRate(&self, pInstrumentMarginRate: InstrumentMarginRateField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool);
         pub fn OnRspQryInstrumentCommissionRate(&self, pInstrumentCommissionRate: InstrumentCommissionRateField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool);
-        // OnRspQryUserSession: v6.7.11 only, not used by our system
+        pub fn OnRspQryUserSession(&self, pUserSession: UserSessionField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool);
         pub fn OnRspQryExchange(&self, pExchange: ExchangeField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool);
         pub fn OnRspQryProduct(&self, pProduct: ProductField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool);
         pub fn OnRspQryInstrument(&self, pInstrument: InstrumentField, pRspInfo: RspInfoField, nRequestID: i32, bIsLast: bool);
@@ -2019,7 +2019,7 @@ mod ffi {
         fn ReqQryTradingCode(&self, pQryTradingCode: QryTradingCodeField, nRequestID: i32)-> i32;
         fn ReqQryInstrumentMarginRate(&self, pQryInstrumentMarginRate: QryInstrumentMarginRateField, nRequestID: i32)-> i32;
         fn ReqQryInstrumentCommissionRate(&self, pQryInstrumentCommissionRate: QryInstrumentCommissionRateField, nRequestID: i32)-> i32;
-        // ReqQryUserSession: v6.7.11 only, not used by our system
+        fn ReqQryUserSession(&self, pQryUserSession: QryUserSessionField, nRequestID: i32) -> i32;
         fn ReqQryExchange(&self, pQryExchange: QryExchangeField, nRequestID: i32)-> i32;
         fn ReqQryProduct(&self, pQryProduct: QryProductField, nRequestID: i32)-> i32;
         fn ReqQryInstrument(&self, pQryInstrument: QryInstrumentField, nRequestID: i32)-> i32;

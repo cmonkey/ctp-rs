@@ -402,6 +402,10 @@ int32_t TraderApi::ReqQryUserSession(QryUserSessionField pQryUserSession, int32_
         nRequestID
     );
 }
+#else
+int32_t TraderApi::ReqQryUserSession(QryUserSessionField, int32_t) const {
+    return -10000; // API version does not support this request
+}
 #endif
 
 int32_t TraderApi::ReqQryExchange(QryExchangeField pQryExchange, int32_t nRequestID) const {

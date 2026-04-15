@@ -318,8 +318,13 @@ void CTraderSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommission
 }
 
 #ifdef CTP_6_7_11
-void CTraderSpi::OnRspQryUserSession(CThostFtdcUserSessionField*, CThostFtdcRspInfoField*, int32_t, bool) {
-    // Not forwarded to Rust — not used by our system
+void CTraderSpi::OnRspQryUserSession(CThostFtdcUserSessionField* pUserSession, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) {
+    this->gateway->gateway.OnRspQryUserSession(
+        Converter::CThostFtdcUserSessionFieldToRust(pUserSession),
+        Converter::CThostFtdcRspInfoFieldToRust(pRspInfo),
+        nRequestID,
+        bIsLast
+    );
 }
 #endif
 
