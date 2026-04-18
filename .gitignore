@@ -1,3 +1,11 @@
 /target
 MdFlow/
 TraderFlow/
+
+# lib/ is a build artifact — populated by build.rs (cargo build) or build.sh
+# from sdk/v${CTP_VERSION}/. Commit to sdk/vX.Y.ZZ/ instead.
+/lib/*.so
+/lib/*.dll
+/lib/*.lib
+/lib/*.h
+/lib/error.*
