@@ -35,11 +35,27 @@ void gb2312_to_utf8(const char *src, char *dst, int len)
     size_t outlen = len;
 
     // duanqn: The iconv function in Linux requires non-const char *
-    // So we need to copy the source string
-    char *inbuf = (char *)malloc(len);
+    // So we need to copy the source string.
+    //
+    // Pre-fix `malloc(len) + memcpy(inbuf, src, len)` read MAX_BUF
+    // (3072) bytes from src — but src is typically a CTP struct
+    // field (InstrumentID[31] etc., at most ~80 bytes). The over-
+    // read past the field end is silently absorbed when adjacent
+    // struct fields / heap padding are mapped, but SIGSEGVs when
+    // src happens to be near a page boundary with the next page
+    // unmapped (heap arena edge, mmap'd region end). Observed in
+    // production as periodic SEGV on OnRtnDepthMarketData.
+    // See wrapper/tests/test_gb2312_overread.cpp for the reproducer
+    // + regression test (proves: pre-fix → SEGV under guard-page
+    // layout; post-fix → output identical).
+    //
+    // Fix: only allocate + copy inlen bytes (the actual NUL-
+    // terminated source length). iconv reads at most inlen bytes
+    // of input regardless, so behavior for callers is unchanged.
+    char *inbuf = (char *)malloc(inlen);
     char *inbuf_hold = inbuf; // iconv may change the address of inbuf
                               // so we use another pointer to keep the address
-    memcpy(inbuf, src, len);
+    memcpy(inbuf, src, inlen);
 
     char *outbuf2 = NULL;
     char *outbuf = dst;
