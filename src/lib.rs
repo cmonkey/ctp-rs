@@ -9447,6 +9447,7 @@ mod ffi {
     // `#if CTP_VERSION_NUM >= CTP_V6_7_13` 门控 + stub 兜住。
     // ═══════════════════════════════════════════════════════════════
 
+    #[derive(Debug, Clone, Default)]
     struct AppAuthenticationCodeField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9462,6 +9463,7 @@ mod ffi {
         AppType: u8,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct UserDRIBypassField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9473,6 +9475,7 @@ mod ffi {
         DRIdentityID: i32,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct ReqGenSMSCodeField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9484,6 +9487,7 @@ mod ffi {
         Mobile: String,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct RspGenSMSCodeField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9495,6 +9499,7 @@ mod ffi {
         GenTime: String,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct SMSVerifyInfoFromSecField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9518,6 +9523,7 @@ mod ffi {
         FromSec: i32,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct SMSVerifyConfigField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9531,6 +9537,7 @@ mod ffi {
         UseSMSVerify: i32,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct SMSVerifyInfoField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9542,6 +9549,7 @@ mod ffi {
         SMSContent: Vec<u8>,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct InputSpdApplyField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9573,6 +9581,7 @@ mod ffi {
         MacAddress: String,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct InputHedgeCfmField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9600,6 +9609,7 @@ mod ffi {
         MacAddress: String,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct SpdApplyField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9673,6 +9683,7 @@ mod ffi {
         StatusMsg: String,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct HedgeCfmField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9746,6 +9757,7 @@ mod ffi {
         MacAddress: String,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct QrySpdApplyField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9763,6 +9775,7 @@ mod ffi {
         SecondLegInstrumentID: String,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct QryHedgeCfmField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9778,6 +9791,7 @@ mod ffi {
         InstrumentID: String,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct InputSpdApplyActionField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9805,6 +9819,7 @@ mod ffi {
         MacAddress: String,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct InputHedgeCfmActionField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9832,6 +9847,7 @@ mod ffi {
         MacAddress: String,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct SpdApplyActionField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
@@ -9879,6 +9895,7 @@ mod ffi {
         MacAddress: String,
     }
 
+    #[derive(Debug, Clone, Default)]
     struct HedgeCfmActionField {
         /// C++ 端传入的整体 Field 是否为 `nullptr`
         is_null: bool,
