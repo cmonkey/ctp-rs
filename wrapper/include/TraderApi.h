@@ -545,7 +545,7 @@ struct TraderApi {
     void RegisterFront(rust::String pszFrontAddress) const;
     void RegisterNameServer(rust::String pszNsAddress) const;
     void RegisterFensUserInfo(FensUserInfoField pFensUserInfo) const;
-    void SubscribePrivateTopic(int32_t nResumeType) const;
+    void SubscribePrivateTopic(int32_t nResumeType, int32_t nSeqNo) const;
     void SubscribePublicTopic(int32_t nResumeType) const;
     int32_t ReqAuthenticate(ReqAuthenticateField pReqAuthenticateField, int32_t nRequestID) const;
     int32_t RegisterUserSystemInfo(UserSystemInfoField pUserSystemInfo) const;

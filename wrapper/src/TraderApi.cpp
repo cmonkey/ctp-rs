@@ -66,10 +66,22 @@ void TraderApi::RegisterFensUserInfo(FensUserInfoField pFensUserInfo) const {
     );
 }
 
-void TraderApi::SubscribePrivateTopic(int32_t nResumeType) const {
+void TraderApi::SubscribePrivateTopic(int32_t nResumeType, int32_t nSeqNo) const {
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    // 6.7.13 起签名是双参;nSeqNo 只在 THOST_TERT_RESUME_FROM_SEQ_NO 下有效。
+    return api->SubscribePrivateTopic(
+        (THOST_TE_RESUME_TYPE)nResumeType,
+        nSeqNo
+    );
+#else
+    // 6.7.10 / 6.7.11 的签名是单参(ThostFtdcTraderApi.h:592 / :596),
+    // 且枚举里没有 THOST_TERT_RESUME_FROM_SEQ_NO。低版本上 nSeqNo 无处可
+    // 送 —— 直接丢弃。调用方负责不在低版本上传 RESUME_FROM_SEQ_NO。
+    (void)nSeqNo;
     return api->SubscribePrivateTopic(
         (THOST_TE_RESUME_TYPE)nResumeType
     );
+#endif
 }
 
 void TraderApi::SubscribePublicTopic(int32_t nResumeType) const {

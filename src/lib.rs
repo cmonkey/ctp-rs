@@ -18,6 +18,10 @@ pub enum THOST_TE_RESUME_TYPE {
     THOST_TERT_RESUME,
     THOST_TERT_QUICK,
     THOST_TERT_NONE,
+    /// 6.7.13 新增 —— 从 `SubscribePrivateTopic` 的 `nSeqNo` 指定序号起重传。
+    /// 只在 6.7.13+ SDK 上有效;低版本 SDK 收到这个值行为未定义,调用方
+    /// 必须自己保证版本。序号从 1 开始,且**每个交易日重新从 1 计**。
+    THOST_TERT_RESUME_FROM_SEQ_NO,
 }
 
 pub const THOST_FTDC_EXP_Normal: u8 = '0' as u8;
@@ -2022,7 +2026,7 @@ mod ffi {
         fn RegisterFront(&self, pszFrontAddress: String);
         fn RegisterNameServer(&self, pszNsAddress: String);
         fn RegisterFensUserInfo(&self, pFensUserInfo: FensUserInfoField);
-        fn SubscribePrivateTopic(&self, nResumeType: i32);
+        fn SubscribePrivateTopic(&self, nResumeType: i32, nSeqNo: i32);
         fn SubscribePublicTopic(&self, nResumeType: i32);
         fn ReqAuthenticate(&self, pReqAuthenticateField: ReqAuthenticateField, nRequestID: i32)-> i32;
         fn RegisterUserSystemInfo(&self, pUserSystemInfo: UserSystemInfoField)-> i32;
