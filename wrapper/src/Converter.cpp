@@ -24,92 +24,14 @@ std::string Converter::Gb2312ToUtf8(const char *src_str)
 
 #else
 
-#include <iconv.h>
+#include "ctp-rs/wrapper/include/GbkDecode.h"
 
-#define MAX_BUF 3072
-
-void gb2312_to_utf8(const char *src, char *dst, int len)
-{
-    int ret = 0;
-    size_t inlen = strlen(src) + 1;
-    size_t outlen = len;
-
-    // duanqn: The iconv function in Linux requires non-const char *
-    // So we need to copy the source string.
-    //
-    // Pre-fix `malloc(len) + memcpy(inbuf, src, len)` read MAX_BUF
-    // (3072) bytes from src — but src is typically a CTP struct
-    // field (InstrumentID[31] etc., at most ~80 bytes). The over-
-    // read past the field end is silently absorbed when adjacent
-    // struct fields / heap padding are mapped, but SIGSEGVs when
-    // src happens to be near a page boundary with the next page
-    // unmapped (heap arena edge, mmap'd region end). Observed in
-    // production as periodic SEGV on OnRtnDepthMarketData.
-    // See wrapper/tests/test_gb2312_overread.cpp for the reproducer
-    // + regression test (proves: pre-fix → SEGV under guard-page
-    // layout; post-fix → output identical).
-    //
-    // Fix: only allocate + copy inlen bytes (the actual NUL-
-    // terminated source length). iconv reads at most inlen bytes
-    // of input regardless, so behavior for callers is unchanged.
-    char *inbuf = (char *)malloc(inlen);
-    char *inbuf_hold = inbuf; // iconv may change the address of inbuf
-                              // so we use another pointer to keep the address
-    memcpy(inbuf, src, inlen);
-
-    char *outbuf2 = NULL;
-    char *outbuf = dst;
-    iconv_t cd;
-
-    // starkwong: if src==dst, the string will become invalid during conversion since UTF-8 is 3 chars in Chinese but GBK is mostly 2 chars
-    if (src == dst)
-    {
-        outbuf2 = (char *)malloc(len);
-        memset(outbuf2, 0, len);
-        outbuf = outbuf2;
-    }
-
-    cd = iconv_open("UTF-8", "GB2312");
-    if (cd != (iconv_t)-1)
-    {
-        ret = iconv(cd, &inbuf, &inlen, &outbuf, &outlen);
-
-        if (outbuf2 != NULL)
-        {
-            // iconv may have filled outbuf2 to capacity, leaving it
-            // unterminated. Bound both the read and the write: dst holds
-            // `len` bytes by this function's contract, so a full buffer
-            // must not over-read outbuf2 nor write past dst.
-            if (len > 0)
-            {
-                size_t copied = strnlen(outbuf2, (size_t)len);
-                if (copied >= (size_t)len)
-                    copied = (size_t)len - 1;
-                memcpy(dst, outbuf2, copied);
-                dst[copied] = '\0';
-            }
-            free(outbuf2);
-        }
-
-        iconv_close(cd);
-    }
-
-    if (ret != 0)
-    {
-        printf("iconv failed, buf: [0x%02x", (unsigned char)*inbuf_hold);
-        for (char *p = inbuf_hold + 1; p && *p; p++)
-            printf(", 0x%02x", (unsigned char)*p);
-        printf("], err: %s\n", strerror(errno));
-        dst[0] = '\0';
-    }
-    free(inbuf_hold); // Don't pass in inbuf as it may have been modified
-}
-
+// CTP hands us codepage-936 (GBK) bytes; see GbkDecode.h for why the
+// previous GB2312 decoder discarded whole fields and why this one does
+// not. Regression test: wrapper/tests/test_gbk_decode.cpp.
 std::string Converter::Gb2312ToUtf8(const char *src_str)
 {
-    char dst_str[MAX_BUF] = {0};
-    gb2312_to_utf8(src_str, dst_str, MAX_BUF);
-    return std::string(dst_str);
+    return gbk_to_utf8(src_str);
 }
 
 #endif

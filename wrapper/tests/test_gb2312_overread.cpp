@@ -1,3 +1,12 @@
+// SUPERSEDED (2026-08-29) — the `gb2312_to_utf8(src, dst, len)` helper
+// this file exercises no longer exists. Converter::Gb2312ToUtf8 now
+// delegates to wrapper/include/GbkDecode.h, which never copies the
+// source into a scratch buffer at all, so the over-read class this test
+// guards cannot return by construction. Kept as the record of the
+// original SIGSEGV and of the guard-page technique used to pin it down;
+// it is self-contained (it embeds its own pre-/post-fix copies) and
+// still builds and passes on its own.
+//
 // Regression test for buffer over-read in gb2312_to_utf8.
 //
 // Background
