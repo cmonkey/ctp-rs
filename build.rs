@@ -59,6 +59,7 @@ fn main() {
     let rust_files = vec!["src/lib.rs"];
     let wrapper_files = vec![
         "wrapper/include/Converter.h",
+        "wrapper/include/CtpFieldGuard.h",
         "wrapper/include/CMdSpi.h",
         "wrapper/include/CTraderSpi.h",
         "wrapper/include/MdApi.h",

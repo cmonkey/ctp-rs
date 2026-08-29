@@ -505,6 +505,8 @@ struct FrontInfoField;
 
 #include "ctp-rs/src/lib.rs.h"
 #include "rust/cxx.h"
+
+#include "ctp-rs/wrapper/include/CtpFieldGuard.h"
 #include <cstring>
 #include <ctime>
 #include <iomanip>

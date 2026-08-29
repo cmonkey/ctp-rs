@@ -76,7 +76,18 @@ void gb2312_to_utf8(const char *src, char *dst, int len)
 
         if (outbuf2 != NULL)
         {
-            strcpy(dst, outbuf2);
+            // iconv may have filled outbuf2 to capacity, leaving it
+            // unterminated. Bound both the read and the write: dst holds
+            // `len` bytes by this function's contract, so a full buffer
+            // must not over-read outbuf2 nor write past dst.
+            if (len > 0)
+            {
+                size_t copied = strnlen(outbuf2, (size_t)len);
+                if (copied >= (size_t)len)
+                    copied = (size_t)len - 1;
+                memcpy(dst, outbuf2, copied);
+                dst[copied] = '\0';
+            }
             free(outbuf2);
         }
 
@@ -130,18 +141,18 @@ DisseminationField Converter::CThostFtdcDisseminationFieldToRust(CThostFtdcDisse
 CThostFtdcReqUserLoginField Converter::ReqUserLoginFieldToCpp(ReqUserLoginField x) {
     CThostFtdcReqUserLoginField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.Password, x.Password.c_str());
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.InterfaceProductInfo, x.InterfaceProductInfo.c_str());
-    strcpy(y.ProtocolInfo, x.ProtocolInfo.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.OneTimePassword, x.OneTimePassword.c_str());
-    strcpy(y.LoginRemark, x.LoginRemark.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.InterfaceProductInfo, x.InterfaceProductInfo.c_str());
+    CTP_SET_FIELD(y.ProtocolInfo, x.ProtocolInfo.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.OneTimePassword, x.OneTimePassword.c_str());
+    CTP_SET_FIELD(y.LoginRemark, x.LoginRemark.c_str());
     y.ClientIPPort = x.ClientIPPort;
-    strcpy(y.ClientIPAddress, x.ClientIPAddress.c_str());
+    CTP_SET_FIELD(y.ClientIPAddress, x.ClientIPAddress.c_str());
     return y;
 }
 
@@ -167,26 +178,26 @@ ReqUserLoginField Converter::CThostFtdcReqUserLoginFieldToRust(CThostFtdcReqUser
 CThostFtdcRspUserLoginField Converter::RspUserLoginFieldToCpp(RspUserLoginField x) {
     CThostFtdcRspUserLoginField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.LoginTime, x.LoginTime.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.SystemName, x.SystemName.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.LoginTime, x.LoginTime.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.SystemName, x.SystemName.c_str());
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.MaxOrderRef, x.MaxOrderRef.c_str());
-    strcpy(y.SHFETime, x.SHFETime.c_str());
-    strcpy(y.DCETime, x.DCETime.c_str());
-    strcpy(y.CZCETime, x.CZCETime.c_str());
-    strcpy(y.FFEXTime, x.FFEXTime.c_str());
-    strcpy(y.INETime, x.INETime.c_str());
-    strcpy(y.SysVersion, x.SysVersion.c_str());
-    strcpy(y.GFEXTime, x.GFEXTime.c_str());
+    CTP_SET_FIELD(y.MaxOrderRef, x.MaxOrderRef.c_str());
+    CTP_SET_FIELD(y.SHFETime, x.SHFETime.c_str());
+    CTP_SET_FIELD(y.DCETime, x.DCETime.c_str());
+    CTP_SET_FIELD(y.CZCETime, x.CZCETime.c_str());
+    CTP_SET_FIELD(y.FFEXTime, x.FFEXTime.c_str());
+    CTP_SET_FIELD(y.INETime, x.INETime.c_str());
+    CTP_SET_FIELD(y.SysVersion, x.SysVersion.c_str());
+    CTP_SET_FIELD(y.GFEXTime, x.GFEXTime.c_str());
     y.LoginDRIdentityID = x.LoginDRIdentityID;
     y.UserDRIdentityID = x.UserDRIdentityID;
 #ifdef CTP_6_7_11
-    strcpy(y.LastLoginTime, x.LastLoginTime.c_str());
-    strcpy(y.ReserveInfo, x.ReserveInfo.c_str());
+    CTP_SET_FIELD(y.LastLoginTime, x.LastLoginTime.c_str());
+    CTP_SET_FIELD(y.ReserveInfo, x.ReserveInfo.c_str());
 #endif
     return y;
 }
@@ -222,8 +233,8 @@ RspUserLoginField Converter::CThostFtdcRspUserLoginFieldToRust(CThostFtdcRspUser
 CThostFtdcUserLogoutField Converter::UserLogoutFieldToCpp(UserLogoutField x) {
     CThostFtdcUserLogoutField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     return y;
 }
 
@@ -239,8 +250,8 @@ UserLogoutField Converter::CThostFtdcUserLogoutFieldToRust(CThostFtdcUserLogoutF
 CThostFtdcForceUserLogoutField Converter::ForceUserLogoutFieldToCpp(ForceUserLogoutField x) {
     CThostFtdcForceUserLogoutField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     return y;
 }
 
@@ -256,11 +267,11 @@ ForceUserLogoutField Converter::CThostFtdcForceUserLogoutFieldToRust(CThostFtdcF
 CThostFtdcReqAuthenticateField Converter::ReqAuthenticateFieldToCpp(ReqAuthenticateField x) {
     CThostFtdcReqAuthenticateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.AuthCode, x.AuthCode.c_str());
-    strcpy(y.AppID, x.AppID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.AuthCode, x.AuthCode.c_str());
+    CTP_SET_FIELD(y.AppID, x.AppID.c_str());
     return y;
 }
 
@@ -279,10 +290,10 @@ ReqAuthenticateField Converter::CThostFtdcReqAuthenticateFieldToRust(CThostFtdcR
 CThostFtdcRspAuthenticateField Converter::RspAuthenticateFieldToCpp(RspAuthenticateField x) {
     CThostFtdcRspAuthenticateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.AppID, x.AppID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.AppID, x.AppID.c_str());
     y.AppType = x.AppType;
     return y;
 }
@@ -302,14 +313,14 @@ RspAuthenticateField Converter::CThostFtdcRspAuthenticateFieldToRust(CThostFtdcR
 CThostFtdcAuthenticationInfoField Converter::AuthenticationInfoFieldToCpp(AuthenticationInfoField x) {
     CThostFtdcAuthenticationInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.AuthInfo, x.AuthInfo.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.AuthInfo, x.AuthInfo.c_str());
     y.IsResult = x.IsResult;
-    strcpy(y.AppID, x.AppID.c_str());
+    CTP_SET_FIELD(y.AppID, x.AppID.c_str());
     y.AppType = x.AppType;
-    strcpy(y.ClientIPAddress, x.ClientIPAddress.c_str());
+    CTP_SET_FIELD(y.ClientIPAddress, x.ClientIPAddress.c_str());
     return y;
 }
 
@@ -331,19 +342,19 @@ AuthenticationInfoField Converter::CThostFtdcAuthenticationInfoFieldToRust(CThos
 CThostFtdcRspUserLogin2Field Converter::RspUserLogin2FieldToCpp(RspUserLogin2Field x) {
     CThostFtdcRspUserLogin2Field y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.LoginTime, x.LoginTime.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.SystemName, x.SystemName.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.LoginTime, x.LoginTime.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.SystemName, x.SystemName.c_str());
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.MaxOrderRef, x.MaxOrderRef.c_str());
-    strcpy(y.SHFETime, x.SHFETime.c_str());
-    strcpy(y.DCETime, x.DCETime.c_str());
-    strcpy(y.CZCETime, x.CZCETime.c_str());
-    strcpy(y.FFEXTime, x.FFEXTime.c_str());
-    strcpy(y.INETime, x.INETime.c_str());
+    CTP_SET_FIELD(y.MaxOrderRef, x.MaxOrderRef.c_str());
+    CTP_SET_FIELD(y.SHFETime, x.SHFETime.c_str());
+    CTP_SET_FIELD(y.DCETime, x.DCETime.c_str());
+    CTP_SET_FIELD(y.CZCETime, x.CZCETime.c_str());
+    CTP_SET_FIELD(y.FFEXTime, x.FFEXTime.c_str());
+    CTP_SET_FIELD(y.INETime, x.INETime.c_str());
     memcpy(y.RandomString, x.RandomString.data(), x.RandomString.size() * sizeof(uint8_t));
     return y;
 }
@@ -373,16 +384,16 @@ RspUserLogin2Field Converter::CThostFtdcRspUserLogin2FieldToRust(CThostFtdcRspUs
 CThostFtdcTransferHeaderField Converter::TransferHeaderFieldToCpp(TransferHeaderField x) {
     CThostFtdcTransferHeaderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.Version, x.Version.c_str());
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.TradeSerial, x.TradeSerial.c_str());
-    strcpy(y.FutureID, x.FutureID.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBrchID, x.BankBrchID.c_str());
-    strcpy(y.OperNo, x.OperNo.c_str());
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.Version, x.Version.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.TradeSerial, x.TradeSerial.c_str());
+    CTP_SET_FIELD(y.FutureID, x.FutureID.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBrchID, x.BankBrchID.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     memcpy(y.RecordNum, x.RecordNum.data(), x.RecordNum.size() * sizeof(uint8_t));
     y.SessionID = x.SessionID;
     y.RequestID = x.RequestID;
@@ -413,12 +424,12 @@ TransferHeaderField Converter::CThostFtdcTransferHeaderFieldToRust(CThostFtdcTra
 CThostFtdcTransferBankToFutureReqField Converter::TransferBankToFutureReqFieldToCpp(TransferBankToFutureReqField x) {
     CThostFtdcTransferBankToFutureReqField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.FutureAccount, x.FutureAccount.c_str());
+    CTP_SET_FIELD(y.FutureAccount, x.FutureAccount.c_str());
     y.FuturePwdFlag = x.FuturePwdFlag;
-    strcpy(y.FutureAccPwd, x.FutureAccPwd.c_str());
+    CTP_SET_FIELD(y.FutureAccPwd, x.FutureAccPwd.c_str());
     y.TradeAmt = x.TradeAmt;
     y.CustFee = x.CustFee;
-    strcpy(y.CurrencyCode, x.CurrencyCode.c_str());
+    CTP_SET_FIELD(y.CurrencyCode, x.CurrencyCode.c_str());
     return y;
 }
 
@@ -438,12 +449,12 @@ TransferBankToFutureReqField Converter::CThostFtdcTransferBankToFutureReqFieldTo
 CThostFtdcTransferBankToFutureRspField Converter::TransferBankToFutureRspFieldToCpp(TransferBankToFutureRspField x) {
     CThostFtdcTransferBankToFutureRspField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.RetCode, x.RetCode.c_str());
-    strcpy(y.RetInfo, x.RetInfo.c_str());
-    strcpy(y.FutureAccount, x.FutureAccount.c_str());
+    CTP_SET_FIELD(y.RetCode, x.RetCode.c_str());
+    CTP_SET_FIELD(y.RetInfo, x.RetInfo.c_str());
+    CTP_SET_FIELD(y.FutureAccount, x.FutureAccount.c_str());
     y.TradeAmt = x.TradeAmt;
     y.CustFee = x.CustFee;
-    strcpy(y.CurrencyCode, x.CurrencyCode.c_str());
+    CTP_SET_FIELD(y.CurrencyCode, x.CurrencyCode.c_str());
     return y;
 }
 
@@ -463,12 +474,12 @@ TransferBankToFutureRspField Converter::CThostFtdcTransferBankToFutureRspFieldTo
 CThostFtdcTransferFutureToBankReqField Converter::TransferFutureToBankReqFieldToCpp(TransferFutureToBankReqField x) {
     CThostFtdcTransferFutureToBankReqField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.FutureAccount, x.FutureAccount.c_str());
+    CTP_SET_FIELD(y.FutureAccount, x.FutureAccount.c_str());
     y.FuturePwdFlag = x.FuturePwdFlag;
-    strcpy(y.FutureAccPwd, x.FutureAccPwd.c_str());
+    CTP_SET_FIELD(y.FutureAccPwd, x.FutureAccPwd.c_str());
     y.TradeAmt = x.TradeAmt;
     y.CustFee = x.CustFee;
-    strcpy(y.CurrencyCode, x.CurrencyCode.c_str());
+    CTP_SET_FIELD(y.CurrencyCode, x.CurrencyCode.c_str());
     return y;
 }
 
@@ -488,12 +499,12 @@ TransferFutureToBankReqField Converter::CThostFtdcTransferFutureToBankReqFieldTo
 CThostFtdcTransferFutureToBankRspField Converter::TransferFutureToBankRspFieldToCpp(TransferFutureToBankRspField x) {
     CThostFtdcTransferFutureToBankRspField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.RetCode, x.RetCode.c_str());
-    strcpy(y.RetInfo, x.RetInfo.c_str());
-    strcpy(y.FutureAccount, x.FutureAccount.c_str());
+    CTP_SET_FIELD(y.RetCode, x.RetCode.c_str());
+    CTP_SET_FIELD(y.RetInfo, x.RetInfo.c_str());
+    CTP_SET_FIELD(y.FutureAccount, x.FutureAccount.c_str());
     y.TradeAmt = x.TradeAmt;
     y.CustFee = x.CustFee;
-    strcpy(y.CurrencyCode, x.CurrencyCode.c_str());
+    CTP_SET_FIELD(y.CurrencyCode, x.CurrencyCode.c_str());
     return y;
 }
 
@@ -513,10 +524,10 @@ TransferFutureToBankRspField Converter::CThostFtdcTransferFutureToBankRspFieldTo
 CThostFtdcTransferQryBankReqField Converter::TransferQryBankReqFieldToCpp(TransferQryBankReqField x) {
     CThostFtdcTransferQryBankReqField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.FutureAccount, x.FutureAccount.c_str());
+    CTP_SET_FIELD(y.FutureAccount, x.FutureAccount.c_str());
     y.FuturePwdFlag = x.FuturePwdFlag;
-    strcpy(y.FutureAccPwd, x.FutureAccPwd.c_str());
-    strcpy(y.CurrencyCode, x.CurrencyCode.c_str());
+    CTP_SET_FIELD(y.FutureAccPwd, x.FutureAccPwd.c_str());
+    CTP_SET_FIELD(y.CurrencyCode, x.CurrencyCode.c_str());
     return y;
 }
 
@@ -534,13 +545,13 @@ TransferQryBankReqField Converter::CThostFtdcTransferQryBankReqFieldToRust(CThos
 CThostFtdcTransferQryBankRspField Converter::TransferQryBankRspFieldToCpp(TransferQryBankRspField x) {
     CThostFtdcTransferQryBankRspField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.RetCode, x.RetCode.c_str());
-    strcpy(y.RetInfo, x.RetInfo.c_str());
-    strcpy(y.FutureAccount, x.FutureAccount.c_str());
+    CTP_SET_FIELD(y.RetCode, x.RetCode.c_str());
+    CTP_SET_FIELD(y.RetInfo, x.RetInfo.c_str());
+    CTP_SET_FIELD(y.FutureAccount, x.FutureAccount.c_str());
     y.TradeAmt = x.TradeAmt;
     y.UseAmt = x.UseAmt;
     y.FetchAmt = x.FetchAmt;
-    strcpy(y.CurrencyCode, x.CurrencyCode.c_str());
+    CTP_SET_FIELD(y.CurrencyCode, x.CurrencyCode.c_str());
     return y;
 }
 
@@ -561,7 +572,7 @@ TransferQryBankRspField Converter::CThostFtdcTransferQryBankRspFieldToRust(CThos
 CThostFtdcTransferQryDetailReqField Converter::TransferQryDetailReqFieldToCpp(TransferQryDetailReqField x) {
     CThostFtdcTransferQryDetailReqField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.FutureAccount, x.FutureAccount.c_str());
+    CTP_SET_FIELD(y.FutureAccount, x.FutureAccount.c_str());
     return y;
 }
 
@@ -576,18 +587,18 @@ TransferQryDetailReqField Converter::CThostFtdcTransferQryDetailReqFieldToRust(C
 CThostFtdcTransferQryDetailRspField Converter::TransferQryDetailRspFieldToCpp(TransferQryDetailRspField x) {
     CThostFtdcTransferQryDetailRspField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
     y.FutureSerial = x.FutureSerial;
-    strcpy(y.FutureID, x.FutureID.c_str());
-    strcpy(y.FutureAccount, x.FutureAccount.c_str());
+    CTP_SET_FIELD(y.FutureID, x.FutureID.c_str());
+    CTP_SET_FIELD(y.FutureAccount, x.FutureAccount.c_str());
     y.BankSerial = x.BankSerial;
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBrchID, x.BankBrchID.c_str());
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.CertCode, x.CertCode.c_str());
-    strcpy(y.CurrencyCode, x.CurrencyCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBrchID, x.BankBrchID.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.CertCode, x.CertCode.c_str());
+    CTP_SET_FIELD(y.CurrencyCode, x.CurrencyCode.c_str());
     y.TxAmount = x.TxAmount;
     y.Flag = x.Flag;
     return y;
@@ -618,7 +629,7 @@ CThostFtdcRspInfoField Converter::RspInfoFieldToCpp(RspInfoField x) {
     CThostFtdcRspInfoField y;
     memset(&y, 0, sizeof(y));
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     return y;
 }
 
@@ -634,8 +645,8 @@ RspInfoField Converter::CThostFtdcRspInfoFieldToRust(CThostFtdcRspInfoField* x) 
 CThostFtdcExchangeField Converter::ExchangeFieldToCpp(ExchangeField x) {
     CThostFtdcExchangeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ExchangeName, x.ExchangeName.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeName, x.ExchangeName.c_str());
     y.ExchangeProperty = x.ExchangeProperty;
     return y;
 }
@@ -653,8 +664,8 @@ ExchangeField Converter::CThostFtdcExchangeFieldToRust(CThostFtdcExchangeField* 
 CThostFtdcProductField Converter::ProductFieldToCpp(ProductField x) {
     CThostFtdcProductField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ProductName, x.ProductName.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductName, x.ProductName.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.ProductClass = x.ProductClass;
     y.VolumeMultiple = x.VolumeMultiple;
     y.PriceTick = x.PriceTick;
@@ -665,11 +676,11 @@ CThostFtdcProductField Converter::ProductFieldToCpp(ProductField x) {
     y.PositionType = x.PositionType;
     y.PositionDateType = x.PositionDateType;
     y.CloseDealType = x.CloseDealType;
-    strcpy(y.TradeCurrencyID, x.TradeCurrencyID.c_str());
+    CTP_SET_FIELD(y.TradeCurrencyID, x.TradeCurrencyID.c_str());
     y.MortgageFundUseRange = x.MortgageFundUseRange;
     y.UnderlyingMultiple = x.UnderlyingMultiple;
-    strcpy(y.ProductID, x.ProductID.c_str());
-    strcpy(y.ExchangeProductID, x.ExchangeProductID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ExchangeProductID, x.ExchangeProductID.c_str());
     y.OpenLimitControlLevel = x.OpenLimitControlLevel;
     y.OrderFreqControlLevel = x.OrderFreqControlLevel;
     return y;
@@ -704,8 +715,8 @@ ProductField Converter::CThostFtdcProductFieldToRust(CThostFtdcProductField* x) 
 CThostFtdcInstrumentField Converter::InstrumentFieldToCpp(InstrumentField x) {
     CThostFtdcInstrumentField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentName, x.InstrumentName.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentName, x.InstrumentName.c_str());
     y.ProductClass = x.ProductClass;
     y.DeliveryYear = x.DeliveryYear;
     y.DeliveryMonth = x.DeliveryMonth;
@@ -715,11 +726,11 @@ CThostFtdcInstrumentField Converter::InstrumentFieldToCpp(InstrumentField x) {
     y.MinLimitOrderVolume = x.MinLimitOrderVolume;
     y.VolumeMultiple = x.VolumeMultiple;
     y.PriceTick = x.PriceTick;
-    strcpy(y.CreateDate, x.CreateDate.c_str());
-    strcpy(y.OpenDate, x.OpenDate.c_str());
-    strcpy(y.ExpireDate, x.ExpireDate.c_str());
-    strcpy(y.StartDelivDate, x.StartDelivDate.c_str());
-    strcpy(y.EndDelivDate, x.EndDelivDate.c_str());
+    CTP_SET_FIELD(y.CreateDate, x.CreateDate.c_str());
+    CTP_SET_FIELD(y.OpenDate, x.OpenDate.c_str());
+    CTP_SET_FIELD(y.ExpireDate, x.ExpireDate.c_str());
+    CTP_SET_FIELD(y.StartDelivDate, x.StartDelivDate.c_str());
+    CTP_SET_FIELD(y.EndDelivDate, x.EndDelivDate.c_str());
     y.InstLifePhase = x.InstLifePhase;
     y.IsTrading = x.IsTrading;
     y.PositionType = x.PositionType;
@@ -731,10 +742,10 @@ CThostFtdcInstrumentField Converter::InstrumentFieldToCpp(InstrumentField x) {
     y.OptionsType = x.OptionsType;
     y.UnderlyingMultiple = x.UnderlyingMultiple;
     y.CombinationType = x.CombinationType;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
-    strcpy(y.UnderlyingInstrID, x.UnderlyingInstrID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.UnderlyingInstrID, x.UnderlyingInstrID.c_str());
     return y;
 }
 
@@ -779,9 +790,9 @@ InstrumentField Converter::CThostFtdcInstrumentFieldToRust(CThostFtdcInstrumentF
 CThostFtdcBrokerField Converter::BrokerFieldToCpp(BrokerField x) {
     CThostFtdcBrokerField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerAbbr, x.BrokerAbbr.c_str());
-    strcpy(y.BrokerName, x.BrokerName.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerAbbr, x.BrokerAbbr.c_str());
+    CTP_SET_FIELD(y.BrokerName, x.BrokerName.c_str());
     y.IsActive = x.IsActive;
     return y;
 }
@@ -800,12 +811,12 @@ BrokerField Converter::CThostFtdcBrokerFieldToRust(CThostFtdcBrokerField* x) {
 CThostFtdcTraderField Converter::TraderFieldToCpp(TraderField x) {
     CThostFtdcTraderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.InstallCount = x.InstallCount;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     y.OrderCancelAlg = x.OrderCancelAlg;
     y.TradeInstallCount = x.TradeInstallCount;
     y.MDInstallCount = x.MDInstallCount;
@@ -831,19 +842,19 @@ TraderField Converter::CThostFtdcTraderFieldToRust(CThostFtdcTraderField* x) {
 CThostFtdcInvestorField Converter::InvestorFieldToCpp(InvestorField x) {
     CThostFtdcInvestorField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorGroupID, x.InvestorGroupID.c_str());
-    strcpy(y.InvestorName, x.InvestorName.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorGroupID, x.InvestorGroupID.c_str());
+    CTP_SET_FIELD(y.InvestorName, x.InvestorName.c_str());
     y.IdentifiedCardType = x.IdentifiedCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.IsActive = x.IsActive;
-    strcpy(y.Telephone, x.Telephone.c_str());
-    strcpy(y.Address, x.Address.c_str());
-    strcpy(y.OpenDate, x.OpenDate.c_str());
-    strcpy(y.Mobile, x.Mobile.c_str());
-    strcpy(y.CommModelID, x.CommModelID.c_str());
-    strcpy(y.MarginModelID, x.MarginModelID.c_str());
+    CTP_SET_FIELD(y.Telephone, x.Telephone.c_str());
+    CTP_SET_FIELD(y.Address, x.Address.c_str());
+    CTP_SET_FIELD(y.OpenDate, x.OpenDate.c_str());
+    CTP_SET_FIELD(y.Mobile, x.Mobile.c_str());
+    CTP_SET_FIELD(y.CommModelID, x.CommModelID.c_str());
+    CTP_SET_FIELD(y.MarginModelID, x.MarginModelID.c_str());
     y.IsOrderFreq = x.IsOrderFreq;
     y.IsOpenVolLimit = x.IsOpenVolLimit;
     return y;
@@ -874,15 +885,15 @@ InvestorField Converter::CThostFtdcInvestorFieldToRust(CThostFtdcInvestorField* 
 CThostFtdcTradingCodeField Converter::TradingCodeFieldToCpp(TradingCodeField x) {
     CThostFtdcTradingCodeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
     y.IsActive = x.IsActive;
     y.ClientIDType = x.ClientIDType;
-    strcpy(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
     y.BizType = x.BizType;
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
     return y;
 }
 
@@ -905,9 +916,9 @@ TradingCodeField Converter::CThostFtdcTradingCodeFieldToRust(CThostFtdcTradingCo
 CThostFtdcPartBrokerField Converter::PartBrokerFieldToCpp(PartBrokerField x) {
     CThostFtdcPartBrokerField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
     y.IsActive = x.IsActive;
     return y;
 }
@@ -926,9 +937,9 @@ PartBrokerField Converter::CThostFtdcPartBrokerFieldToRust(CThostFtdcPartBrokerF
 CThostFtdcSuperUserField Converter::SuperUserFieldToCpp(SuperUserField x) {
     CThostFtdcSuperUserField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.UserName, x.UserName.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserName, x.UserName.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.IsActive = x.IsActive;
     return y;
 }
@@ -947,7 +958,7 @@ SuperUserField Converter::CThostFtdcSuperUserFieldToRust(CThostFtdcSuperUserFiel
 CThostFtdcSuperUserFunctionField Converter::SuperUserFunctionFieldToCpp(SuperUserFunctionField x) {
     CThostFtdcSuperUserFunctionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.FunctionCode = x.FunctionCode;
     return y;
 }
@@ -964,9 +975,9 @@ SuperUserFunctionField Converter::CThostFtdcSuperUserFunctionFieldToRust(CThostF
 CThostFtdcInvestorGroupField Converter::InvestorGroupFieldToCpp(InvestorGroupField x) {
     CThostFtdcInvestorGroupField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorGroupID, x.InvestorGroupID.c_str());
-    strcpy(y.InvestorGroupName, x.InvestorGroupName.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorGroupID, x.InvestorGroupID.c_str());
+    CTP_SET_FIELD(y.InvestorGroupName, x.InvestorGroupName.c_str());
     return y;
 }
 
@@ -983,8 +994,8 @@ InvestorGroupField Converter::CThostFtdcInvestorGroupFieldToRust(CThostFtdcInves
 CThostFtdcTradingAccountField Converter::TradingAccountFieldToCpp(TradingAccountField x) {
     CThostFtdcTradingAccountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     y.PreMortgage = x.PreMortgage;
     y.PreCredit = x.PreCredit;
     y.PreDeposit = x.PreDeposit;
@@ -1006,7 +1017,7 @@ CThostFtdcTradingAccountField Converter::TradingAccountFieldToCpp(TradingAccount
     y.Available = x.Available;
     y.WithdrawQuota = x.WithdrawQuota;
     y.Reserve = x.Reserve;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
     y.Credit = x.Credit;
     y.Mortgage = x.Mortgage;
@@ -1014,7 +1025,7 @@ CThostFtdcTradingAccountField Converter::TradingAccountFieldToCpp(TradingAccount
     y.DeliveryMargin = x.DeliveryMargin;
     y.ExchangeDeliveryMargin = x.ExchangeDeliveryMargin;
     y.ReserveBalance = x.ReserveBalance;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.PreFundMortgageIn = x.PreFundMortgageIn;
     y.PreFundMortgageOut = x.PreFundMortgageOut;
     y.FundMortgageIn = x.FundMortgageIn;
@@ -1096,8 +1107,8 @@ TradingAccountField Converter::CThostFtdcTradingAccountFieldToRust(CThostFtdcTra
 CThostFtdcInvestorPositionField Converter::InvestorPositionFieldToCpp(InvestorPositionField x) {
     CThostFtdcInvestorPositionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.PosiDirection = x.PosiDirection;
     y.HedgeFlag = x.HedgeFlag;
     y.PositionDate = x.PositionDate;
@@ -1123,7 +1134,7 @@ CThostFtdcInvestorPositionField Converter::InvestorPositionFieldToCpp(InvestorPo
     y.PositionProfit = x.PositionProfit;
     y.PreSettlementPrice = x.PreSettlementPrice;
     y.SettlementPrice = x.SettlementPrice;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
     y.OpenCost = x.OpenCost;
     y.ExchangeMargin = x.ExchangeMargin;
@@ -1138,13 +1149,13 @@ CThostFtdcInvestorPositionField Converter::InvestorPositionFieldToCpp(InvestorPo
     y.StrikeFrozen = x.StrikeFrozen;
     y.StrikeFrozenAmount = x.StrikeFrozenAmount;
     y.AbandonFrozen = x.AbandonFrozen;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.YdStrikeFrozen = x.YdStrikeFrozen;
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
     y.PositionCostOffset = x.PositionCostOffset;
     y.TasPosition = x.TasPosition;
     y.TasPositionCost = x.TasPositionCost;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.OptionValue = x.OptionValue;
     return y;
 }
@@ -1210,17 +1221,17 @@ CThostFtdcInstrumentMarginRateField Converter::InstrumentMarginRateFieldToCpp(In
     CThostFtdcInstrumentMarginRateField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.LongMarginRatioByMoney = x.LongMarginRatioByMoney;
     y.LongMarginRatioByVolume = x.LongMarginRatioByVolume;
     y.ShortMarginRatioByMoney = x.ShortMarginRatioByMoney;
     y.ShortMarginRatioByVolume = x.ShortMarginRatioByVolume;
     y.IsRelative = x.IsRelative;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -1247,18 +1258,18 @@ CThostFtdcInstrumentCommissionRateField Converter::InstrumentCommissionRateField
     CThostFtdcInstrumentCommissionRateField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.OpenRatioByMoney = x.OpenRatioByMoney;
     y.OpenRatioByVolume = x.OpenRatioByVolume;
     y.CloseRatioByMoney = x.CloseRatioByMoney;
     y.CloseRatioByVolume = x.CloseRatioByVolume;
     y.CloseTodayRatioByMoney = x.CloseTodayRatioByMoney;
     y.CloseTodayRatioByVolume = x.CloseTodayRatioByVolume;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.BizType = x.BizType;
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -1285,8 +1296,8 @@ InstrumentCommissionRateField Converter::CThostFtdcInstrumentCommissionRateField
 CThostFtdcDepthMarketDataField Converter::DepthMarketDataFieldToCpp(DepthMarketDataField x) {
     CThostFtdcDepthMarketDataField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.LastPrice = x.LastPrice;
     y.PreSettlementPrice = x.PreSettlementPrice;
     y.PreClosePrice = x.PreClosePrice;
@@ -1303,7 +1314,7 @@ CThostFtdcDepthMarketDataField Converter::DepthMarketDataFieldToCpp(DepthMarketD
     y.LowerLimitPrice = x.LowerLimitPrice;
     y.PreDelta = x.PreDelta;
     y.CurrDelta = x.CurrDelta;
-    strcpy(y.UpdateTime, x.UpdateTime.c_str());
+    CTP_SET_FIELD(y.UpdateTime, x.UpdateTime.c_str());
     y.UpdateMillisec = x.UpdateMillisec;
     y.BidPrice1 = x.BidPrice1;
     y.BidVolume1 = x.BidVolume1;
@@ -1326,9 +1337,9 @@ CThostFtdcDepthMarketDataField Converter::DepthMarketDataFieldToCpp(DepthMarketD
     y.AskPrice5 = x.AskPrice5;
     y.AskVolume5 = x.AskVolume5;
     y.AveragePrice = x.AveragePrice;
-    strcpy(y.ActionDay, x.ActionDay.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.ActionDay, x.ActionDay.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     y.BandingUpperPrice = x.BandingUpperPrice;
     y.BandingLowerPrice = x.BandingLowerPrice;
     return y;
@@ -1391,10 +1402,10 @@ CThostFtdcInstrumentTradingRightField Converter::InstrumentTradingRightFieldToCp
     CThostFtdcInstrumentTradingRightField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.TradingRight = x.TradingRight;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -1413,9 +1424,9 @@ InstrumentTradingRightField Converter::CThostFtdcInstrumentTradingRightFieldToRu
 CThostFtdcBrokerUserField Converter::BrokerUserFieldToCpp(BrokerUserField x) {
     CThostFtdcBrokerUserField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.UserName, x.UserName.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserName, x.UserName.c_str());
     y.UserType = x.UserType;
     y.IsActive = x.IsActive;
     y.IsUsingOTP = x.IsUsingOTP;
@@ -1440,13 +1451,13 @@ BrokerUserField Converter::CThostFtdcBrokerUserFieldToRust(CThostFtdcBrokerUserF
 CThostFtdcBrokerUserPasswordField Converter::BrokerUserPasswordFieldToCpp(BrokerUserPasswordField x) {
     CThostFtdcBrokerUserPasswordField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.Password, x.Password.c_str());
-    strcpy(y.LastUpdateTime, x.LastUpdateTime.c_str());
-    strcpy(y.LastLoginTime, x.LastLoginTime.c_str());
-    strcpy(y.ExpireDate, x.ExpireDate.c_str());
-    strcpy(y.WeakExpireDate, x.WeakExpireDate.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.LastUpdateTime, x.LastUpdateTime.c_str());
+    CTP_SET_FIELD(y.LastLoginTime, x.LastLoginTime.c_str());
+    CTP_SET_FIELD(y.ExpireDate, x.ExpireDate.c_str());
+    CTP_SET_FIELD(y.WeakExpireDate, x.WeakExpireDate.c_str());
     return y;
 }
 
@@ -1467,8 +1478,8 @@ BrokerUserPasswordField Converter::CThostFtdcBrokerUserPasswordFieldToRust(CThos
 CThostFtdcBrokerUserFunctionField Converter::BrokerUserFunctionFieldToCpp(BrokerUserFunctionField x) {
     CThostFtdcBrokerUserFunctionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.BrokerFunctionCode = x.BrokerFunctionCode;
     return y;
 }
@@ -1486,24 +1497,24 @@ BrokerUserFunctionField Converter::CThostFtdcBrokerUserFunctionFieldToRust(CThos
 CThostFtdcTraderOfferField Converter::TraderOfferFieldToCpp(TraderOfferField x) {
     CThostFtdcTraderOfferField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
     y.TraderConnectStatus = x.TraderConnectStatus;
-    strcpy(y.ConnectRequestDate, x.ConnectRequestDate.c_str());
-    strcpy(y.ConnectRequestTime, x.ConnectRequestTime.c_str());
-    strcpy(y.LastReportDate, x.LastReportDate.c_str());
-    strcpy(y.LastReportTime, x.LastReportTime.c_str());
-    strcpy(y.ConnectDate, x.ConnectDate.c_str());
-    strcpy(y.ConnectTime, x.ConnectTime.c_str());
-    strcpy(y.StartDate, x.StartDate.c_str());
-    strcpy(y.StartTime, x.StartTime.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.MaxTradeID, x.MaxTradeID.c_str());
+    CTP_SET_FIELD(y.ConnectRequestDate, x.ConnectRequestDate.c_str());
+    CTP_SET_FIELD(y.ConnectRequestTime, x.ConnectRequestTime.c_str());
+    CTP_SET_FIELD(y.LastReportDate, x.LastReportDate.c_str());
+    CTP_SET_FIELD(y.LastReportTime, x.LastReportTime.c_str());
+    CTP_SET_FIELD(y.ConnectDate, x.ConnectDate.c_str());
+    CTP_SET_FIELD(y.ConnectTime, x.ConnectTime.c_str());
+    CTP_SET_FIELD(y.StartDate, x.StartDate.c_str());
+    CTP_SET_FIELD(y.StartTime, x.StartTime.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.MaxTradeID, x.MaxTradeID.c_str());
     memcpy(y.MaxOrderMessageReference, x.MaxOrderMessageReference.data(), x.MaxOrderMessageReference.size() * sizeof(uint8_t));
     y.OrderCancelAlg = x.OrderCancelAlg;
     return y;
@@ -1540,14 +1551,14 @@ TraderOfferField Converter::CThostFtdcTraderOfferFieldToRust(CThostFtdcTraderOff
 CThostFtdcSettlementInfoField Converter::SettlementInfoFieldToCpp(SettlementInfoField x) {
     CThostFtdcSettlementInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.SequenceNo = x.SequenceNo;
     memcpy(y.Content, x.Content.data(), x.Content.size() * sizeof(uint8_t));
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
 }
 
@@ -1571,15 +1582,15 @@ CThostFtdcInstrumentMarginRateAdjustField Converter::InstrumentMarginRateAdjustF
     CThostFtdcInstrumentMarginRateAdjustField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.LongMarginRatioByMoney = x.LongMarginRatioByMoney;
     y.LongMarginRatioByVolume = x.LongMarginRatioByVolume;
     y.ShortMarginRatioByMoney = x.ShortMarginRatioByMoney;
     y.ShortMarginRatioByVolume = x.ShortMarginRatioByVolume;
     y.IsRelative = x.IsRelative;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -1603,14 +1614,14 @@ InstrumentMarginRateAdjustField Converter::CThostFtdcInstrumentMarginRateAdjustF
 CThostFtdcExchangeMarginRateField Converter::ExchangeMarginRateFieldToCpp(ExchangeMarginRateField x) {
     CThostFtdcExchangeMarginRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.LongMarginRatioByMoney = x.LongMarginRatioByMoney;
     y.LongMarginRatioByVolume = x.LongMarginRatioByVolume;
     y.ShortMarginRatioByMoney = x.ShortMarginRatioByMoney;
     y.ShortMarginRatioByVolume = x.ShortMarginRatioByVolume;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -1632,7 +1643,7 @@ ExchangeMarginRateField Converter::CThostFtdcExchangeMarginRateFieldToRust(CThos
 CThostFtdcExchangeMarginRateAdjustField Converter::ExchangeMarginRateAdjustFieldToCpp(ExchangeMarginRateAdjustField x) {
     CThostFtdcExchangeMarginRateAdjustField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.LongMarginRatioByMoney = x.LongMarginRatioByMoney;
     y.LongMarginRatioByVolume = x.LongMarginRatioByVolume;
@@ -1646,7 +1657,7 @@ CThostFtdcExchangeMarginRateAdjustField Converter::ExchangeMarginRateAdjustField
     y.NoLongMarginRatioByVolume = x.NoLongMarginRatioByVolume;
     y.NoShortMarginRatioByMoney = x.NoShortMarginRatioByMoney;
     y.NoShortMarginRatioByVolume = x.NoShortMarginRatioByVolume;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -1675,10 +1686,10 @@ ExchangeMarginRateAdjustField Converter::CThostFtdcExchangeMarginRateAdjustField
 CThostFtdcExchangeRateField Converter::ExchangeRateFieldToCpp(ExchangeRateField x) {
     CThostFtdcExchangeRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.FromCurrencyID, x.FromCurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.FromCurrencyID, x.FromCurrencyID.c_str());
     y.FromCurrencyUnit = x.FromCurrencyUnit;
-    strcpy(y.ToCurrencyID, x.ToCurrencyID.c_str());
+    CTP_SET_FIELD(y.ToCurrencyID, x.ToCurrencyID.c_str());
     y.ExchangeRate = x.ExchangeRate;
     return y;
 }
@@ -1698,7 +1709,7 @@ ExchangeRateField Converter::CThostFtdcExchangeRateFieldToRust(CThostFtdcExchang
 CThostFtdcSettlementRefField Converter::SettlementRefFieldToCpp(SettlementRefField x) {
     CThostFtdcSettlementRefField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
     return y;
 }
@@ -1715,10 +1726,10 @@ SettlementRefField Converter::CThostFtdcSettlementRefFieldToRust(CThostFtdcSettl
 CThostFtdcCurrentTimeField Converter::CurrentTimeFieldToCpp(CurrentTimeField x) {
     CThostFtdcCurrentTimeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.CurrDate, x.CurrDate.c_str());
-    strcpy(y.CurrTime, x.CurrTime.c_str());
+    CTP_SET_FIELD(y.CurrDate, x.CurrDate.c_str());
+    CTP_SET_FIELD(y.CurrTime, x.CurrTime.c_str());
     y.CurrMillisec = x.CurrMillisec;
-    strcpy(y.ActionDay, x.ActionDay.c_str());
+    CTP_SET_FIELD(y.ActionDay, x.ActionDay.c_str());
     return y;
 }
 
@@ -1736,9 +1747,9 @@ CurrentTimeField Converter::CThostFtdcCurrentTimeFieldToRust(CThostFtdcCurrentTi
 CThostFtdcCommPhaseField Converter::CommPhaseFieldToCpp(CommPhaseField x) {
     CThostFtdcCommPhaseField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.CommPhaseNo = x.CommPhaseNo;
-    strcpy(y.SystemID, x.SystemID.c_str());
+    CTP_SET_FIELD(y.SystemID, x.SystemID.c_str());
     return y;
 }
 
@@ -1757,27 +1768,27 @@ CThostFtdcLoginInfoField Converter::LoginInfoFieldToCpp(LoginInfoField x) {
     memset(&y, 0, sizeof(y));
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.LoginDate, x.LoginDate.c_str());
-    strcpy(y.LoginTime, x.LoginTime.c_str());
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.InterfaceProductInfo, x.InterfaceProductInfo.c_str());
-    strcpy(y.ProtocolInfo, x.ProtocolInfo.c_str());
-    strcpy(y.SystemName, x.SystemName.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.LoginDate, x.LoginDate.c_str());
+    CTP_SET_FIELD(y.LoginTime, x.LoginTime.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.InterfaceProductInfo, x.InterfaceProductInfo.c_str());
+    CTP_SET_FIELD(y.ProtocolInfo, x.ProtocolInfo.c_str());
+    CTP_SET_FIELD(y.SystemName, x.SystemName.c_str());
     memcpy(y.PasswordDeprecated, x.PasswordDeprecated.data(), x.PasswordDeprecated.size() * sizeof(uint8_t));
-    strcpy(y.MaxOrderRef, x.MaxOrderRef.c_str());
-    strcpy(y.SHFETime, x.SHFETime.c_str());
-    strcpy(y.DCETime, x.DCETime.c_str());
-    strcpy(y.CZCETime, x.CZCETime.c_str());
-    strcpy(y.FFEXTime, x.FFEXTime.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.OneTimePassword, x.OneTimePassword.c_str());
-    strcpy(y.INETime, x.INETime.c_str());
+    CTP_SET_FIELD(y.MaxOrderRef, x.MaxOrderRef.c_str());
+    CTP_SET_FIELD(y.SHFETime, x.SHFETime.c_str());
+    CTP_SET_FIELD(y.DCETime, x.DCETime.c_str());
+    CTP_SET_FIELD(y.CZCETime, x.CZCETime.c_str());
+    CTP_SET_FIELD(y.FFEXTime, x.FFEXTime.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.OneTimePassword, x.OneTimePassword.c_str());
+    CTP_SET_FIELD(y.INETime, x.INETime.c_str());
     y.IsQryControl = x.IsQryControl;
-    strcpy(y.LoginRemark, x.LoginRemark.c_str());
-    strcpy(y.Password, x.Password.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.LoginRemark, x.LoginRemark.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -1817,7 +1828,7 @@ CThostFtdcLogoutAllField Converter::LogoutAllFieldToCpp(LogoutAllField x) {
     memset(&y, 0, sizeof(y));
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.SystemName, x.SystemName.c_str());
+    CTP_SET_FIELD(y.SystemName, x.SystemName.c_str());
     return y;
 }
 
@@ -1835,8 +1846,8 @@ CThostFtdcFrontStatusField Converter::FrontStatusFieldToCpp(FrontStatusField x) 
     CThostFtdcFrontStatusField y;
     memset(&y, 0, sizeof(y));
     y.FrontID = x.FrontID;
-    strcpy(y.LastReportDate, x.LastReportDate.c_str());
-    strcpy(y.LastReportTime, x.LastReportTime.c_str());
+    CTP_SET_FIELD(y.LastReportDate, x.LastReportDate.c_str());
+    CTP_SET_FIELD(y.LastReportTime, x.LastReportTime.c_str());
     y.IsActive = x.IsActive;
     return y;
 }
@@ -1855,10 +1866,10 @@ FrontStatusField Converter::CThostFtdcFrontStatusFieldToRust(CThostFtdcFrontStat
 CThostFtdcUserPasswordUpdateField Converter::UserPasswordUpdateFieldToCpp(UserPasswordUpdateField x) {
     CThostFtdcUserPasswordUpdateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.OldPassword, x.OldPassword.c_str());
-    strcpy(y.NewPassword, x.NewPassword.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.OldPassword, x.OldPassword.c_str());
+    CTP_SET_FIELD(y.NewPassword, x.NewPassword.c_str());
     return y;
 }
 
@@ -1876,37 +1887,37 @@ UserPasswordUpdateField Converter::CThostFtdcUserPasswordUpdateFieldToRust(CThos
 CThostFtdcInputOrderField Converter::InputOrderFieldToCpp(InputOrderField x) {
     CThostFtdcInputOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.OrderRef, x.OrderRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.OrderPriceType = x.OrderPriceType;
     y.Direction = x.Direction;
-    strcpy(y.CombOffsetFlag, x.CombOffsetFlag.c_str());
-    strcpy(y.CombHedgeFlag, x.CombHedgeFlag.c_str());
+    CTP_SET_FIELD(y.CombOffsetFlag, x.CombOffsetFlag.c_str());
+    CTP_SET_FIELD(y.CombHedgeFlag, x.CombHedgeFlag.c_str());
     y.LimitPrice = x.LimitPrice;
     y.VolumeTotalOriginal = x.VolumeTotalOriginal;
     y.TimeCondition = x.TimeCondition;
-    strcpy(y.GTDDate, x.GTDDate.c_str());
+    CTP_SET_FIELD(y.GTDDate, x.GTDDate.c_str());
     y.VolumeCondition = x.VolumeCondition;
     y.MinVolume = x.MinVolume;
     y.ContingentCondition = x.ContingentCondition;
     y.StopPrice = x.StopPrice;
     y.ForceCloseReason = x.ForceCloseReason;
     y.IsAutoSuspend = x.IsAutoSuspend;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.RequestID = x.RequestID;
     y.UserForceClose = x.UserForceClose;
     y.IsSwapOrder = x.IsSwapOrder;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
-    strcpy(y.OrderMemo, x.OrderMemo.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.OrderMemo, x.OrderMemo.c_str());
     y.SessionReqSeq = x.SessionReqSeq;
     return y;
 }
@@ -1953,70 +1964,70 @@ InputOrderField Converter::CThostFtdcInputOrderFieldToRust(CThostFtdcInputOrderF
 CThostFtdcOrderField Converter::OrderFieldToCpp(OrderField x) {
     CThostFtdcOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.OrderRef, x.OrderRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.OrderPriceType = x.OrderPriceType;
     y.Direction = x.Direction;
-    strcpy(y.CombOffsetFlag, x.CombOffsetFlag.c_str());
-    strcpy(y.CombHedgeFlag, x.CombHedgeFlag.c_str());
+    CTP_SET_FIELD(y.CombOffsetFlag, x.CombOffsetFlag.c_str());
+    CTP_SET_FIELD(y.CombHedgeFlag, x.CombHedgeFlag.c_str());
     y.LimitPrice = x.LimitPrice;
     y.VolumeTotalOriginal = x.VolumeTotalOriginal;
     y.TimeCondition = x.TimeCondition;
-    strcpy(y.GTDDate, x.GTDDate.c_str());
+    CTP_SET_FIELD(y.GTDDate, x.GTDDate.c_str());
     y.VolumeCondition = x.VolumeCondition;
     y.MinVolume = x.MinVolume;
     y.ContingentCondition = x.ContingentCondition;
     y.StopPrice = x.StopPrice;
     y.ForceCloseReason = x.ForceCloseReason;
     y.IsAutoSuspend = x.IsAutoSuspend;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.RequestID = x.RequestID;
-    strcpy(y.OrderLocalID, x.OrderLocalID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
     y.OrderSubmitStatus = x.OrderSubmitStatus;
     y.NotifySequence = x.NotifySequence;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
-    strcpy(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
     y.OrderSource = x.OrderSource;
     y.OrderStatus = x.OrderStatus;
     y.OrderType = x.OrderType;
     y.VolumeTraded = x.VolumeTraded;
     y.VolumeTotal = x.VolumeTotal;
-    strcpy(y.InsertDate, x.InsertDate.c_str());
-    strcpy(y.InsertTime, x.InsertTime.c_str());
-    strcpy(y.ActiveTime, x.ActiveTime.c_str());
-    strcpy(y.SuspendTime, x.SuspendTime.c_str());
-    strcpy(y.UpdateTime, x.UpdateTime.c_str());
-    strcpy(y.CancelTime, x.CancelTime.c_str());
-    strcpy(y.ActiveTraderID, x.ActiveTraderID.c_str());
-    strcpy(y.ClearingPartID, x.ClearingPartID.c_str());
+    CTP_SET_FIELD(y.InsertDate, x.InsertDate.c_str());
+    CTP_SET_FIELD(y.InsertTime, x.InsertTime.c_str());
+    CTP_SET_FIELD(y.ActiveTime, x.ActiveTime.c_str());
+    CTP_SET_FIELD(y.SuspendTime, x.SuspendTime.c_str());
+    CTP_SET_FIELD(y.UpdateTime, x.UpdateTime.c_str());
+    CTP_SET_FIELD(y.CancelTime, x.CancelTime.c_str());
+    CTP_SET_FIELD(y.ActiveTraderID, x.ActiveTraderID.c_str());
+    CTP_SET_FIELD(y.ClearingPartID, x.ClearingPartID.c_str());
     y.SequenceNo = x.SequenceNo;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
     y.UserForceClose = x.UserForceClose;
-    strcpy(y.ActiveUserID, x.ActiveUserID.c_str());
+    CTP_SET_FIELD(y.ActiveUserID, x.ActiveUserID.c_str());
     y.BrokerOrderSeq = x.BrokerOrderSeq;
-    strcpy(y.RelativeOrderSysID, x.RelativeOrderSysID.c_str());
+    CTP_SET_FIELD(y.RelativeOrderSysID, x.RelativeOrderSysID.c_str());
     y.ZCETotalTradedVolume = x.ZCETotalTradedVolume;
     y.IsSwapOrder = x.IsSwapOrder;
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
-    strcpy(y.OrderMemo, x.OrderMemo.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.OrderMemo, x.OrderMemo.c_str());
     y.SessionReqSeq = x.SessionReqSeq;
     return y;
 }
@@ -2098,49 +2109,49 @@ CThostFtdcExchangeOrderField Converter::ExchangeOrderFieldToCpp(ExchangeOrderFie
     memset(&y, 0, sizeof(y));
     y.OrderPriceType = x.OrderPriceType;
     y.Direction = x.Direction;
-    strcpy(y.CombOffsetFlag, x.CombOffsetFlag.c_str());
-    strcpy(y.CombHedgeFlag, x.CombHedgeFlag.c_str());
+    CTP_SET_FIELD(y.CombOffsetFlag, x.CombOffsetFlag.c_str());
+    CTP_SET_FIELD(y.CombHedgeFlag, x.CombHedgeFlag.c_str());
     y.LimitPrice = x.LimitPrice;
     y.VolumeTotalOriginal = x.VolumeTotalOriginal;
     y.TimeCondition = x.TimeCondition;
-    strcpy(y.GTDDate, x.GTDDate.c_str());
+    CTP_SET_FIELD(y.GTDDate, x.GTDDate.c_str());
     y.VolumeCondition = x.VolumeCondition;
     y.MinVolume = x.MinVolume;
     y.ContingentCondition = x.ContingentCondition;
     y.StopPrice = x.StopPrice;
     y.ForceCloseReason = x.ForceCloseReason;
     y.IsAutoSuspend = x.IsAutoSuspend;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.RequestID = x.RequestID;
-    strcpy(y.OrderLocalID, x.OrderLocalID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
     y.OrderSubmitStatus = x.OrderSubmitStatus;
     y.NotifySequence = x.NotifySequence;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
-    strcpy(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
     y.OrderSource = x.OrderSource;
     y.OrderStatus = x.OrderStatus;
     y.OrderType = x.OrderType;
     y.VolumeTraded = x.VolumeTraded;
     y.VolumeTotal = x.VolumeTotal;
-    strcpy(y.InsertDate, x.InsertDate.c_str());
-    strcpy(y.InsertTime, x.InsertTime.c_str());
-    strcpy(y.ActiveTime, x.ActiveTime.c_str());
-    strcpy(y.SuspendTime, x.SuspendTime.c_str());
-    strcpy(y.UpdateTime, x.UpdateTime.c_str());
-    strcpy(y.CancelTime, x.CancelTime.c_str());
-    strcpy(y.ActiveTraderID, x.ActiveTraderID.c_str());
-    strcpy(y.ClearingPartID, x.ClearingPartID.c_str());
+    CTP_SET_FIELD(y.InsertDate, x.InsertDate.c_str());
+    CTP_SET_FIELD(y.InsertTime, x.InsertTime.c_str());
+    CTP_SET_FIELD(y.ActiveTime, x.ActiveTime.c_str());
+    CTP_SET_FIELD(y.SuspendTime, x.SuspendTime.c_str());
+    CTP_SET_FIELD(y.UpdateTime, x.UpdateTime.c_str());
+    CTP_SET_FIELD(y.CancelTime, x.CancelTime.c_str());
+    CTP_SET_FIELD(y.ActiveTraderID, x.ActiveTraderID.c_str());
+    CTP_SET_FIELD(y.ClearingPartID, x.ClearingPartID.c_str());
     y.SequenceNo = x.SequenceNo;
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -2199,13 +2210,13 @@ ExchangeOrderField Converter::CThostFtdcExchangeOrderFieldToRust(CThostFtdcExcha
 CThostFtdcExchangeOrderInsertErrorField Converter::ExchangeOrderInsertErrorFieldToCpp(ExchangeOrderInsertErrorField x) {
     CThostFtdcExchangeOrderInsertErrorField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     return y;
 }
 
@@ -2226,24 +2237,24 @@ ExchangeOrderInsertErrorField Converter::CThostFtdcExchangeOrderInsertErrorField
 CThostFtdcInputOrderActionField Converter::InputOrderActionFieldToCpp(InputOrderActionField x) {
     CThostFtdcInputOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.OrderActionRef = x.OrderActionRef;
-    strcpy(y.OrderRef, x.OrderRef.c_str());
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
     y.RequestID = x.RequestID;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
     y.ActionFlag = x.ActionFlag;
     y.LimitPrice = x.LimitPrice;
     y.VolumeChange = x.VolumeChange;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
-    strcpy(y.OrderMemo, x.OrderMemo.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.OrderMemo, x.OrderMemo.c_str());
     y.SessionReqSeq = x.SessionReqSeq;
     return y;
 }
@@ -2277,36 +2288,36 @@ InputOrderActionField Converter::CThostFtdcInputOrderActionFieldToRust(CThostFtd
 CThostFtdcOrderActionField Converter::OrderActionFieldToCpp(OrderActionField x) {
     CThostFtdcOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.OrderActionRef = x.OrderActionRef;
-    strcpy(y.OrderRef, x.OrderRef.c_str());
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
     y.RequestID = x.RequestID;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
     y.ActionFlag = x.ActionFlag;
     y.LimitPrice = x.LimitPrice;
     y.VolumeChange = x.VolumeChange;
-    strcpy(y.ActionDate, x.ActionDate.c_str());
-    strcpy(y.ActionTime, x.ActionTime.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ActionDate, x.ActionDate.c_str());
+    CTP_SET_FIELD(y.ActionTime, x.ActionTime.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.OrderLocalID, x.OrderLocalID.c_str());
-    strcpy(y.ActionLocalID, x.ActionLocalID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.OrderActionStatus = x.OrderActionStatus;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.StatusMsg, x.StatusMsg.c_str());
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
-    strcpy(y.OrderMemo, x.OrderMemo.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.OrderMemo, x.OrderMemo.c_str());
     y.SessionReqSeq = x.SessionReqSeq;
     return y;
 }
@@ -2352,25 +2363,25 @@ OrderActionField Converter::CThostFtdcOrderActionFieldToRust(CThostFtdcOrderActi
 CThostFtdcExchangeOrderActionField Converter::ExchangeOrderActionFieldToCpp(ExchangeOrderActionField x) {
     CThostFtdcExchangeOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
     y.ActionFlag = x.ActionFlag;
     y.LimitPrice = x.LimitPrice;
     y.VolumeChange = x.VolumeChange;
-    strcpy(y.ActionDate, x.ActionDate.c_str());
-    strcpy(y.ActionTime, x.ActionTime.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ActionDate, x.ActionDate.c_str());
+    CTP_SET_FIELD(y.ActionTime, x.ActionTime.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.OrderLocalID, x.OrderLocalID.c_str());
-    strcpy(y.ActionLocalID, x.ActionLocalID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.OrderActionStatus = x.OrderActionStatus;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -2403,14 +2414,14 @@ ExchangeOrderActionField Converter::CThostFtdcExchangeOrderActionFieldToRust(CTh
 CThostFtdcExchangeOrderActionErrorField Converter::ExchangeOrderActionErrorFieldToCpp(ExchangeOrderActionErrorField x) {
     CThostFtdcExchangeOrderActionErrorField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.OrderSysID, x.OrderSysID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.OrderLocalID, x.OrderLocalID.c_str());
-    strcpy(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     return y;
 }
 
@@ -2432,28 +2443,28 @@ ExchangeOrderActionErrorField Converter::CThostFtdcExchangeOrderActionErrorField
 CThostFtdcExchangeTradeField Converter::ExchangeTradeFieldToCpp(ExchangeTradeField x) {
     CThostFtdcExchangeTradeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TradeID, x.TradeID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradeID, x.TradeID.c_str());
     y.Direction = x.Direction;
-    strcpy(y.OrderSysID, x.OrderSysID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
     y.TradingRole = x.TradingRole;
     y.OffsetFlag = x.OffsetFlag;
     y.HedgeFlag = x.HedgeFlag;
     y.Price = x.Price;
     y.Volume = x.Volume;
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
     y.TradeType = x.TradeType;
     y.PriceSource = x.PriceSource;
-    strcpy(y.TraderID, x.TraderID.c_str());
-    strcpy(y.OrderLocalID, x.OrderLocalID.c_str());
-    strcpy(y.ClearingPartID, x.ClearingPartID.c_str());
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.ClearingPartID, x.ClearingPartID.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.SequenceNo = x.SequenceNo;
     y.TradeSource = x.TradeSource;
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     return y;
 }
 
@@ -2489,37 +2500,37 @@ ExchangeTradeField Converter::CThostFtdcExchangeTradeFieldToRust(CThostFtdcExcha
 CThostFtdcTradeField Converter::TradeFieldToCpp(TradeField x) {
     CThostFtdcTradeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.OrderRef, x.OrderRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TradeID, x.TradeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradeID, x.TradeID.c_str());
     y.Direction = x.Direction;
-    strcpy(y.OrderSysID, x.OrderSysID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
     y.TradingRole = x.TradingRole;
     y.OffsetFlag = x.OffsetFlag;
     y.HedgeFlag = x.HedgeFlag;
     y.Price = x.Price;
     y.Volume = x.Volume;
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
     y.TradeType = x.TradeType;
     y.PriceSource = x.PriceSource;
-    strcpy(y.TraderID, x.TraderID.c_str());
-    strcpy(y.OrderLocalID, x.OrderLocalID.c_str());
-    strcpy(y.ClearingPartID, x.ClearingPartID.c_str());
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.ClearingPartID, x.ClearingPartID.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.SequenceNo = x.SequenceNo;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
     y.BrokerOrderSeq = x.BrokerOrderSeq;
     y.TradeSource = x.TradeSource;
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     return y;
 }
 
@@ -2567,16 +2578,16 @@ CThostFtdcUserSessionField Converter::UserSessionFieldToCpp(UserSessionField x) 
     memset(&y, 0, sizeof(y));
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.LoginDate, x.LoginDate.c_str());
-    strcpy(y.LoginTime, x.LoginTime.c_str());
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.InterfaceProductInfo, x.InterfaceProductInfo.c_str());
-    strcpy(y.ProtocolInfo, x.ProtocolInfo.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.LoginRemark, x.LoginRemark.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.LoginDate, x.LoginDate.c_str());
+    CTP_SET_FIELD(y.LoginTime, x.LoginTime.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.InterfaceProductInfo, x.InterfaceProductInfo.c_str());
+    CTP_SET_FIELD(y.ProtocolInfo, x.ProtocolInfo.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.LoginRemark, x.LoginRemark.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -2603,15 +2614,15 @@ UserSessionField Converter::CThostFtdcUserSessionFieldToRust(CThostFtdcUserSessi
 CThostFtdcQryMaxOrderVolumeField Converter::QryMaxOrderVolumeFieldToCpp(QryMaxOrderVolumeField x) {
     CThostFtdcQryMaxOrderVolumeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.Direction = x.Direction;
     y.OffsetFlag = x.OffsetFlag;
     y.HedgeFlag = x.HedgeFlag;
     y.MaxVolume = x.MaxVolume;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -2634,13 +2645,13 @@ QryMaxOrderVolumeField Converter::CThostFtdcQryMaxOrderVolumeFieldToRust(CThostF
 CThostFtdcSettlementInfoConfirmField Converter::SettlementInfoConfirmFieldToCpp(SettlementInfoConfirmField x) {
     CThostFtdcSettlementInfoConfirmField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ConfirmDate, x.ConfirmDate.c_str());
-    strcpy(y.ConfirmTime, x.ConfirmTime.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ConfirmDate, x.ConfirmDate.c_str());
+    CTP_SET_FIELD(y.ConfirmTime, x.ConfirmTime.c_str());
     y.SettlementID = x.SettlementID;
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
 }
 
@@ -2662,13 +2673,13 @@ CThostFtdcSyncDepositField Converter::SyncDepositFieldToCpp(SyncDepositField x) 
     CThostFtdcSyncDepositField y;
     memset(&y, 0, sizeof(y));
     memcpy(y.DepositSeqNo, x.DepositSeqNo.data(), x.DepositSeqNo.size() * sizeof(uint8_t));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.Deposit = x.Deposit;
     y.IsForce = x.IsForce;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.IsFromSopt = x.IsFromSopt;
-    strcpy(y.TradingPassword, x.TradingPassword.c_str());
+    CTP_SET_FIELD(y.TradingPassword, x.TradingPassword.c_str());
     y.IsSecAgentTranfer = x.IsSecAgentTranfer;
     return y;
 }
@@ -2694,11 +2705,11 @@ CThostFtdcSyncFundMortgageField Converter::SyncFundMortgageFieldToCpp(SyncFundMo
     CThostFtdcSyncFundMortgageField y;
     memset(&y, 0, sizeof(y));
     memcpy(y.MortgageSeqNo, x.MortgageSeqNo.data(), x.MortgageSeqNo.size() * sizeof(uint8_t));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.FromCurrencyID, x.FromCurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.FromCurrencyID, x.FromCurrencyID.c_str());
     y.MortgageAmount = x.MortgageAmount;
-    strcpy(y.ToCurrencyID, x.ToCurrencyID.c_str());
+    CTP_SET_FIELD(y.ToCurrencyID, x.ToCurrencyID.c_str());
     return y;
 }
 
@@ -2719,7 +2730,7 @@ SyncFundMortgageField Converter::CThostFtdcSyncFundMortgageFieldToRust(CThostFtd
 CThostFtdcBrokerSyncField Converter::BrokerSyncFieldToCpp(BrokerSyncField x) {
     CThostFtdcBrokerSyncField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     return y;
 }
 
@@ -2734,19 +2745,19 @@ BrokerSyncField Converter::CThostFtdcBrokerSyncFieldToRust(CThostFtdcBrokerSyncF
 CThostFtdcSyncingInvestorField Converter::SyncingInvestorFieldToCpp(SyncingInvestorField x) {
     CThostFtdcSyncingInvestorField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorGroupID, x.InvestorGroupID.c_str());
-    strcpy(y.InvestorName, x.InvestorName.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorGroupID, x.InvestorGroupID.c_str());
+    CTP_SET_FIELD(y.InvestorName, x.InvestorName.c_str());
     y.IdentifiedCardType = x.IdentifiedCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.IsActive = x.IsActive;
-    strcpy(y.Telephone, x.Telephone.c_str());
-    strcpy(y.Address, x.Address.c_str());
-    strcpy(y.OpenDate, x.OpenDate.c_str());
-    strcpy(y.Mobile, x.Mobile.c_str());
-    strcpy(y.CommModelID, x.CommModelID.c_str());
-    strcpy(y.MarginModelID, x.MarginModelID.c_str());
+    CTP_SET_FIELD(y.Telephone, x.Telephone.c_str());
+    CTP_SET_FIELD(y.Address, x.Address.c_str());
+    CTP_SET_FIELD(y.OpenDate, x.OpenDate.c_str());
+    CTP_SET_FIELD(y.Mobile, x.Mobile.c_str());
+    CTP_SET_FIELD(y.CommModelID, x.CommModelID.c_str());
+    CTP_SET_FIELD(y.MarginModelID, x.MarginModelID.c_str());
     y.IsOrderFreq = x.IsOrderFreq;
     y.IsOpenVolLimit = x.IsOpenVolLimit;
     return y;
@@ -2777,10 +2788,10 @@ SyncingInvestorField Converter::CThostFtdcSyncingInvestorFieldToRust(CThostFtdcS
 CThostFtdcSyncingTradingCodeField Converter::SyncingTradingCodeFieldToCpp(SyncingTradingCodeField x) {
     CThostFtdcSyncingTradingCodeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
     y.IsActive = x.IsActive;
     y.ClientIDType = x.ClientIDType;
     return y;
@@ -2802,9 +2813,9 @@ SyncingTradingCodeField Converter::CThostFtdcSyncingTradingCodeFieldToRust(CThos
 CThostFtdcSyncingInvestorGroupField Converter::SyncingInvestorGroupFieldToCpp(SyncingInvestorGroupField x) {
     CThostFtdcSyncingInvestorGroupField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorGroupID, x.InvestorGroupID.c_str());
-    strcpy(y.InvestorGroupName, x.InvestorGroupName.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorGroupID, x.InvestorGroupID.c_str());
+    CTP_SET_FIELD(y.InvestorGroupName, x.InvestorGroupName.c_str());
     return y;
 }
 
@@ -2821,8 +2832,8 @@ SyncingInvestorGroupField Converter::CThostFtdcSyncingInvestorGroupFieldToRust(C
 CThostFtdcSyncingTradingAccountField Converter::SyncingTradingAccountFieldToCpp(SyncingTradingAccountField x) {
     CThostFtdcSyncingTradingAccountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     y.PreMortgage = x.PreMortgage;
     y.PreCredit = x.PreCredit;
     y.PreDeposit = x.PreDeposit;
@@ -2844,7 +2855,7 @@ CThostFtdcSyncingTradingAccountField Converter::SyncingTradingAccountFieldToCpp(
     y.Available = x.Available;
     y.WithdrawQuota = x.WithdrawQuota;
     y.Reserve = x.Reserve;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
     y.Credit = x.Credit;
     y.Mortgage = x.Mortgage;
@@ -2852,7 +2863,7 @@ CThostFtdcSyncingTradingAccountField Converter::SyncingTradingAccountFieldToCpp(
     y.DeliveryMargin = x.DeliveryMargin;
     y.ExchangeDeliveryMargin = x.ExchangeDeliveryMargin;
     y.ReserveBalance = x.ReserveBalance;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.PreFundMortgageIn = x.PreFundMortgageIn;
     y.PreFundMortgageOut = x.PreFundMortgageOut;
     y.FundMortgageIn = x.FundMortgageIn;
@@ -2932,8 +2943,8 @@ SyncingTradingAccountField Converter::CThostFtdcSyncingTradingAccountFieldToRust
 CThostFtdcSyncingInvestorPositionField Converter::SyncingInvestorPositionFieldToCpp(SyncingInvestorPositionField x) {
     CThostFtdcSyncingInvestorPositionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.PosiDirection = x.PosiDirection;
     y.HedgeFlag = x.HedgeFlag;
     y.PositionDate = x.PositionDate;
@@ -2959,7 +2970,7 @@ CThostFtdcSyncingInvestorPositionField Converter::SyncingInvestorPositionFieldTo
     y.PositionProfit = x.PositionProfit;
     y.PreSettlementPrice = x.PreSettlementPrice;
     y.SettlementPrice = x.SettlementPrice;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
     y.OpenCost = x.OpenCost;
     y.ExchangeMargin = x.ExchangeMargin;
@@ -2974,13 +2985,13 @@ CThostFtdcSyncingInvestorPositionField Converter::SyncingInvestorPositionFieldTo
     y.StrikeFrozen = x.StrikeFrozen;
     y.StrikeFrozenAmount = x.StrikeFrozenAmount;
     y.AbandonFrozen = x.AbandonFrozen;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.YdStrikeFrozen = x.YdStrikeFrozen;
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
     y.PositionCostOffset = x.PositionCostOffset;
     y.TasPosition = x.TasPosition;
     y.TasPositionCost = x.TasPositionCost;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3044,15 +3055,15 @@ CThostFtdcSyncingInstrumentMarginRateField Converter::SyncingInstrumentMarginRat
     CThostFtdcSyncingInstrumentMarginRateField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.LongMarginRatioByMoney = x.LongMarginRatioByMoney;
     y.LongMarginRatioByVolume = x.LongMarginRatioByVolume;
     y.ShortMarginRatioByMoney = x.ShortMarginRatioByMoney;
     y.ShortMarginRatioByVolume = x.ShortMarginRatioByVolume;
     y.IsRelative = x.IsRelative;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3077,15 +3088,15 @@ CThostFtdcSyncingInstrumentCommissionRateField Converter::SyncingInstrumentCommi
     CThostFtdcSyncingInstrumentCommissionRateField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.OpenRatioByMoney = x.OpenRatioByMoney;
     y.OpenRatioByVolume = x.OpenRatioByVolume;
     y.CloseRatioByMoney = x.CloseRatioByMoney;
     y.CloseRatioByVolume = x.CloseRatioByVolume;
     y.CloseTodayRatioByMoney = x.CloseTodayRatioByMoney;
     y.CloseTodayRatioByVolume = x.CloseTodayRatioByVolume;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3110,10 +3121,10 @@ CThostFtdcSyncingInstrumentTradingRightField Converter::SyncingInstrumentTrading
     CThostFtdcSyncingInstrumentTradingRightField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.TradingRight = x.TradingRight;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3132,14 +3143,14 @@ SyncingInstrumentTradingRightField Converter::CThostFtdcSyncingInstrumentTrading
 CThostFtdcQryOrderField Converter::QryOrderFieldToCpp(QryOrderField x) {
     CThostFtdcQryOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.OrderSysID, x.OrderSysID.c_str());
-    strcpy(y.InsertTimeStart, x.InsertTimeStart.c_str());
-    strcpy(y.InsertTimeEnd, x.InsertTimeEnd.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.InsertTimeStart, x.InsertTimeStart.c_str());
+    CTP_SET_FIELD(y.InsertTimeEnd, x.InsertTimeEnd.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3161,14 +3172,14 @@ QryOrderField Converter::CThostFtdcQryOrderFieldToRust(CThostFtdcQryOrderField* 
 CThostFtdcQryTradeField Converter::QryTradeFieldToCpp(QryTradeField x) {
     CThostFtdcQryTradeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TradeID, x.TradeID.c_str());
-    strcpy(y.TradeTimeStart, x.TradeTimeStart.c_str());
-    strcpy(y.TradeTimeEnd, x.TradeTimeEnd.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradeID, x.TradeID.c_str());
+    CTP_SET_FIELD(y.TradeTimeStart, x.TradeTimeStart.c_str());
+    CTP_SET_FIELD(y.TradeTimeEnd, x.TradeTimeEnd.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3190,11 +3201,11 @@ QryTradeField Converter::CThostFtdcQryTradeFieldToRust(CThostFtdcQryTradeField* 
 CThostFtdcQryInvestorPositionField Converter::QryInvestorPositionFieldToCpp(QryInvestorPositionField x) {
     CThostFtdcQryInvestorPositionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3213,11 +3224,11 @@ QryInvestorPositionField Converter::CThostFtdcQryInvestorPositionFieldToRust(CTh
 CThostFtdcQryTradingAccountField Converter::QryTradingAccountFieldToCpp(QryTradingAccountField x) {
     CThostFtdcQryTradingAccountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.BizType = x.BizType;
-    strcpy(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     return y;
 }
 
@@ -3236,8 +3247,8 @@ QryTradingAccountField Converter::CThostFtdcQryTradingAccountFieldToRust(CThostF
 CThostFtdcQryInvestorField Converter::QryInvestorFieldToCpp(QryInvestorField x) {
     CThostFtdcQryInvestorField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     return y;
 }
 
@@ -3253,12 +3264,12 @@ QryInvestorField Converter::CThostFtdcQryInvestorFieldToRust(CThostFtdcQryInvest
 CThostFtdcQryTradingCodeField Converter::QryTradingCodeFieldToCpp(QryTradingCodeField x) {
     CThostFtdcQryTradingCodeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
     y.ClientIDType = x.ClientIDType;
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
     return y;
 }
 
@@ -3278,7 +3289,7 @@ QryTradingCodeField Converter::CThostFtdcQryTradingCodeFieldToRust(CThostFtdcQry
 CThostFtdcQryInvestorGroupField Converter::QryInvestorGroupFieldToCpp(QryInvestorGroupField x) {
     CThostFtdcQryInvestorGroupField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     return y;
 }
 
@@ -3293,12 +3304,12 @@ QryInvestorGroupField Converter::CThostFtdcQryInvestorGroupFieldToRust(CThostFtd
 CThostFtdcQryInstrumentMarginRateField Converter::QryInstrumentMarginRateFieldToCpp(QryInstrumentMarginRateField x) {
     CThostFtdcQryInstrumentMarginRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.HedgeFlag = x.HedgeFlag;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3318,11 +3329,11 @@ QryInstrumentMarginRateField Converter::CThostFtdcQryInstrumentMarginRateFieldTo
 CThostFtdcQryInstrumentCommissionRateField Converter::QryInstrumentCommissionRateFieldToCpp(QryInstrumentCommissionRateField x) {
     CThostFtdcQryInstrumentCommissionRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3341,9 +3352,9 @@ QryInstrumentCommissionRateField Converter::CThostFtdcQryInstrumentCommissionRat
 CThostFtdcQryInstrumentTradingRightField Converter::QryInstrumentTradingRightFieldToCpp(QryInstrumentTradingRightField x) {
     CThostFtdcQryInstrumentTradingRightField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3360,7 +3371,7 @@ QryInstrumentTradingRightField Converter::CThostFtdcQryInstrumentTradingRightFie
 CThostFtdcQryBrokerField Converter::QryBrokerFieldToCpp(QryBrokerField x) {
     CThostFtdcQryBrokerField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     return y;
 }
 
@@ -3375,9 +3386,9 @@ QryBrokerField Converter::CThostFtdcQryBrokerFieldToRust(CThostFtdcQryBrokerFiel
 CThostFtdcQryTraderField Converter::QryTraderFieldToCpp(QryTraderField x) {
     CThostFtdcQryTraderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     return y;
 }
 
@@ -3394,7 +3405,7 @@ QryTraderField Converter::CThostFtdcQryTraderFieldToRust(CThostFtdcQryTraderFiel
 CThostFtdcQrySuperUserFunctionField Converter::QrySuperUserFunctionFieldToCpp(QrySuperUserFunctionField x) {
     CThostFtdcQrySuperUserFunctionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     return y;
 }
 
@@ -3412,8 +3423,8 @@ CThostFtdcQryUserSessionField Converter::QryUserSessionFieldToCpp(QryUserSession
     memset(&y, 0, sizeof(y));
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     return y;
 }
 
@@ -3432,9 +3443,9 @@ QryUserSessionField Converter::CThostFtdcQryUserSessionFieldToRust(CThostFtdcQry
 CThostFtdcQryPartBrokerField Converter::QryPartBrokerFieldToCpp(QryPartBrokerField x) {
     CThostFtdcQryPartBrokerField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
     return y;
 }
 
@@ -3466,11 +3477,11 @@ QryFrontStatusField Converter::CThostFtdcQryFrontStatusFieldToRust(CThostFtdcQry
 CThostFtdcQryExchangeOrderField Converter::QryExchangeOrderFieldToCpp(QryExchangeOrderField x) {
     CThostFtdcQryExchangeOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     return y;
 }
 
@@ -3489,9 +3500,9 @@ QryExchangeOrderField Converter::CThostFtdcQryExchangeOrderFieldToRust(CThostFtd
 CThostFtdcQryOrderActionField Converter::QryOrderActionFieldToCpp(QryOrderActionField x) {
     CThostFtdcQryOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     return y;
 }
 
@@ -3508,10 +3519,10 @@ QryOrderActionField Converter::CThostFtdcQryOrderActionFieldToRust(CThostFtdcQry
 CThostFtdcQryExchangeOrderActionField Converter::QryExchangeOrderActionFieldToCpp(QryExchangeOrderActionField x) {
     CThostFtdcQryExchangeOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     return y;
 }
 
@@ -3529,7 +3540,7 @@ QryExchangeOrderActionField Converter::CThostFtdcQryExchangeOrderActionFieldToRu
 CThostFtdcQrySuperUserField Converter::QrySuperUserFieldToCpp(QrySuperUserField x) {
     CThostFtdcQrySuperUserField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     return y;
 }
 
@@ -3544,7 +3555,7 @@ QrySuperUserField Converter::CThostFtdcQrySuperUserFieldToRust(CThostFtdcQrySupe
 CThostFtdcQryExchangeField Converter::QryExchangeFieldToCpp(QryExchangeField x) {
     CThostFtdcQryExchangeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     return y;
 }
 
@@ -3560,8 +3571,8 @@ CThostFtdcQryProductField Converter::QryProductFieldToCpp(QryProductField x) {
     CThostFtdcQryProductField y;
     memset(&y, 0, sizeof(y));
     y.ProductClass = x.ProductClass;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     return y;
 }
 
@@ -3578,10 +3589,10 @@ QryProductField Converter::CThostFtdcQryProductFieldToRust(CThostFtdcQryProductF
 CThostFtdcQryInstrumentField Converter::QryInstrumentFieldToCpp(QryInstrumentField x) {
     CThostFtdcQryInstrumentField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     return y;
 }
 
@@ -3599,8 +3610,8 @@ QryInstrumentField Converter::CThostFtdcQryInstrumentFieldToRust(CThostFtdcQryIn
 CThostFtdcQryDepthMarketDataField Converter::QryDepthMarketDataFieldToCpp(QryDepthMarketDataField x) {
     CThostFtdcQryDepthMarketDataField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.ProductClass = x.ProductClass;
     return y;
 }
@@ -3618,8 +3629,8 @@ QryDepthMarketDataField Converter::CThostFtdcQryDepthMarketDataFieldToRust(CThos
 CThostFtdcQryBrokerUserField Converter::QryBrokerUserFieldToCpp(QryBrokerUserField x) {
     CThostFtdcQryBrokerUserField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     return y;
 }
 
@@ -3635,8 +3646,8 @@ QryBrokerUserField Converter::CThostFtdcQryBrokerUserFieldToRust(CThostFtdcQryBr
 CThostFtdcQryBrokerUserFunctionField Converter::QryBrokerUserFunctionFieldToCpp(QryBrokerUserFunctionField x) {
     CThostFtdcQryBrokerUserFunctionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     return y;
 }
 
@@ -3652,9 +3663,9 @@ QryBrokerUserFunctionField Converter::CThostFtdcQryBrokerUserFunctionFieldToRust
 CThostFtdcQryTraderOfferField Converter::QryTraderOfferFieldToCpp(QryTraderOfferField x) {
     CThostFtdcQryTraderOfferField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     return y;
 }
 
@@ -3671,7 +3682,7 @@ QryTraderOfferField Converter::CThostFtdcQryTraderOfferFieldToRust(CThostFtdcQry
 CThostFtdcQrySyncDepositField Converter::QrySyncDepositFieldToCpp(QrySyncDepositField x) {
     CThostFtdcQrySyncDepositField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     memcpy(y.DepositSeqNo, x.DepositSeqNo.data(), x.DepositSeqNo.size() * sizeof(uint8_t));
     return y;
 }
@@ -3689,11 +3700,11 @@ QrySyncDepositField Converter::CThostFtdcQrySyncDepositFieldToRust(CThostFtdcQry
 CThostFtdcQrySettlementInfoField Converter::QrySettlementInfoFieldToCpp(QrySettlementInfoField x) {
     CThostFtdcQrySettlementInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
 }
 
@@ -3712,10 +3723,10 @@ QrySettlementInfoField Converter::CThostFtdcQrySettlementInfoFieldToRust(CThostF
 CThostFtdcQryExchangeMarginRateField Converter::QryExchangeMarginRateFieldToCpp(QryExchangeMarginRateField x) {
     CThostFtdcQryExchangeMarginRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     y.HedgeFlag = x.HedgeFlag;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3733,9 +3744,9 @@ QryExchangeMarginRateField Converter::CThostFtdcQryExchangeMarginRateFieldToRust
 CThostFtdcQryExchangeMarginRateAdjustField Converter::QryExchangeMarginRateAdjustFieldToCpp(QryExchangeMarginRateAdjustField x) {
     CThostFtdcQryExchangeMarginRateAdjustField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     y.HedgeFlag = x.HedgeFlag;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3752,9 +3763,9 @@ QryExchangeMarginRateAdjustField Converter::CThostFtdcQryExchangeMarginRateAdjus
 CThostFtdcQryExchangeRateField Converter::QryExchangeRateFieldToCpp(QryExchangeRateField x) {
     CThostFtdcQryExchangeRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.FromCurrencyID, x.FromCurrencyID.c_str());
-    strcpy(y.ToCurrencyID, x.ToCurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.FromCurrencyID, x.FromCurrencyID.c_str());
+    CTP_SET_FIELD(y.ToCurrencyID, x.ToCurrencyID.c_str());
     return y;
 }
 
@@ -3771,7 +3782,7 @@ QryExchangeRateField Converter::CThostFtdcQryExchangeRateFieldToRust(CThostFtdcQ
 CThostFtdcQrySyncFundMortgageField Converter::QrySyncFundMortgageFieldToCpp(QrySyncFundMortgageField x) {
     CThostFtdcQrySyncFundMortgageField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     memcpy(y.MortgageSeqNo, x.MortgageSeqNo.data(), x.MortgageSeqNo.size() * sizeof(uint8_t));
     return y;
 }
@@ -3789,15 +3800,15 @@ QrySyncFundMortgageField Converter::CThostFtdcQrySyncFundMortgageFieldToRust(CTh
 CThostFtdcQryHisOrderField Converter::QryHisOrderFieldToCpp(QryHisOrderField x) {
     CThostFtdcQryHisOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.OrderSysID, x.OrderSysID.c_str());
-    strcpy(y.InsertTimeStart, x.InsertTimeStart.c_str());
-    strcpy(y.InsertTimeEnd, x.InsertTimeEnd.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.InsertTimeStart, x.InsertTimeStart.c_str());
+    CTP_SET_FIELD(y.InsertTimeEnd, x.InsertTimeEnd.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3821,12 +3832,12 @@ CThostFtdcOptionInstrMiniMarginField Converter::OptionInstrMiniMarginFieldToCpp(
     CThostFtdcOptionInstrMiniMarginField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.MinMargin = x.MinMargin;
     y.ValueMethod = x.ValueMethod;
     y.IsRelative = x.IsRelative;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3848,8 +3859,8 @@ CThostFtdcOptionInstrMarginAdjustField Converter::OptionInstrMarginAdjustFieldTo
     CThostFtdcOptionInstrMarginAdjustField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.SShortMarginRatioByMoney = x.SShortMarginRatioByMoney;
     y.SShortMarginRatioByVolume = x.SShortMarginRatioByVolume;
     y.HShortMarginRatioByMoney = x.HShortMarginRatioByMoney;
@@ -3859,7 +3870,7 @@ CThostFtdcOptionInstrMarginAdjustField Converter::OptionInstrMarginAdjustFieldTo
     y.IsRelative = x.IsRelative;
     y.MShortMarginRatioByMoney = x.MShortMarginRatioByMoney;
     y.MShortMarginRatioByVolume = x.MShortMarginRatioByVolume;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3887,8 +3898,8 @@ CThostFtdcOptionInstrCommRateField Converter::OptionInstrCommRateFieldToCpp(Opti
     CThostFtdcOptionInstrCommRateField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.OpenRatioByMoney = x.OpenRatioByMoney;
     y.OpenRatioByVolume = x.OpenRatioByVolume;
     y.CloseRatioByMoney = x.CloseRatioByMoney;
@@ -3897,9 +3908,9 @@ CThostFtdcOptionInstrCommRateField Converter::OptionInstrCommRateFieldToCpp(Opti
     y.CloseTodayRatioByVolume = x.CloseTodayRatioByVolume;
     y.StrikeRatioByMoney = x.StrikeRatioByMoney;
     y.StrikeRatioByVolume = x.StrikeRatioByVolume;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3927,17 +3938,17 @@ OptionInstrCommRateField Converter::CThostFtdcOptionInstrCommRateFieldToRust(CTh
 CThostFtdcOptionInstrTradeCostField Converter::OptionInstrTradeCostFieldToCpp(OptionInstrTradeCostField x) {
     CThostFtdcOptionInstrTradeCostField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.FixedMargin = x.FixedMargin;
     y.MiniMargin = x.MiniMargin;
     y.Royalty = x.Royalty;
     y.ExchFixedMargin = x.ExchFixedMargin;
     y.ExchMiniMargin = x.ExchMiniMargin;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3962,14 +3973,14 @@ OptionInstrTradeCostField Converter::CThostFtdcOptionInstrTradeCostFieldToRust(C
 CThostFtdcQryOptionInstrTradeCostField Converter::QryOptionInstrTradeCostFieldToCpp(QryOptionInstrTradeCostField x) {
     CThostFtdcQryOptionInstrTradeCostField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.InputPrice = x.InputPrice;
     y.UnderlyingPrice = x.UnderlyingPrice;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -3991,11 +4002,11 @@ QryOptionInstrTradeCostField Converter::CThostFtdcQryOptionInstrTradeCostFieldTo
 CThostFtdcQryOptionInstrCommRateField Converter::QryOptionInstrCommRateFieldToCpp(QryOptionInstrCommRateField x) {
     CThostFtdcQryOptionInstrCommRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -4014,9 +4025,9 @@ QryOptionInstrCommRateField Converter::CThostFtdcQryOptionInstrCommRateFieldToRu
 CThostFtdcIndexPriceField Converter::IndexPriceFieldToCpp(IndexPriceField x) {
     CThostFtdcIndexPriceField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     y.ClosePrice = x.ClosePrice;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -4033,27 +4044,27 @@ IndexPriceField Converter::CThostFtdcIndexPriceFieldToRust(CThostFtdcIndexPriceF
 CThostFtdcInputExecOrderField Converter::InputExecOrderFieldToCpp(InputExecOrderField x) {
     CThostFtdcInputExecOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExecOrderRef, x.ExecOrderRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExecOrderRef, x.ExecOrderRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.Volume = x.Volume;
     y.RequestID = x.RequestID;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.OffsetFlag = x.OffsetFlag;
     y.HedgeFlag = x.HedgeFlag;
     y.ActionType = x.ActionType;
     y.PosiDirection = x.PosiDirection;
     y.ReservePositionFlag = x.ReservePositionFlag;
     y.CloseFlag = x.CloseFlag;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -4088,21 +4099,21 @@ InputExecOrderField Converter::CThostFtdcInputExecOrderFieldToRust(CThostFtdcInp
 CThostFtdcInputExecOrderActionField Converter::InputExecOrderActionFieldToCpp(InputExecOrderActionField x) {
     CThostFtdcInputExecOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.ExecOrderActionRef = x.ExecOrderActionRef;
-    strcpy(y.ExecOrderRef, x.ExecOrderRef.c_str());
+    CTP_SET_FIELD(y.ExecOrderRef, x.ExecOrderRef.c_str());
     y.RequestID = x.RequestID;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ExecOrderSysID, x.ExecOrderSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExecOrderSysID, x.ExecOrderSysID.c_str());
     y.ActionFlag = x.ActionFlag;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -4131,50 +4142,50 @@ InputExecOrderActionField Converter::CThostFtdcInputExecOrderActionFieldToRust(C
 CThostFtdcExecOrderField Converter::ExecOrderFieldToCpp(ExecOrderField x) {
     CThostFtdcExecOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExecOrderRef, x.ExecOrderRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExecOrderRef, x.ExecOrderRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.Volume = x.Volume;
     y.RequestID = x.RequestID;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.OffsetFlag = x.OffsetFlag;
     y.HedgeFlag = x.HedgeFlag;
     y.ActionType = x.ActionType;
     y.PosiDirection = x.PosiDirection;
     y.ReservePositionFlag = x.ReservePositionFlag;
     y.CloseFlag = x.CloseFlag;
-    strcpy(y.ExecOrderLocalID, x.ExecOrderLocalID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExecOrderLocalID, x.ExecOrderLocalID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
     y.OrderSubmitStatus = x.OrderSubmitStatus;
     y.NotifySequence = x.NotifySequence;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
-    strcpy(y.ExecOrderSysID, x.ExecOrderSysID.c_str());
-    strcpy(y.InsertDate, x.InsertDate.c_str());
-    strcpy(y.InsertTime, x.InsertTime.c_str());
-    strcpy(y.CancelTime, x.CancelTime.c_str());
+    CTP_SET_FIELD(y.ExecOrderSysID, x.ExecOrderSysID.c_str());
+    CTP_SET_FIELD(y.InsertDate, x.InsertDate.c_str());
+    CTP_SET_FIELD(y.InsertTime, x.InsertTime.c_str());
+    CTP_SET_FIELD(y.CancelTime, x.CancelTime.c_str());
     y.ExecResult = x.ExecResult;
-    strcpy(y.ClearingPartID, x.ClearingPartID.c_str());
+    CTP_SET_FIELD(y.ClearingPartID, x.ClearingPartID.c_str());
     y.SequenceNo = x.SequenceNo;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.StatusMsg, x.StatusMsg.c_str());
-    strcpy(y.ActiveUserID, x.ActiveUserID.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.ActiveUserID, x.ActiveUserID.c_str());
     y.BrokerExecOrderSeq = x.BrokerExecOrderSeq;
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -4232,34 +4243,34 @@ ExecOrderField Converter::CThostFtdcExecOrderFieldToRust(CThostFtdcExecOrderFiel
 CThostFtdcExecOrderActionField Converter::ExecOrderActionFieldToCpp(ExecOrderActionField x) {
     CThostFtdcExecOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.ExecOrderActionRef = x.ExecOrderActionRef;
-    strcpy(y.ExecOrderRef, x.ExecOrderRef.c_str());
+    CTP_SET_FIELD(y.ExecOrderRef, x.ExecOrderRef.c_str());
     y.RequestID = x.RequestID;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ExecOrderSysID, x.ExecOrderSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExecOrderSysID, x.ExecOrderSysID.c_str());
     y.ActionFlag = x.ActionFlag;
-    strcpy(y.ActionDate, x.ActionDate.c_str());
-    strcpy(y.ActionTime, x.ActionTime.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ActionDate, x.ActionDate.c_str());
+    CTP_SET_FIELD(y.ActionTime, x.ActionTime.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.ExecOrderLocalID, x.ExecOrderLocalID.c_str());
-    strcpy(y.ActionLocalID, x.ActionLocalID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.ExecOrderLocalID, x.ExecOrderLocalID.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.OrderActionStatus = x.OrderActionStatus;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.ActionType = x.ActionType;
-    strcpy(y.StatusMsg, x.StatusMsg.c_str());
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -4301,13 +4312,13 @@ ExecOrderActionField Converter::CThostFtdcExecOrderActionFieldToRust(CThostFtdcE
 CThostFtdcQryExecOrderField Converter::QryExecOrderFieldToCpp(QryExecOrderField x) {
     CThostFtdcQryExecOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ExecOrderSysID, x.ExecOrderSysID.c_str());
-    strcpy(y.InsertTimeStart, x.InsertTimeStart.c_str());
-    strcpy(y.InsertTimeEnd, x.InsertTimeEnd.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExecOrderSysID, x.ExecOrderSysID.c_str());
+    CTP_SET_FIELD(y.InsertTimeStart, x.InsertTimeStart.c_str());
+    CTP_SET_FIELD(y.InsertTimeEnd, x.InsertTimeEnd.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -4330,34 +4341,34 @@ CThostFtdcExchangeExecOrderField Converter::ExchangeExecOrderFieldToCpp(Exchange
     memset(&y, 0, sizeof(y));
     y.Volume = x.Volume;
     y.RequestID = x.RequestID;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.OffsetFlag = x.OffsetFlag;
     y.HedgeFlag = x.HedgeFlag;
     y.ActionType = x.ActionType;
     y.PosiDirection = x.PosiDirection;
     y.ReservePositionFlag = x.ReservePositionFlag;
     y.CloseFlag = x.CloseFlag;
-    strcpy(y.ExecOrderLocalID, x.ExecOrderLocalID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExecOrderLocalID, x.ExecOrderLocalID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
     y.OrderSubmitStatus = x.OrderSubmitStatus;
     y.NotifySequence = x.NotifySequence;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
-    strcpy(y.ExecOrderSysID, x.ExecOrderSysID.c_str());
-    strcpy(y.InsertDate, x.InsertDate.c_str());
-    strcpy(y.InsertTime, x.InsertTime.c_str());
-    strcpy(y.CancelTime, x.CancelTime.c_str());
+    CTP_SET_FIELD(y.ExecOrderSysID, x.ExecOrderSysID.c_str());
+    CTP_SET_FIELD(y.InsertDate, x.InsertDate.c_str());
+    CTP_SET_FIELD(y.InsertTime, x.InsertTime.c_str());
+    CTP_SET_FIELD(y.CancelTime, x.CancelTime.c_str());
     y.ExecResult = x.ExecResult;
-    strcpy(y.ClearingPartID, x.ClearingPartID.c_str());
+    CTP_SET_FIELD(y.ClearingPartID, x.ClearingPartID.c_str());
     y.SequenceNo = x.SequenceNo;
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -4401,11 +4412,11 @@ ExchangeExecOrderField Converter::CThostFtdcExchangeExecOrderFieldToRust(CThostF
 CThostFtdcQryExchangeExecOrderField Converter::QryExchangeExecOrderFieldToCpp(QryExchangeExecOrderField x) {
     CThostFtdcQryExchangeExecOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     return y;
 }
 
@@ -4424,9 +4435,9 @@ QryExchangeExecOrderField Converter::CThostFtdcQryExchangeExecOrderFieldToRust(C
 CThostFtdcQryExecOrderActionField Converter::QryExecOrderActionFieldToCpp(QryExecOrderActionField x) {
     CThostFtdcQryExecOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     return y;
 }
 
@@ -4443,26 +4454,26 @@ QryExecOrderActionField Converter::CThostFtdcQryExecOrderActionFieldToRust(CThos
 CThostFtdcExchangeExecOrderActionField Converter::ExchangeExecOrderActionFieldToCpp(ExchangeExecOrderActionField x) {
     CThostFtdcExchangeExecOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ExecOrderSysID, x.ExecOrderSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExecOrderSysID, x.ExecOrderSysID.c_str());
     y.ActionFlag = x.ActionFlag;
-    strcpy(y.ActionDate, x.ActionDate.c_str());
-    strcpy(y.ActionTime, x.ActionTime.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ActionDate, x.ActionDate.c_str());
+    CTP_SET_FIELD(y.ActionTime, x.ActionTime.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.ExecOrderLocalID, x.ExecOrderLocalID.c_str());
-    strcpy(y.ActionLocalID, x.ActionLocalID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.ExecOrderLocalID, x.ExecOrderLocalID.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.OrderActionStatus = x.OrderActionStatus;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.ActionType = x.ActionType;
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
     y.Volume = x.Volume;
-    strcpy(y.IPAddress, x.IPAddress.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     return y;
 }
 
@@ -4496,10 +4507,10 @@ ExchangeExecOrderActionField Converter::CThostFtdcExchangeExecOrderActionFieldTo
 CThostFtdcQryExchangeExecOrderActionField Converter::QryExchangeExecOrderActionFieldToCpp(QryExchangeExecOrderActionField x) {
     CThostFtdcQryExchangeExecOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     return y;
 }
 
@@ -4517,29 +4528,29 @@ QryExchangeExecOrderActionField Converter::CThostFtdcQryExchangeExecOrderActionF
 CThostFtdcErrExecOrderField Converter::ErrExecOrderFieldToCpp(ErrExecOrderField x) {
     CThostFtdcErrExecOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExecOrderRef, x.ExecOrderRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExecOrderRef, x.ExecOrderRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.Volume = x.Volume;
     y.RequestID = x.RequestID;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.OffsetFlag = x.OffsetFlag;
     y.HedgeFlag = x.HedgeFlag;
     y.ActionType = x.ActionType;
     y.PosiDirection = x.PosiDirection;
     y.ReservePositionFlag = x.ReservePositionFlag;
     y.CloseFlag = x.CloseFlag;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -4576,8 +4587,8 @@ ErrExecOrderField Converter::CThostFtdcErrExecOrderFieldToRust(CThostFtdcErrExec
 CThostFtdcQryErrExecOrderField Converter::QryErrExecOrderFieldToCpp(QryErrExecOrderField x) {
     CThostFtdcQryErrExecOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     return y;
 }
 
@@ -4593,23 +4604,23 @@ QryErrExecOrderField Converter::CThostFtdcQryErrExecOrderFieldToRust(CThostFtdcQ
 CThostFtdcErrExecOrderActionField Converter::ErrExecOrderActionFieldToCpp(ErrExecOrderActionField x) {
     CThostFtdcErrExecOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.ExecOrderActionRef = x.ExecOrderActionRef;
-    strcpy(y.ExecOrderRef, x.ExecOrderRef.c_str());
+    CTP_SET_FIELD(y.ExecOrderRef, x.ExecOrderRef.c_str());
     y.RequestID = x.RequestID;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ExecOrderSysID, x.ExecOrderSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExecOrderSysID, x.ExecOrderSysID.c_str());
     y.ActionFlag = x.ActionFlag;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -4640,8 +4651,8 @@ ErrExecOrderActionField Converter::CThostFtdcErrExecOrderActionFieldToRust(CThos
 CThostFtdcQryErrExecOrderActionField Converter::QryErrExecOrderActionFieldToCpp(QryErrExecOrderActionField x) {
     CThostFtdcQryErrExecOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     return y;
 }
 
@@ -4658,11 +4669,11 @@ CThostFtdcOptionInstrTradingRightField Converter::OptionInstrTradingRightFieldTo
     CThostFtdcOptionInstrTradingRightField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.Direction = x.Direction;
     y.TradingRight = x.TradingRight;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -4682,10 +4693,10 @@ OptionInstrTradingRightField Converter::CThostFtdcOptionInstrTradingRightFieldTo
 CThostFtdcQryOptionInstrTradingRightField Converter::QryOptionInstrTradingRightFieldToCpp(QryOptionInstrTradingRightField x) {
     CThostFtdcQryOptionInstrTradingRightField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.Direction = x.Direction;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -4703,15 +4714,15 @@ QryOptionInstrTradingRightField Converter::CThostFtdcQryOptionInstrTradingRightF
 CThostFtdcInputForQuoteField Converter::InputForQuoteFieldToCpp(InputForQuoteField x) {
     CThostFtdcInputForQuoteField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ForQuoteRef, x.ForQuoteRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ForQuoteRef, x.ForQuoteRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -4734,29 +4745,29 @@ InputForQuoteField Converter::CThostFtdcInputForQuoteFieldToRust(CThostFtdcInput
 CThostFtdcForQuoteField Converter::ForQuoteFieldToCpp(ForQuoteField x) {
     CThostFtdcForQuoteField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ForQuoteRef, x.ForQuoteRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.ForQuoteLocalID, x.ForQuoteLocalID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ForQuoteRef, x.ForQuoteRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.ForQuoteLocalID, x.ForQuoteLocalID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.InsertDate, x.InsertDate.c_str());
-    strcpy(y.InsertTime, x.InsertTime.c_str());
+    CTP_SET_FIELD(y.InsertDate, x.InsertDate.c_str());
+    CTP_SET_FIELD(y.InsertTime, x.InsertTime.c_str());
     y.ForQuoteStatus = x.ForQuoteStatus;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.StatusMsg, x.StatusMsg.c_str());
-    strcpy(y.ActiveUserID, x.ActiveUserID.c_str());
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.ActiveUserID, x.ActiveUserID.c_str());
     y.BrokerForQutoSeq = x.BrokerForQutoSeq;
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -4793,13 +4804,13 @@ ForQuoteField Converter::CThostFtdcForQuoteFieldToRust(CThostFtdcForQuoteField* 
 CThostFtdcQryForQuoteField Converter::QryForQuoteFieldToCpp(QryForQuoteField x) {
     CThostFtdcQryForQuoteField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InsertTimeStart, x.InsertTimeStart.c_str());
-    strcpy(y.InsertTimeEnd, x.InsertTimeEnd.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InsertTimeStart, x.InsertTimeStart.c_str());
+    CTP_SET_FIELD(y.InsertTimeEnd, x.InsertTimeEnd.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -4820,18 +4831,18 @@ QryForQuoteField Converter::CThostFtdcQryForQuoteFieldToRust(CThostFtdcQryForQuo
 CThostFtdcExchangeForQuoteField Converter::ExchangeForQuoteFieldToCpp(ExchangeForQuoteField x) {
     CThostFtdcExchangeForQuoteField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ForQuoteLocalID, x.ForQuoteLocalID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ForQuoteLocalID, x.ForQuoteLocalID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.InsertDate, x.InsertDate.c_str());
-    strcpy(y.InsertTime, x.InsertTime.c_str());
+    CTP_SET_FIELD(y.InsertDate, x.InsertDate.c_str());
+    CTP_SET_FIELD(y.InsertTime, x.InsertTime.c_str());
     y.ForQuoteStatus = x.ForQuoteStatus;
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -4857,11 +4868,11 @@ ExchangeForQuoteField Converter::CThostFtdcExchangeForQuoteFieldToRust(CThostFtd
 CThostFtdcQryExchangeForQuoteField Converter::QryExchangeForQuoteFieldToCpp(QryExchangeForQuoteField x) {
     CThostFtdcQryExchangeForQuoteField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     return y;
 }
 
@@ -4880,32 +4891,32 @@ QryExchangeForQuoteField Converter::CThostFtdcQryExchangeForQuoteFieldToRust(CTh
 CThostFtdcInputQuoteField Converter::InputQuoteFieldToCpp(InputQuoteField x) {
     CThostFtdcInputQuoteField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.QuoteRef, x.QuoteRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.QuoteRef, x.QuoteRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.AskPrice = x.AskPrice;
     y.BidPrice = x.BidPrice;
     y.AskVolume = x.AskVolume;
     y.BidVolume = x.BidVolume;
     y.RequestID = x.RequestID;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.AskOffsetFlag = x.AskOffsetFlag;
     y.BidOffsetFlag = x.BidOffsetFlag;
     y.AskHedgeFlag = x.AskHedgeFlag;
     y.BidHedgeFlag = x.BidHedgeFlag;
-    strcpy(y.AskOrderRef, x.AskOrderRef.c_str());
-    strcpy(y.BidOrderRef, x.BidOrderRef.c_str());
-    strcpy(y.ForQuoteSysID, x.ForQuoteSysID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
-    strcpy(y.ReplaceSysID, x.ReplaceSysID.c_str());
+    CTP_SET_FIELD(y.AskOrderRef, x.AskOrderRef.c_str());
+    CTP_SET_FIELD(y.BidOrderRef, x.BidOrderRef.c_str());
+    CTP_SET_FIELD(y.ForQuoteSysID, x.ForQuoteSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.ReplaceSysID, x.ReplaceSysID.c_str());
     y.TimeCondition = x.TimeCondition;
-    strcpy(y.OrderMemo, x.OrderMemo.c_str());
+    CTP_SET_FIELD(y.OrderMemo, x.OrderMemo.c_str());
     y.SessionReqSeq = x.SessionReqSeq;
     return y;
 }
@@ -4947,23 +4958,23 @@ InputQuoteField Converter::CThostFtdcInputQuoteFieldToRust(CThostFtdcInputQuoteF
 CThostFtdcInputQuoteActionField Converter::InputQuoteActionFieldToCpp(InputQuoteActionField x) {
     CThostFtdcInputQuoteActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.QuoteActionRef = x.QuoteActionRef;
-    strcpy(y.QuoteRef, x.QuoteRef.c_str());
+    CTP_SET_FIELD(y.QuoteRef, x.QuoteRef.c_str());
     y.RequestID = x.RequestID;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.QuoteSysID, x.QuoteSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.QuoteSysID, x.QuoteSysID.c_str());
     y.ActionFlag = x.ActionFlag;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
-    strcpy(y.OrderMemo, x.OrderMemo.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.OrderMemo, x.OrderMemo.c_str());
     y.SessionReqSeq = x.SessionReqSeq;
     return y;
 }
@@ -4996,59 +5007,59 @@ InputQuoteActionField Converter::CThostFtdcInputQuoteActionFieldToRust(CThostFtd
 CThostFtdcQuoteField Converter::QuoteFieldToCpp(QuoteField x) {
     CThostFtdcQuoteField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.QuoteRef, x.QuoteRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.QuoteRef, x.QuoteRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.AskPrice = x.AskPrice;
     y.BidPrice = x.BidPrice;
     y.AskVolume = x.AskVolume;
     y.BidVolume = x.BidVolume;
     y.RequestID = x.RequestID;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.AskOffsetFlag = x.AskOffsetFlag;
     y.BidOffsetFlag = x.BidOffsetFlag;
     y.AskHedgeFlag = x.AskHedgeFlag;
     y.BidHedgeFlag = x.BidHedgeFlag;
-    strcpy(y.QuoteLocalID, x.QuoteLocalID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.QuoteLocalID, x.QuoteLocalID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
     y.NotifySequence = x.NotifySequence;
     y.OrderSubmitStatus = x.OrderSubmitStatus;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
-    strcpy(y.QuoteSysID, x.QuoteSysID.c_str());
-    strcpy(y.InsertDate, x.InsertDate.c_str());
-    strcpy(y.InsertTime, x.InsertTime.c_str());
-    strcpy(y.CancelTime, x.CancelTime.c_str());
+    CTP_SET_FIELD(y.QuoteSysID, x.QuoteSysID.c_str());
+    CTP_SET_FIELD(y.InsertDate, x.InsertDate.c_str());
+    CTP_SET_FIELD(y.InsertTime, x.InsertTime.c_str());
+    CTP_SET_FIELD(y.CancelTime, x.CancelTime.c_str());
     y.QuoteStatus = x.QuoteStatus;
-    strcpy(y.ClearingPartID, x.ClearingPartID.c_str());
+    CTP_SET_FIELD(y.ClearingPartID, x.ClearingPartID.c_str());
     y.SequenceNo = x.SequenceNo;
-    strcpy(y.AskOrderSysID, x.AskOrderSysID.c_str());
-    strcpy(y.BidOrderSysID, x.BidOrderSysID.c_str());
+    CTP_SET_FIELD(y.AskOrderSysID, x.AskOrderSysID.c_str());
+    CTP_SET_FIELD(y.BidOrderSysID, x.BidOrderSysID.c_str());
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.StatusMsg, x.StatusMsg.c_str());
-    strcpy(y.ActiveUserID, x.ActiveUserID.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.ActiveUserID, x.ActiveUserID.c_str());
     y.BrokerQuoteSeq = x.BrokerQuoteSeq;
-    strcpy(y.AskOrderRef, x.AskOrderRef.c_str());
-    strcpy(y.BidOrderRef, x.BidOrderRef.c_str());
-    strcpy(y.ForQuoteSysID, x.ForQuoteSysID.c_str());
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
-    strcpy(y.ReplaceSysID, x.ReplaceSysID.c_str());
+    CTP_SET_FIELD(y.AskOrderRef, x.AskOrderRef.c_str());
+    CTP_SET_FIELD(y.BidOrderRef, x.BidOrderRef.c_str());
+    CTP_SET_FIELD(y.ForQuoteSysID, x.ForQuoteSysID.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.ReplaceSysID, x.ReplaceSysID.c_str());
     y.TimeCondition = x.TimeCondition;
-    strcpy(y.OrderMemo, x.OrderMemo.c_str());
+    CTP_SET_FIELD(y.OrderMemo, x.OrderMemo.c_str());
     y.SessionReqSeq = x.SessionReqSeq;
     return y;
 }
@@ -5117,34 +5128,34 @@ QuoteField Converter::CThostFtdcQuoteFieldToRust(CThostFtdcQuoteField* x) {
 CThostFtdcQuoteActionField Converter::QuoteActionFieldToCpp(QuoteActionField x) {
     CThostFtdcQuoteActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.QuoteActionRef = x.QuoteActionRef;
-    strcpy(y.QuoteRef, x.QuoteRef.c_str());
+    CTP_SET_FIELD(y.QuoteRef, x.QuoteRef.c_str());
     y.RequestID = x.RequestID;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.QuoteSysID, x.QuoteSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.QuoteSysID, x.QuoteSysID.c_str());
     y.ActionFlag = x.ActionFlag;
-    strcpy(y.ActionDate, x.ActionDate.c_str());
-    strcpy(y.ActionTime, x.ActionTime.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ActionDate, x.ActionDate.c_str());
+    CTP_SET_FIELD(y.ActionTime, x.ActionTime.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.QuoteLocalID, x.QuoteLocalID.c_str());
-    strcpy(y.ActionLocalID, x.ActionLocalID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.QuoteLocalID, x.QuoteLocalID.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.OrderActionStatus = x.OrderActionStatus;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.StatusMsg, x.StatusMsg.c_str());
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
-    strcpy(y.OrderMemo, x.OrderMemo.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.OrderMemo, x.OrderMemo.c_str());
     y.SessionReqSeq = x.SessionReqSeq;
     return y;
 }
@@ -5188,14 +5199,14 @@ QuoteActionField Converter::CThostFtdcQuoteActionFieldToRust(CThostFtdcQuoteActi
 CThostFtdcQryQuoteField Converter::QryQuoteFieldToCpp(QryQuoteField x) {
     CThostFtdcQryQuoteField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.QuoteSysID, x.QuoteSysID.c_str());
-    strcpy(y.InsertTimeStart, x.InsertTimeStart.c_str());
-    strcpy(y.InsertTimeEnd, x.InsertTimeEnd.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.QuoteSysID, x.QuoteSysID.c_str());
+    CTP_SET_FIELD(y.InsertTimeStart, x.InsertTimeStart.c_str());
+    CTP_SET_FIELD(y.InsertTimeEnd, x.InsertTimeEnd.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -5222,35 +5233,35 @@ CThostFtdcExchangeQuoteField Converter::ExchangeQuoteFieldToCpp(ExchangeQuoteFie
     y.AskVolume = x.AskVolume;
     y.BidVolume = x.BidVolume;
     y.RequestID = x.RequestID;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.AskOffsetFlag = x.AskOffsetFlag;
     y.BidOffsetFlag = x.BidOffsetFlag;
     y.AskHedgeFlag = x.AskHedgeFlag;
     y.BidHedgeFlag = x.BidHedgeFlag;
-    strcpy(y.QuoteLocalID, x.QuoteLocalID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.QuoteLocalID, x.QuoteLocalID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
     y.NotifySequence = x.NotifySequence;
     y.OrderSubmitStatus = x.OrderSubmitStatus;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
-    strcpy(y.QuoteSysID, x.QuoteSysID.c_str());
-    strcpy(y.InsertDate, x.InsertDate.c_str());
-    strcpy(y.InsertTime, x.InsertTime.c_str());
-    strcpy(y.CancelTime, x.CancelTime.c_str());
+    CTP_SET_FIELD(y.QuoteSysID, x.QuoteSysID.c_str());
+    CTP_SET_FIELD(y.InsertDate, x.InsertDate.c_str());
+    CTP_SET_FIELD(y.InsertTime, x.InsertTime.c_str());
+    CTP_SET_FIELD(y.CancelTime, x.CancelTime.c_str());
     y.QuoteStatus = x.QuoteStatus;
-    strcpy(y.ClearingPartID, x.ClearingPartID.c_str());
+    CTP_SET_FIELD(y.ClearingPartID, x.ClearingPartID.c_str());
     y.SequenceNo = x.SequenceNo;
-    strcpy(y.AskOrderSysID, x.AskOrderSysID.c_str());
-    strcpy(y.BidOrderSysID, x.BidOrderSysID.c_str());
-    strcpy(y.ForQuoteSysID, x.ForQuoteSysID.c_str());
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.AskOrderSysID, x.AskOrderSysID.c_str());
+    CTP_SET_FIELD(y.BidOrderSysID, x.BidOrderSysID.c_str());
+    CTP_SET_FIELD(y.ForQuoteSysID, x.ForQuoteSysID.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     y.TimeCondition = x.TimeCondition;
     return y;
 }
@@ -5300,11 +5311,11 @@ ExchangeQuoteField Converter::CThostFtdcExchangeQuoteFieldToRust(CThostFtdcExcha
 CThostFtdcQryExchangeQuoteField Converter::QryExchangeQuoteFieldToCpp(QryExchangeQuoteField x) {
     CThostFtdcQryExchangeQuoteField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     return y;
 }
 
@@ -5323,9 +5334,9 @@ QryExchangeQuoteField Converter::CThostFtdcQryExchangeQuoteFieldToRust(CThostFtd
 CThostFtdcQryQuoteActionField Converter::QryQuoteActionFieldToCpp(QryQuoteActionField x) {
     CThostFtdcQryQuoteActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     return y;
 }
 
@@ -5342,22 +5353,22 @@ QryQuoteActionField Converter::CThostFtdcQryQuoteActionFieldToRust(CThostFtdcQry
 CThostFtdcExchangeQuoteActionField Converter::ExchangeQuoteActionFieldToCpp(ExchangeQuoteActionField x) {
     CThostFtdcExchangeQuoteActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.QuoteSysID, x.QuoteSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.QuoteSysID, x.QuoteSysID.c_str());
     y.ActionFlag = x.ActionFlag;
-    strcpy(y.ActionDate, x.ActionDate.c_str());
-    strcpy(y.ActionTime, x.ActionTime.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ActionDate, x.ActionDate.c_str());
+    CTP_SET_FIELD(y.ActionTime, x.ActionTime.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.QuoteLocalID, x.QuoteLocalID.c_str());
-    strcpy(y.ActionLocalID, x.ActionLocalID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.QuoteLocalID, x.QuoteLocalID.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.OrderActionStatus = x.OrderActionStatus;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -5387,10 +5398,10 @@ ExchangeQuoteActionField Converter::CThostFtdcExchangeQuoteActionFieldToRust(CTh
 CThostFtdcQryExchangeQuoteActionField Converter::QryExchangeQuoteActionFieldToCpp(QryExchangeQuoteActionField x) {
     CThostFtdcQryExchangeQuoteActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     return y;
 }
 
@@ -5409,10 +5420,10 @@ CThostFtdcOptionInstrDeltaField Converter::OptionInstrDeltaFieldToCpp(OptionInst
     CThostFtdcOptionInstrDeltaField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.Delta = x.Delta;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -5431,12 +5442,12 @@ OptionInstrDeltaField Converter::CThostFtdcOptionInstrDeltaFieldToRust(CThostFtd
 CThostFtdcForQuoteRspField Converter::ForQuoteRspFieldToCpp(ForQuoteRspField x) {
     CThostFtdcForQuoteRspField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ForQuoteSysID, x.ForQuoteSysID.c_str());
-    strcpy(y.ForQuoteTime, x.ForQuoteTime.c_str());
-    strcpy(y.ActionDay, x.ActionDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ForQuoteSysID, x.ForQuoteSysID.c_str());
+    CTP_SET_FIELD(y.ForQuoteTime, x.ForQuoteTime.c_str());
+    CTP_SET_FIELD(y.ActionDay, x.ActionDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -5457,11 +5468,11 @@ CThostFtdcStrikeOffsetField Converter::StrikeOffsetFieldToCpp(StrikeOffsetField 
     CThostFtdcStrikeOffsetField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.Offset = x.Offset;
     y.OffsetType = x.OffsetType;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -5481,9 +5492,9 @@ StrikeOffsetField Converter::CThostFtdcStrikeOffsetFieldToRust(CThostFtdcStrikeO
 CThostFtdcQryStrikeOffsetField Converter::QryStrikeOffsetFieldToCpp(QryStrikeOffsetField x) {
     CThostFtdcQryStrikeOffsetField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -5500,17 +5511,17 @@ QryStrikeOffsetField Converter::CThostFtdcQryStrikeOffsetFieldToRust(CThostFtdcQ
 CThostFtdcInputBatchOrderActionField Converter::InputBatchOrderActionFieldToCpp(InputBatchOrderActionField x) {
     CThostFtdcInputBatchOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.OrderActionRef = x.OrderActionRef;
     y.RequestID = x.RequestID;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -5535,27 +5546,27 @@ InputBatchOrderActionField Converter::CThostFtdcInputBatchOrderActionFieldToRust
 CThostFtdcBatchOrderActionField Converter::BatchOrderActionFieldToCpp(BatchOrderActionField x) {
     CThostFtdcBatchOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.OrderActionRef = x.OrderActionRef;
     y.RequestID = x.RequestID;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ActionDate, x.ActionDate.c_str());
-    strcpy(y.ActionTime, x.ActionTime.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ActionDate, x.ActionDate.c_str());
+    CTP_SET_FIELD(y.ActionTime, x.ActionTime.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.ActionLocalID, x.ActionLocalID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.OrderActionStatus = x.OrderActionStatus;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.StatusMsg, x.StatusMsg.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -5590,19 +5601,19 @@ BatchOrderActionField Converter::CThostFtdcBatchOrderActionFieldToRust(CThostFtd
 CThostFtdcExchangeBatchOrderActionField Converter::ExchangeBatchOrderActionFieldToCpp(ExchangeBatchOrderActionField x) {
     CThostFtdcExchangeBatchOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ActionDate, x.ActionDate.c_str());
-    strcpy(y.ActionTime, x.ActionTime.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ActionDate, x.ActionDate.c_str());
+    CTP_SET_FIELD(y.ActionTime, x.ActionTime.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.ActionLocalID, x.ActionLocalID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.OrderActionStatus = x.OrderActionStatus;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -5629,9 +5640,9 @@ ExchangeBatchOrderActionField Converter::CThostFtdcExchangeBatchOrderActionField
 CThostFtdcQryBatchOrderActionField Converter::QryBatchOrderActionFieldToCpp(QryBatchOrderActionField x) {
     CThostFtdcQryBatchOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     return y;
 }
 
@@ -5648,10 +5659,10 @@ QryBatchOrderActionField Converter::CThostFtdcQryBatchOrderActionFieldToRust(CTh
 CThostFtdcCombInstrumentGuardField Converter::CombInstrumentGuardFieldToCpp(CombInstrumentGuardField x) {
     CThostFtdcCombInstrumentGuardField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     y.GuarantRatio = x.GuarantRatio;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -5669,9 +5680,9 @@ CombInstrumentGuardField Converter::CThostFtdcCombInstrumentGuardFieldToRust(CTh
 CThostFtdcQryCombInstrumentGuardField Converter::QryCombInstrumentGuardFieldToCpp(QryCombInstrumentGuardField x) {
     CThostFtdcQryCombInstrumentGuardField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -5688,21 +5699,21 @@ QryCombInstrumentGuardField Converter::CThostFtdcQryCombInstrumentGuardFieldToRu
 CThostFtdcInputCombActionField Converter::InputCombActionFieldToCpp(InputCombActionField x) {
     CThostFtdcInputCombActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.CombActionRef, x.CombActionRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.CombActionRef, x.CombActionRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.Direction = x.Direction;
     y.Volume = x.Volume;
     y.CombDirection = x.CombDirection;
     y.HedgeFlag = x.HedgeFlag;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -5731,36 +5742,36 @@ InputCombActionField Converter::CThostFtdcInputCombActionFieldToRust(CThostFtdcI
 CThostFtdcCombActionField Converter::CombActionFieldToCpp(CombActionField x) {
     CThostFtdcCombActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.CombActionRef, x.CombActionRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.CombActionRef, x.CombActionRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.Direction = x.Direction;
     y.Volume = x.Volume;
     y.CombDirection = x.CombDirection;
     y.HedgeFlag = x.HedgeFlag;
-    strcpy(y.ActionLocalID, x.ActionLocalID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
     y.ActionStatus = x.ActionStatus;
     y.NotifySequence = x.NotifySequence;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
     y.SequenceNo = x.SequenceNo;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.StatusMsg, x.StatusMsg.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.ComTradeID, x.ComTradeID.c_str());
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.ComTradeID, x.ComTradeID.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -5804,11 +5815,11 @@ CombActionField Converter::CThostFtdcCombActionFieldToRust(CThostFtdcCombActionF
 CThostFtdcQryCombActionField Converter::QryCombActionFieldToCpp(QryCombActionField x) {
     CThostFtdcQryCombActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -5831,22 +5842,22 @@ CThostFtdcExchangeCombActionField Converter::ExchangeCombActionFieldToCpp(Exchan
     y.Volume = x.Volume;
     y.CombDirection = x.CombDirection;
     y.HedgeFlag = x.HedgeFlag;
-    strcpy(y.ActionLocalID, x.ActionLocalID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
     y.ActionStatus = x.ActionStatus;
     y.NotifySequence = x.NotifySequence;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
     y.SequenceNo = x.SequenceNo;
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.ComTradeID, x.ComTradeID.c_str());
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.ComTradeID, x.ComTradeID.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -5880,11 +5891,11 @@ ExchangeCombActionField Converter::CThostFtdcExchangeCombActionFieldToRust(CThos
 CThostFtdcQryExchangeCombActionField Converter::QryExchangeCombActionFieldToCpp(QryExchangeCombActionField x) {
     CThostFtdcQryExchangeCombActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     return y;
 }
 
@@ -5903,10 +5914,10 @@ QryExchangeCombActionField Converter::CThostFtdcQryExchangeCombActionFieldToRust
 CThostFtdcProductExchRateField Converter::ProductExchRateFieldToCpp(ProductExchRateField x) {
     CThostFtdcProductExchRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.QuoteCurrencyID, x.QuoteCurrencyID.c_str());
+    CTP_SET_FIELD(y.QuoteCurrencyID, x.QuoteCurrencyID.c_str());
     y.ExchangeRate = x.ExchangeRate;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     return y;
 }
 
@@ -5924,8 +5935,8 @@ ProductExchRateField Converter::CThostFtdcProductExchRateFieldToRust(CThostFtdcP
 CThostFtdcQryProductExchRateField Converter::QryProductExchRateFieldToCpp(QryProductExchRateField x) {
     CThostFtdcQryProductExchRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     return y;
 }
 
@@ -5941,9 +5952,9 @@ QryProductExchRateField Converter::CThostFtdcQryProductExchRateFieldToRust(CThos
 CThostFtdcQryForQuoteParamField Converter::QryForQuoteParamFieldToCpp(QryForQuoteParamField x) {
     CThostFtdcQryForQuoteParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -5960,11 +5971,11 @@ QryForQuoteParamField Converter::CThostFtdcQryForQuoteParamFieldToRust(CThostFtd
 CThostFtdcForQuoteParamField Converter::ForQuoteParamFieldToCpp(ForQuoteParamField x) {
     CThostFtdcForQuoteParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.LastPrice = x.LastPrice;
     y.PriceInterval = x.PriceInterval;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -5984,8 +5995,8 @@ CThostFtdcMMOptionInstrCommRateField Converter::MMOptionInstrCommRateFieldToCpp(
     CThostFtdcMMOptionInstrCommRateField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.OpenRatioByMoney = x.OpenRatioByMoney;
     y.OpenRatioByVolume = x.OpenRatioByVolume;
     y.CloseRatioByMoney = x.CloseRatioByMoney;
@@ -5994,7 +6005,7 @@ CThostFtdcMMOptionInstrCommRateField Converter::MMOptionInstrCommRateFieldToCpp(
     y.CloseTodayRatioByVolume = x.CloseTodayRatioByVolume;
     y.StrikeRatioByMoney = x.StrikeRatioByMoney;
     y.StrikeRatioByVolume = x.StrikeRatioByVolume;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -6020,9 +6031,9 @@ MMOptionInstrCommRateField Converter::CThostFtdcMMOptionInstrCommRateFieldToRust
 CThostFtdcQryMMOptionInstrCommRateField Converter::QryMMOptionInstrCommRateFieldToCpp(QryMMOptionInstrCommRateField x) {
     CThostFtdcQryMMOptionInstrCommRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -6040,15 +6051,15 @@ CThostFtdcMMInstrumentCommissionRateField Converter::MMInstrumentCommissionRateF
     CThostFtdcMMInstrumentCommissionRateField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.OpenRatioByMoney = x.OpenRatioByMoney;
     y.OpenRatioByVolume = x.OpenRatioByVolume;
     y.CloseRatioByMoney = x.CloseRatioByMoney;
     y.CloseRatioByVolume = x.CloseRatioByVolume;
     y.CloseTodayRatioByMoney = x.CloseTodayRatioByMoney;
     y.CloseTodayRatioByVolume = x.CloseTodayRatioByVolume;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -6072,9 +6083,9 @@ MMInstrumentCommissionRateField Converter::CThostFtdcMMInstrumentCommissionRateF
 CThostFtdcQryMMInstrumentCommissionRateField Converter::QryMMInstrumentCommissionRateFieldToCpp(QryMMInstrumentCommissionRateField x) {
     CThostFtdcQryMMInstrumentCommissionRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -6092,14 +6103,14 @@ CThostFtdcInstrumentOrderCommRateField Converter::InstrumentOrderCommRateFieldTo
     CThostFtdcInstrumentOrderCommRateField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.OrderCommByVolume = x.OrderCommByVolume;
     y.OrderActionCommByVolume = x.OrderActionCommByVolume;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.OrderCommByTrade = x.OrderCommByTrade;
     y.OrderActionCommByTrade = x.OrderActionCommByTrade;
     return y;
@@ -6126,9 +6137,9 @@ InstrumentOrderCommRateField Converter::CThostFtdcInstrumentOrderCommRateFieldTo
 CThostFtdcQryInstrumentOrderCommRateField Converter::QryInstrumentOrderCommRateFieldToCpp(QryInstrumentOrderCommRateField x) {
     CThostFtdcQryInstrumentOrderCommRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -6145,10 +6156,10 @@ QryInstrumentOrderCommRateField Converter::CThostFtdcQryInstrumentOrderCommRateF
 CThostFtdcTradeParamField Converter::TradeParamFieldToCpp(TradeParamField x) {
     CThostFtdcTradeParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     y.TradeParamID = x.TradeParamID;
     memcpy(y.TradeParamValue, x.TradeParamValue.data(), x.TradeParamValue.size() * sizeof(uint8_t));
-    strcpy(y.Memo, x.Memo.c_str());
+    CTP_SET_FIELD(y.Memo, x.Memo.c_str());
     return y;
 }
 
@@ -6168,14 +6179,14 @@ CThostFtdcInstrumentMarginRateULField Converter::InstrumentMarginRateULFieldToCp
     CThostFtdcInstrumentMarginRateULField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.LongMarginRatioByMoney = x.LongMarginRatioByMoney;
     y.LongMarginRatioByVolume = x.LongMarginRatioByVolume;
     y.ShortMarginRatioByMoney = x.ShortMarginRatioByMoney;
     y.ShortMarginRatioByVolume = x.ShortMarginRatioByVolume;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -6199,12 +6210,12 @@ CThostFtdcFutureLimitPosiParamField Converter::FutureLimitPosiParamFieldToCpp(Fu
     CThostFtdcFutureLimitPosiParamField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.SpecOpenVolume = x.SpecOpenVolume;
     y.ArbiOpenVolume = x.ArbiOpenVolume;
     y.OpenVolume = x.OpenVolume;
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     return y;
 }
 
@@ -6225,7 +6236,7 @@ FutureLimitPosiParamField Converter::CThostFtdcFutureLimitPosiParamFieldToRust(C
 CThostFtdcLoginForbiddenIPField Converter::LoginForbiddenIPFieldToCpp(LoginForbiddenIPField x) {
     CThostFtdcLoginForbiddenIPField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -6241,7 +6252,7 @@ CThostFtdcIPListField Converter::IPListFieldToCpp(IPListField x) {
     CThostFtdcIPListField y;
     memset(&y, 0, sizeof(y));
     y.IsWhite = x.IsWhite;
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -6257,23 +6268,23 @@ IPListField Converter::CThostFtdcIPListFieldToRust(CThostFtdcIPListField* x) {
 CThostFtdcInputOptionSelfCloseField Converter::InputOptionSelfCloseFieldToCpp(InputOptionSelfCloseField x) {
     CThostFtdcInputOptionSelfCloseField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.OptionSelfCloseRef, x.OptionSelfCloseRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.OptionSelfCloseRef, x.OptionSelfCloseRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.Volume = x.Volume;
     y.RequestID = x.RequestID;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.OptSelfCloseFlag = x.OptSelfCloseFlag;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -6304,21 +6315,21 @@ InputOptionSelfCloseField Converter::CThostFtdcInputOptionSelfCloseFieldToRust(C
 CThostFtdcInputOptionSelfCloseActionField Converter::InputOptionSelfCloseActionFieldToCpp(InputOptionSelfCloseActionField x) {
     CThostFtdcInputOptionSelfCloseActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.OptionSelfCloseActionRef = x.OptionSelfCloseActionRef;
-    strcpy(y.OptionSelfCloseRef, x.OptionSelfCloseRef.c_str());
+    CTP_SET_FIELD(y.OptionSelfCloseRef, x.OptionSelfCloseRef.c_str());
     y.RequestID = x.RequestID;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.OptionSelfCloseSysID, x.OptionSelfCloseSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OptionSelfCloseSysID, x.OptionSelfCloseSysID.c_str());
     y.ActionFlag = x.ActionFlag;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -6347,46 +6358,46 @@ InputOptionSelfCloseActionField Converter::CThostFtdcInputOptionSelfCloseActionF
 CThostFtdcOptionSelfCloseField Converter::OptionSelfCloseFieldToCpp(OptionSelfCloseField x) {
     CThostFtdcOptionSelfCloseField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.OptionSelfCloseRef, x.OptionSelfCloseRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.OptionSelfCloseRef, x.OptionSelfCloseRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.Volume = x.Volume;
     y.RequestID = x.RequestID;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.OptSelfCloseFlag = x.OptSelfCloseFlag;
-    strcpy(y.OptionSelfCloseLocalID, x.OptionSelfCloseLocalID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.OptionSelfCloseLocalID, x.OptionSelfCloseLocalID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
     y.OrderSubmitStatus = x.OrderSubmitStatus;
     y.NotifySequence = x.NotifySequence;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
-    strcpy(y.OptionSelfCloseSysID, x.OptionSelfCloseSysID.c_str());
-    strcpy(y.InsertDate, x.InsertDate.c_str());
-    strcpy(y.InsertTime, x.InsertTime.c_str());
-    strcpy(y.CancelTime, x.CancelTime.c_str());
+    CTP_SET_FIELD(y.OptionSelfCloseSysID, x.OptionSelfCloseSysID.c_str());
+    CTP_SET_FIELD(y.InsertDate, x.InsertDate.c_str());
+    CTP_SET_FIELD(y.InsertTime, x.InsertTime.c_str());
+    CTP_SET_FIELD(y.CancelTime, x.CancelTime.c_str());
     y.ExecResult = x.ExecResult;
-    strcpy(y.ClearingPartID, x.ClearingPartID.c_str());
+    CTP_SET_FIELD(y.ClearingPartID, x.ClearingPartID.c_str());
     y.SequenceNo = x.SequenceNo;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.StatusMsg, x.StatusMsg.c_str());
-    strcpy(y.ActiveUserID, x.ActiveUserID.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.ActiveUserID, x.ActiveUserID.c_str());
     y.BrokerOptionSelfCloseSeq = x.BrokerOptionSelfCloseSeq;
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -6440,33 +6451,33 @@ OptionSelfCloseField Converter::CThostFtdcOptionSelfCloseFieldToRust(CThostFtdcO
 CThostFtdcOptionSelfCloseActionField Converter::OptionSelfCloseActionFieldToCpp(OptionSelfCloseActionField x) {
     CThostFtdcOptionSelfCloseActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.OptionSelfCloseActionRef = x.OptionSelfCloseActionRef;
-    strcpy(y.OptionSelfCloseRef, x.OptionSelfCloseRef.c_str());
+    CTP_SET_FIELD(y.OptionSelfCloseRef, x.OptionSelfCloseRef.c_str());
     y.RequestID = x.RequestID;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.OptionSelfCloseSysID, x.OptionSelfCloseSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OptionSelfCloseSysID, x.OptionSelfCloseSysID.c_str());
     y.ActionFlag = x.ActionFlag;
-    strcpy(y.ActionDate, x.ActionDate.c_str());
-    strcpy(y.ActionTime, x.ActionTime.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ActionDate, x.ActionDate.c_str());
+    CTP_SET_FIELD(y.ActionTime, x.ActionTime.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.OptionSelfCloseLocalID, x.OptionSelfCloseLocalID.c_str());
-    strcpy(y.ActionLocalID, x.ActionLocalID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.OptionSelfCloseLocalID, x.OptionSelfCloseLocalID.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.OrderActionStatus = x.OrderActionStatus;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.StatusMsg, x.StatusMsg.c_str());
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -6507,13 +6518,13 @@ OptionSelfCloseActionField Converter::CThostFtdcOptionSelfCloseActionFieldToRust
 CThostFtdcQryOptionSelfCloseField Converter::QryOptionSelfCloseFieldToCpp(QryOptionSelfCloseField x) {
     CThostFtdcQryOptionSelfCloseField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.OptionSelfCloseSysID, x.OptionSelfCloseSysID.c_str());
-    strcpy(y.InsertTimeStart, x.InsertTimeStart.c_str());
-    strcpy(y.InsertTimeEnd, x.InsertTimeEnd.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OptionSelfCloseSysID, x.OptionSelfCloseSysID.c_str());
+    CTP_SET_FIELD(y.InsertTimeStart, x.InsertTimeStart.c_str());
+    CTP_SET_FIELD(y.InsertTimeEnd, x.InsertTimeEnd.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -6536,30 +6547,30 @@ CThostFtdcExchangeOptionSelfCloseField Converter::ExchangeOptionSelfCloseFieldTo
     memset(&y, 0, sizeof(y));
     y.Volume = x.Volume;
     y.RequestID = x.RequestID;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.OptSelfCloseFlag = x.OptSelfCloseFlag;
-    strcpy(y.OptionSelfCloseLocalID, x.OptionSelfCloseLocalID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.OptionSelfCloseLocalID, x.OptionSelfCloseLocalID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
     y.OrderSubmitStatus = x.OrderSubmitStatus;
     y.NotifySequence = x.NotifySequence;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
-    strcpy(y.OptionSelfCloseSysID, x.OptionSelfCloseSysID.c_str());
-    strcpy(y.InsertDate, x.InsertDate.c_str());
-    strcpy(y.InsertTime, x.InsertTime.c_str());
-    strcpy(y.CancelTime, x.CancelTime.c_str());
+    CTP_SET_FIELD(y.OptionSelfCloseSysID, x.OptionSelfCloseSysID.c_str());
+    CTP_SET_FIELD(y.InsertDate, x.InsertDate.c_str());
+    CTP_SET_FIELD(y.InsertTime, x.InsertTime.c_str());
+    CTP_SET_FIELD(y.CancelTime, x.CancelTime.c_str());
     y.ExecResult = x.ExecResult;
-    strcpy(y.ClearingPartID, x.ClearingPartID.c_str());
+    CTP_SET_FIELD(y.ClearingPartID, x.ClearingPartID.c_str());
     y.SequenceNo = x.SequenceNo;
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -6599,9 +6610,9 @@ ExchangeOptionSelfCloseField Converter::CThostFtdcExchangeOptionSelfCloseFieldTo
 CThostFtdcQryOptionSelfCloseActionField Converter::QryOptionSelfCloseActionFieldToCpp(QryOptionSelfCloseActionField x) {
     CThostFtdcQryOptionSelfCloseActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     return y;
 }
 
@@ -6618,25 +6629,25 @@ QryOptionSelfCloseActionField Converter::CThostFtdcQryOptionSelfCloseActionField
 CThostFtdcExchangeOptionSelfCloseActionField Converter::ExchangeOptionSelfCloseActionFieldToCpp(ExchangeOptionSelfCloseActionField x) {
     CThostFtdcExchangeOptionSelfCloseActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.OptionSelfCloseSysID, x.OptionSelfCloseSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OptionSelfCloseSysID, x.OptionSelfCloseSysID.c_str());
     y.ActionFlag = x.ActionFlag;
-    strcpy(y.ActionDate, x.ActionDate.c_str());
-    strcpy(y.ActionTime, x.ActionTime.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ActionDate, x.ActionDate.c_str());
+    CTP_SET_FIELD(y.ActionTime, x.ActionTime.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.OptionSelfCloseLocalID, x.OptionSelfCloseLocalID.c_str());
-    strcpy(y.ActionLocalID, x.ActionLocalID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.OptionSelfCloseLocalID, x.OptionSelfCloseLocalID.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.OrderActionStatus = x.OrderActionStatus;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
     y.OptSelfCloseFlag = x.OptSelfCloseFlag;
-    strcpy(y.IPAddress, x.IPAddress.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     return y;
 }
 
@@ -6670,13 +6681,13 @@ CThostFtdcSyncDelaySwapField Converter::SyncDelaySwapFieldToCpp(SyncDelaySwapFie
     CThostFtdcSyncDelaySwapField y;
     memset(&y, 0, sizeof(y));
     memcpy(y.DelaySwapSeqNo, x.DelaySwapSeqNo.data(), x.DelaySwapSeqNo.size() * sizeof(uint8_t));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.FromCurrencyID, x.FromCurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.FromCurrencyID, x.FromCurrencyID.c_str());
     y.FromAmount = x.FromAmount;
     y.FromFrozenSwap = x.FromFrozenSwap;
     y.FromRemainSwap = x.FromRemainSwap;
-    strcpy(y.ToCurrencyID, x.ToCurrencyID.c_str());
+    CTP_SET_FIELD(y.ToCurrencyID, x.ToCurrencyID.c_str());
     y.ToAmount = x.ToAmount;
     y.IsManualSwap = x.IsManualSwap;
     y.IsAllRemainSetZero = x.IsAllRemainSetZero;
@@ -6705,7 +6716,7 @@ SyncDelaySwapField Converter::CThostFtdcSyncDelaySwapFieldToRust(CThostFtdcSyncD
 CThostFtdcQrySyncDelaySwapField Converter::QrySyncDelaySwapFieldToCpp(QrySyncDelaySwapField x) {
     CThostFtdcQrySyncDelaySwapField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     memcpy(y.DelaySwapSeqNo, x.DelaySwapSeqNo.data(), x.DelaySwapSeqNo.size() * sizeof(uint8_t));
     return y;
 }
@@ -6723,15 +6734,15 @@ QrySyncDelaySwapField Converter::CThostFtdcQrySyncDelaySwapFieldToRust(CThostFtd
 CThostFtdcInvestUnitField Converter::InvestUnitFieldToCpp(InvestUnitField x) {
     CThostFtdcInvestUnitField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InvestorUnitName, x.InvestorUnitName.c_str());
-    strcpy(y.InvestorGroupID, x.InvestorGroupID.c_str());
-    strcpy(y.CommModelID, x.CommModelID.c_str());
-    strcpy(y.MarginModelID, x.MarginModelID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InvestorUnitName, x.InvestorUnitName.c_str());
+    CTP_SET_FIELD(y.InvestorGroupID, x.InvestorGroupID.c_str());
+    CTP_SET_FIELD(y.CommModelID, x.CommModelID.c_str());
+    CTP_SET_FIELD(y.MarginModelID, x.MarginModelID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
 }
 
@@ -6754,9 +6765,9 @@ InvestUnitField Converter::CThostFtdcInvestUnitFieldToRust(CThostFtdcInvestUnitF
 CThostFtdcQryInvestUnitField Converter::QryInvestUnitFieldToCpp(QryInvestUnitField x) {
     CThostFtdcQryInvestUnitField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
     return y;
 }
 
@@ -6773,10 +6784,10 @@ QryInvestUnitField Converter::CThostFtdcQryInvestUnitFieldToRust(CThostFtdcQryIn
 CThostFtdcSecAgentCheckModeField Converter::SecAgentCheckModeFieldToCpp(SecAgentCheckModeField x) {
     CThostFtdcSecAgentCheckModeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.BrokerSecAgentID, x.BrokerSecAgentID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerSecAgentID, x.BrokerSecAgentID.c_str());
     y.CheckSelfAccount = x.CheckSelfAccount;
     return y;
 }
@@ -6796,10 +6807,10 @@ SecAgentCheckModeField Converter::CThostFtdcSecAgentCheckModeFieldToRust(CThostF
 CThostFtdcSecAgentTradeInfoField Converter::SecAgentTradeInfoFieldToCpp(SecAgentTradeInfoField x) {
     CThostFtdcSecAgentTradeInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerSecAgentID, x.BrokerSecAgentID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerSecAgentID, x.BrokerSecAgentID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -6817,8 +6828,8 @@ SecAgentTradeInfoField Converter::CThostFtdcSecAgentTradeInfoFieldToRust(CThostF
 CThostFtdcMarketDataField Converter::MarketDataFieldToCpp(MarketDataField x) {
     CThostFtdcMarketDataField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.LastPrice = x.LastPrice;
     y.PreSettlementPrice = x.PreSettlementPrice;
     y.PreClosePrice = x.PreClosePrice;
@@ -6835,11 +6846,11 @@ CThostFtdcMarketDataField Converter::MarketDataFieldToCpp(MarketDataField x) {
     y.LowerLimitPrice = x.LowerLimitPrice;
     y.PreDelta = x.PreDelta;
     y.CurrDelta = x.CurrDelta;
-    strcpy(y.UpdateTime, x.UpdateTime.c_str());
+    CTP_SET_FIELD(y.UpdateTime, x.UpdateTime.c_str());
     y.UpdateMillisec = x.UpdateMillisec;
-    strcpy(y.ActionDay, x.ActionDay.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.ActionDay, x.ActionDay.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     return y;
 }
 
@@ -6876,7 +6887,7 @@ MarketDataField Converter::CThostFtdcMarketDataFieldToRust(CThostFtdcMarketDataF
 CThostFtdcMarketDataBaseField Converter::MarketDataBaseFieldToCpp(MarketDataBaseField x) {
     CThostFtdcMarketDataBaseField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PreSettlementPrice = x.PreSettlementPrice;
     y.PreClosePrice = x.PreClosePrice;
     y.PreOpenInterest = x.PreOpenInterest;
@@ -7054,10 +7065,10 @@ MarketDataAsk45Field Converter::CThostFtdcMarketDataAsk45FieldToRust(CThostFtdcM
 CThostFtdcMarketDataUpdateTimeField Converter::MarketDataUpdateTimeFieldToCpp(MarketDataUpdateTimeField x) {
     CThostFtdcMarketDataUpdateTimeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.UpdateTime, x.UpdateTime.c_str());
+    CTP_SET_FIELD(y.UpdateTime, x.UpdateTime.c_str());
     y.UpdateMillisec = x.UpdateMillisec;
-    strcpy(y.ActionDay, x.ActionDay.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ActionDay, x.ActionDay.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -7092,7 +7103,7 @@ MarketDataBandingPriceField Converter::CThostFtdcMarketDataBandingPriceFieldToRu
 CThostFtdcMarketDataExchangeField Converter::MarketDataExchangeFieldToCpp(MarketDataExchangeField x) {
     CThostFtdcMarketDataExchangeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     return y;
 }
 
@@ -7107,7 +7118,7 @@ MarketDataExchangeField Converter::CThostFtdcMarketDataExchangeFieldToRust(CThos
 CThostFtdcSpecificInstrumentField Converter::SpecificInstrumentFieldToCpp(SpecificInstrumentField x) {
     CThostFtdcSpecificInstrumentField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -7122,14 +7133,14 @@ SpecificInstrumentField Converter::CThostFtdcSpecificInstrumentFieldToRust(CThos
 CThostFtdcInstrumentStatusField Converter::InstrumentStatusFieldToCpp(InstrumentStatusField x) {
     CThostFtdcInstrumentStatusField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.SettlementGroupID, x.SettlementGroupID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.SettlementGroupID, x.SettlementGroupID.c_str());
     y.InstrumentStatus = x.InstrumentStatus;
     y.TradingSegmentSN = x.TradingSegmentSN;
-    strcpy(y.EnterTime, x.EnterTime.c_str());
+    CTP_SET_FIELD(y.EnterTime, x.EnterTime.c_str());
     y.EnterReason = x.EnterReason;
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -7151,8 +7162,8 @@ InstrumentStatusField Converter::CThostFtdcInstrumentStatusFieldToRust(CThostFtd
 CThostFtdcQryInstrumentStatusField Converter::QryInstrumentStatusFieldToCpp(QryInstrumentStatusField x) {
     CThostFtdcQryInstrumentStatusField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     return y;
 }
 
@@ -7168,10 +7179,10 @@ QryInstrumentStatusField Converter::CThostFtdcQryInstrumentStatusFieldToRust(CTh
 CThostFtdcInvestorAccountField Converter::InvestorAccountFieldToCpp(InvestorAccountField x) {
     CThostFtdcInvestorAccountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
 }
 
@@ -7189,11 +7200,11 @@ InvestorAccountField Converter::CThostFtdcInvestorAccountFieldToRust(CThostFtdcI
 CThostFtdcPositionProfitAlgorithmField Converter::PositionProfitAlgorithmFieldToCpp(PositionProfitAlgorithmField x) {
     CThostFtdcPositionProfitAlgorithmField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     y.Algorithm = x.Algorithm;
-    strcpy(y.Memo, x.Memo.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.Memo, x.Memo.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
 }
 
@@ -7212,9 +7223,9 @@ PositionProfitAlgorithmField Converter::CThostFtdcPositionProfitAlgorithmFieldTo
 CThostFtdcDiscountField Converter::DiscountFieldToCpp(DiscountField x) {
     CThostFtdcDiscountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.Discount = x.Discount;
     return y;
 }
@@ -7233,8 +7244,8 @@ DiscountField Converter::CThostFtdcDiscountFieldToRust(CThostFtdcDiscountField* 
 CThostFtdcQryTransferBankField Converter::QryTransferBankFieldToCpp(QryTransferBankField x) {
     CThostFtdcQryTransferBankField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBrchID, x.BankBrchID.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBrchID, x.BankBrchID.c_str());
     return y;
 }
 
@@ -7250,9 +7261,9 @@ QryTransferBankField Converter::CThostFtdcQryTransferBankFieldToRust(CThostFtdcQ
 CThostFtdcTransferBankField Converter::TransferBankFieldToCpp(TransferBankField x) {
     CThostFtdcTransferBankField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBrchID, x.BankBrchID.c_str());
-    strcpy(y.BankName, x.BankName.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBrchID, x.BankBrchID.c_str());
+    CTP_SET_FIELD(y.BankName, x.BankName.c_str());
     y.IsActive = x.IsActive;
     return y;
 }
@@ -7271,11 +7282,11 @@ TransferBankField Converter::CThostFtdcTransferBankFieldToRust(CThostFtdcTransfe
 CThostFtdcQryInvestorPositionDetailField Converter::QryInvestorPositionDetailFieldToCpp(QryInvestorPositionDetailField x) {
     CThostFtdcQryInvestorPositionDetailField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -7294,18 +7305,18 @@ QryInvestorPositionDetailField Converter::CThostFtdcQryInvestorPositionDetailFie
 CThostFtdcInvestorPositionDetailField Converter::InvestorPositionDetailFieldToCpp(InvestorPositionDetailField x) {
     CThostFtdcInvestorPositionDetailField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.Direction = x.Direction;
-    strcpy(y.OpenDate, x.OpenDate.c_str());
-    strcpy(y.TradeID, x.TradeID.c_str());
+    CTP_SET_FIELD(y.OpenDate, x.OpenDate.c_str());
+    CTP_SET_FIELD(y.TradeID, x.TradeID.c_str());
     y.Volume = x.Volume;
     y.OpenPrice = x.OpenPrice;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
     y.TradeType = x.TradeType;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.CloseProfitByDate = x.CloseProfitByDate;
     y.CloseProfitByTrade = x.CloseProfitByTrade;
     y.PositionProfitByDate = x.PositionProfitByDate;
@@ -7319,10 +7330,10 @@ CThostFtdcInvestorPositionDetailField Converter::InvestorPositionDetailFieldToCp
     y.CloseVolume = x.CloseVolume;
     y.CloseAmount = x.CloseAmount;
     y.TimeFirstVolume = x.TimeFirstVolume;
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
     y.SpecPosiType = x.SpecPosiType;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.CombInstrumentID, x.CombInstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.CombInstrumentID, x.CombInstrumentID.c_str());
     return y;
 }
 
@@ -7365,10 +7376,10 @@ InvestorPositionDetailField Converter::CThostFtdcInvestorPositionDetailFieldToRu
 CThostFtdcTradingAccountPasswordField Converter::TradingAccountPasswordFieldToCpp(TradingAccountPasswordField x) {
     CThostFtdcTradingAccountPasswordField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
 }
 
@@ -7386,24 +7397,24 @@ TradingAccountPasswordField Converter::CThostFtdcTradingAccountPasswordFieldToRu
 CThostFtdcMDTraderOfferField Converter::MDTraderOfferFieldToCpp(MDTraderOfferField x) {
     CThostFtdcMDTraderOfferField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
     y.TraderConnectStatus = x.TraderConnectStatus;
-    strcpy(y.ConnectRequestDate, x.ConnectRequestDate.c_str());
-    strcpy(y.ConnectRequestTime, x.ConnectRequestTime.c_str());
-    strcpy(y.LastReportDate, x.LastReportDate.c_str());
-    strcpy(y.LastReportTime, x.LastReportTime.c_str());
-    strcpy(y.ConnectDate, x.ConnectDate.c_str());
-    strcpy(y.ConnectTime, x.ConnectTime.c_str());
-    strcpy(y.StartDate, x.StartDate.c_str());
-    strcpy(y.StartTime, x.StartTime.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.MaxTradeID, x.MaxTradeID.c_str());
+    CTP_SET_FIELD(y.ConnectRequestDate, x.ConnectRequestDate.c_str());
+    CTP_SET_FIELD(y.ConnectRequestTime, x.ConnectRequestTime.c_str());
+    CTP_SET_FIELD(y.LastReportDate, x.LastReportDate.c_str());
+    CTP_SET_FIELD(y.LastReportTime, x.LastReportTime.c_str());
+    CTP_SET_FIELD(y.ConnectDate, x.ConnectDate.c_str());
+    CTP_SET_FIELD(y.ConnectTime, x.ConnectTime.c_str());
+    CTP_SET_FIELD(y.StartDate, x.StartDate.c_str());
+    CTP_SET_FIELD(y.StartTime, x.StartTime.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.MaxTradeID, x.MaxTradeID.c_str());
     memcpy(y.MaxOrderMessageReference, x.MaxOrderMessageReference.data(), x.MaxOrderMessageReference.size() * sizeof(uint8_t));
     y.OrderCancelAlg = x.OrderCancelAlg;
     return y;
@@ -7440,9 +7451,9 @@ MDTraderOfferField Converter::CThostFtdcMDTraderOfferFieldToRust(CThostFtdcMDTra
 CThostFtdcQryMDTraderOfferField Converter::QryMDTraderOfferFieldToCpp(QryMDTraderOfferField x) {
     CThostFtdcQryMDTraderOfferField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     return y;
 }
 
@@ -7459,7 +7470,7 @@ QryMDTraderOfferField Converter::CThostFtdcQryMDTraderOfferFieldToRust(CThostFtd
 CThostFtdcQryNoticeField Converter::QryNoticeFieldToCpp(QryNoticeField x) {
     CThostFtdcQryNoticeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     return y;
 }
 
@@ -7474,7 +7485,7 @@ QryNoticeField Converter::CThostFtdcQryNoticeFieldToRust(CThostFtdcQryNoticeFiel
 CThostFtdcNoticeField Converter::NoticeFieldToCpp(NoticeField x) {
     CThostFtdcNoticeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     memcpy(y.Content, x.Content.data(), x.Content.size() * sizeof(uint8_t));
     memcpy(y.SequenceLabel, x.SequenceLabel.data(), x.SequenceLabel.size() * sizeof(uint8_t));
     return y;
@@ -7495,8 +7506,8 @@ NoticeField Converter::CThostFtdcNoticeFieldToRust(CThostFtdcNoticeField* x) {
 CThostFtdcUserRightField Converter::UserRightFieldToCpp(UserRightField x) {
     CThostFtdcUserRightField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.UserRightType = x.UserRightType;
     y.IsForbidden = x.IsForbidden;
     return y;
@@ -7516,10 +7527,10 @@ UserRightField Converter::CThostFtdcUserRightFieldToRust(CThostFtdcUserRightFiel
 CThostFtdcQrySettlementInfoConfirmField Converter::QrySettlementInfoConfirmFieldToCpp(QrySettlementInfoConfirmField x) {
     CThostFtdcQrySettlementInfoConfirmField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
 }
 
@@ -7537,7 +7548,7 @@ QrySettlementInfoConfirmField Converter::CThostFtdcQrySettlementInfoConfirmField
 CThostFtdcLoadSettlementInfoField Converter::LoadSettlementInfoFieldToCpp(LoadSettlementInfoField x) {
     CThostFtdcLoadSettlementInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     return y;
 }
 
@@ -7552,14 +7563,14 @@ LoadSettlementInfoField Converter::CThostFtdcLoadSettlementInfoFieldToRust(CThos
 CThostFtdcBrokerWithdrawAlgorithmField Converter::BrokerWithdrawAlgorithmFieldToCpp(BrokerWithdrawAlgorithmField x) {
     CThostFtdcBrokerWithdrawAlgorithmField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     y.WithdrawAlgorithm = x.WithdrawAlgorithm;
     y.UsingRatio = x.UsingRatio;
     y.IncludeCloseProfit = x.IncludeCloseProfit;
     y.AllWithoutTrade = x.AllWithoutTrade;
     y.AvailIncludeCloseProfit = x.AvailIncludeCloseProfit;
     y.IsBrokerUserEvent = x.IsBrokerUserEvent;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.FundMortgageRatio = x.FundMortgageRatio;
     y.BalanceAlgorithm = x.BalanceAlgorithm;
     return y;
@@ -7585,10 +7596,10 @@ BrokerWithdrawAlgorithmField Converter::CThostFtdcBrokerWithdrawAlgorithmFieldTo
 CThostFtdcTradingAccountPasswordUpdateV1Field Converter::TradingAccountPasswordUpdateV1FieldToCpp(TradingAccountPasswordUpdateV1Field x) {
     CThostFtdcTradingAccountPasswordUpdateV1Field y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.OldPassword, x.OldPassword.c_str());
-    strcpy(y.NewPassword, x.NewPassword.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.OldPassword, x.OldPassword.c_str());
+    CTP_SET_FIELD(y.NewPassword, x.NewPassword.c_str());
     return y;
 }
 
@@ -7606,11 +7617,11 @@ TradingAccountPasswordUpdateV1Field Converter::CThostFtdcTradingAccountPasswordU
 CThostFtdcTradingAccountPasswordUpdateField Converter::TradingAccountPasswordUpdateFieldToCpp(TradingAccountPasswordUpdateField x) {
     CThostFtdcTradingAccountPasswordUpdateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.OldPassword, x.OldPassword.c_str());
-    strcpy(y.NewPassword, x.NewPassword.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.OldPassword, x.OldPassword.c_str());
+    CTP_SET_FIELD(y.NewPassword, x.NewPassword.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
 }
 
@@ -7630,8 +7641,8 @@ CThostFtdcQryCombinationLegField Converter::QryCombinationLegFieldToCpp(QryCombi
     CThostFtdcQryCombinationLegField y;
     memset(&y, 0, sizeof(y));
     y.LegID = x.LegID;
-    strcpy(y.CombInstrumentID, x.CombInstrumentID.c_str());
-    strcpy(y.LegInstrumentID, x.LegInstrumentID.c_str());
+    CTP_SET_FIELD(y.CombInstrumentID, x.CombInstrumentID.c_str());
+    CTP_SET_FIELD(y.LegInstrumentID, x.LegInstrumentID.c_str());
     return y;
 }
 
@@ -7648,7 +7659,7 @@ QryCombinationLegField Converter::CThostFtdcQryCombinationLegFieldToRust(CThostF
 CThostFtdcQrySyncStatusField Converter::QrySyncStatusFieldToCpp(QrySyncStatusField x) {
     CThostFtdcQrySyncStatusField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     return y;
 }
 
@@ -7667,8 +7678,8 @@ CThostFtdcCombinationLegField Converter::CombinationLegFieldToCpp(CombinationLeg
     y.Direction = x.Direction;
     y.LegMultiple = x.LegMultiple;
     y.ImplyLevel = x.ImplyLevel;
-    strcpy(y.CombInstrumentID, x.CombInstrumentID.c_str());
-    strcpy(y.LegInstrumentID, x.LegInstrumentID.c_str());
+    CTP_SET_FIELD(y.CombInstrumentID, x.CombInstrumentID.c_str());
+    CTP_SET_FIELD(y.LegInstrumentID, x.LegInstrumentID.c_str());
     return y;
 }
 
@@ -7688,7 +7699,7 @@ CombinationLegField Converter::CThostFtdcCombinationLegFieldToRust(CThostFtdcCom
 CThostFtdcSyncStatusField Converter::SyncStatusFieldToCpp(SyncStatusField x) {
     CThostFtdcSyncStatusField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.DataSyncStatus = x.DataSyncStatus;
     return y;
 }
@@ -7705,8 +7716,8 @@ SyncStatusField Converter::CThostFtdcSyncStatusFieldToRust(CThostFtdcSyncStatusF
 CThostFtdcQryLinkManField Converter::QryLinkManFieldToCpp(QryLinkManField x) {
     CThostFtdcQryLinkManField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     return y;
 }
 
@@ -7722,18 +7733,18 @@ QryLinkManField Converter::CThostFtdcQryLinkManFieldToRust(CThostFtdcQryLinkManF
 CThostFtdcLinkManField Converter::LinkManFieldToCpp(LinkManField x) {
     CThostFtdcLinkManField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.PersonType = x.PersonType;
     y.IdentifiedCardType = x.IdentifiedCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
-    strcpy(y.PersonName, x.PersonName.c_str());
-    strcpy(y.Telephone, x.Telephone.c_str());
-    strcpy(y.Address, x.Address.c_str());
-    strcpy(y.ZipCode, x.ZipCode.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.PersonName, x.PersonName.c_str());
+    CTP_SET_FIELD(y.Telephone, x.Telephone.c_str());
+    CTP_SET_FIELD(y.Address, x.Address.c_str());
+    CTP_SET_FIELD(y.ZipCode, x.ZipCode.c_str());
     y.Priority = x.Priority;
-    strcpy(y.UOAZipCode, x.UOAZipCode.c_str());
-    strcpy(y.PersonFullName, x.PersonFullName.c_str());
+    CTP_SET_FIELD(y.UOAZipCode, x.UOAZipCode.c_str());
+    CTP_SET_FIELD(y.PersonFullName, x.PersonFullName.c_str());
     return y;
 }
 
@@ -7759,8 +7770,8 @@ LinkManField Converter::CThostFtdcLinkManFieldToRust(CThostFtdcLinkManField* x) 
 CThostFtdcQryBrokerUserEventField Converter::QryBrokerUserEventFieldToCpp(QryBrokerUserEventField x) {
     CThostFtdcQryBrokerUserEventField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.UserEventType = x.UserEventType;
     return y;
 }
@@ -7778,17 +7789,17 @@ QryBrokerUserEventField Converter::CThostFtdcQryBrokerUserEventFieldToRust(CThos
 CThostFtdcBrokerUserEventField Converter::BrokerUserEventFieldToCpp(BrokerUserEventField x) {
     CThostFtdcBrokerUserEventField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.UserEventType = x.UserEventType;
     y.EventSequenceNo = x.EventSequenceNo;
-    strcpy(y.EventDate, x.EventDate.c_str());
-    strcpy(y.EventTime, x.EventTime.c_str());
-    strcpy(y.UserEventInfo, x.UserEventInfo.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.EventDate, x.EventDate.c_str());
+    CTP_SET_FIELD(y.EventTime, x.EventTime.c_str());
+    CTP_SET_FIELD(y.UserEventInfo, x.UserEventInfo.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.DRIdentityID = x.DRIdentityID;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     return y;
 }
 
@@ -7813,9 +7824,9 @@ BrokerUserEventField Converter::CThostFtdcBrokerUserEventFieldToRust(CThostFtdcB
 CThostFtdcQryContractBankField Converter::QryContractBankFieldToCpp(QryContractBankField x) {
     CThostFtdcQryContractBankField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBrchID, x.BankBrchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBrchID, x.BankBrchID.c_str());
     return y;
 }
 
@@ -7832,10 +7843,10 @@ QryContractBankField Converter::CThostFtdcQryContractBankFieldToRust(CThostFtdcQ
 CThostFtdcContractBankField Converter::ContractBankFieldToCpp(ContractBankField x) {
     CThostFtdcContractBankField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBrchID, x.BankBrchID.c_str());
-    strcpy(y.BankName, x.BankName.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBrchID, x.BankBrchID.c_str());
+    CTP_SET_FIELD(y.BankName, x.BankName.c_str());
     return y;
 }
 
@@ -7853,14 +7864,14 @@ ContractBankField Converter::CThostFtdcContractBankFieldToRust(CThostFtdcContrac
 CThostFtdcInvestorPositionCombineDetailField Converter::InvestorPositionCombineDetailFieldToCpp(InvestorPositionCombineDetailField x) {
     CThostFtdcInvestorPositionCombineDetailField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.OpenDate, x.OpenDate.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.OpenDate, x.OpenDate.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.SettlementID = x.SettlementID;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ComTradeID, x.ComTradeID.c_str());
-    strcpy(y.TradeID, x.TradeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ComTradeID, x.ComTradeID.c_str());
+    CTP_SET_FIELD(y.TradeID, x.TradeID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.Direction = x.Direction;
     y.TotalAmt = x.TotalAmt;
@@ -7871,9 +7882,9 @@ CThostFtdcInvestorPositionCombineDetailField Converter::InvestorPositionCombineD
     y.LegID = x.LegID;
     y.LegMultiple = x.LegMultiple;
     y.TradeGroupID = x.TradeGroupID;
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.CombInstrumentID, x.CombInstrumentID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.CombInstrumentID, x.CombInstrumentID.c_str());
     return y;
 }
 
@@ -7908,41 +7919,41 @@ InvestorPositionCombineDetailField Converter::CThostFtdcInvestorPositionCombineD
 CThostFtdcParkedOrderField Converter::ParkedOrderFieldToCpp(ParkedOrderField x) {
     CThostFtdcParkedOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.OrderRef, x.OrderRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.OrderPriceType = x.OrderPriceType;
     y.Direction = x.Direction;
-    strcpy(y.CombOffsetFlag, x.CombOffsetFlag.c_str());
-    strcpy(y.CombHedgeFlag, x.CombHedgeFlag.c_str());
+    CTP_SET_FIELD(y.CombOffsetFlag, x.CombOffsetFlag.c_str());
+    CTP_SET_FIELD(y.CombHedgeFlag, x.CombHedgeFlag.c_str());
     y.LimitPrice = x.LimitPrice;
     y.VolumeTotalOriginal = x.VolumeTotalOriginal;
     y.TimeCondition = x.TimeCondition;
-    strcpy(y.GTDDate, x.GTDDate.c_str());
+    CTP_SET_FIELD(y.GTDDate, x.GTDDate.c_str());
     y.VolumeCondition = x.VolumeCondition;
     y.MinVolume = x.MinVolume;
     y.ContingentCondition = x.ContingentCondition;
     y.StopPrice = x.StopPrice;
     y.ForceCloseReason = x.ForceCloseReason;
     y.IsAutoSuspend = x.IsAutoSuspend;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.RequestID = x.RequestID;
     y.UserForceClose = x.UserForceClose;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParkedOrderID, x.ParkedOrderID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParkedOrderID, x.ParkedOrderID.c_str());
     y.UserType = x.UserType;
     y.Status = x.Status;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     y.IsSwapOrder = x.IsSwapOrder;
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -7991,28 +8002,28 @@ ParkedOrderField Converter::CThostFtdcParkedOrderFieldToRust(CThostFtdcParkedOrd
 CThostFtdcParkedOrderActionField Converter::ParkedOrderActionFieldToCpp(ParkedOrderActionField x) {
     CThostFtdcParkedOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.OrderActionRef = x.OrderActionRef;
-    strcpy(y.OrderRef, x.OrderRef.c_str());
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
     y.RequestID = x.RequestID;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
     y.ActionFlag = x.ActionFlag;
     y.LimitPrice = x.LimitPrice;
     y.VolumeChange = x.VolumeChange;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.ParkedOrderActionID, x.ParkedOrderActionID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.ParkedOrderActionID, x.ParkedOrderActionID.c_str());
     y.UserType = x.UserType;
     y.Status = x.Status;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -8048,11 +8059,11 @@ ParkedOrderActionField Converter::CThostFtdcParkedOrderActionFieldToRust(CThostF
 CThostFtdcQryParkedOrderField Converter::QryParkedOrderFieldToCpp(QryParkedOrderField x) {
     CThostFtdcQryParkedOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -8071,11 +8082,11 @@ QryParkedOrderField Converter::CThostFtdcQryParkedOrderFieldToRust(CThostFtdcQry
 CThostFtdcQryParkedOrderActionField Converter::QryParkedOrderActionFieldToCpp(QryParkedOrderActionField x) {
     CThostFtdcQryParkedOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -8094,10 +8105,10 @@ QryParkedOrderActionField Converter::CThostFtdcQryParkedOrderActionFieldToRust(C
 CThostFtdcRemoveParkedOrderField Converter::RemoveParkedOrderFieldToCpp(RemoveParkedOrderField x) {
     CThostFtdcRemoveParkedOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ParkedOrderID, x.ParkedOrderID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ParkedOrderID, x.ParkedOrderID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
     return y;
 }
 
@@ -8115,10 +8126,10 @@ RemoveParkedOrderField Converter::CThostFtdcRemoveParkedOrderFieldToRust(CThostF
 CThostFtdcRemoveParkedOrderActionField Converter::RemoveParkedOrderActionFieldToCpp(RemoveParkedOrderActionField x) {
     CThostFtdcRemoveParkedOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ParkedOrderActionID, x.ParkedOrderActionID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ParkedOrderActionID, x.ParkedOrderActionID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
     return y;
 }
 
@@ -8136,11 +8147,11 @@ RemoveParkedOrderActionField Converter::CThostFtdcRemoveParkedOrderActionFieldTo
 CThostFtdcInvestorWithdrawAlgorithmField Converter::InvestorWithdrawAlgorithmFieldToCpp(InvestorWithdrawAlgorithmField x) {
     CThostFtdcInvestorWithdrawAlgorithmField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.UsingRatio = x.UsingRatio;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.FundMortgageRatio = x.FundMortgageRatio;
     return y;
 }
@@ -8161,11 +8172,11 @@ InvestorWithdrawAlgorithmField Converter::CThostFtdcInvestorWithdrawAlgorithmFie
 CThostFtdcQryInvestorPositionCombineDetailField Converter::QryInvestorPositionCombineDetailFieldToCpp(QryInvestorPositionCombineDetailField x) {
     CThostFtdcQryInvestorPositionCombineDetailField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.CombInstrumentID, x.CombInstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.CombInstrumentID, x.CombInstrumentID.c_str());
     return y;
 }
 
@@ -8199,9 +8210,9 @@ MarketDataAveragePriceField Converter::CThostFtdcMarketDataAveragePriceFieldToRu
 CThostFtdcVerifyInvestorPasswordField Converter::VerifyInvestorPasswordFieldToCpp(VerifyInvestorPasswordField x) {
     CThostFtdcVerifyInvestorPasswordField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     return y;
 }
 
@@ -8218,10 +8229,10 @@ VerifyInvestorPasswordField Converter::CThostFtdcVerifyInvestorPasswordFieldToRu
 CThostFtdcUserIPField Converter::UserIPFieldToCpp(UserIPField x) {
     CThostFtdcUserIPField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     memcpy(y.IPMask, x.IPMask.data(), x.IPMask.size() * sizeof(uint8_t));
     return y;
 }
@@ -8242,13 +8253,13 @@ UserIPField Converter::CThostFtdcUserIPFieldToRust(CThostFtdcUserIPField* x) {
 CThostFtdcTradingNoticeInfoField Converter::TradingNoticeInfoFieldToCpp(TradingNoticeInfoField x) {
     CThostFtdcTradingNoticeInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.SendTime, x.SendTime.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.SendTime, x.SendTime.c_str());
     memcpy(y.FieldContent, x.FieldContent.data(), x.FieldContent.size() * sizeof(uint8_t));
     y.SequenceSeries = x.SequenceSeries;
     y.SequenceNo = x.SequenceNo;
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
     return y;
 }
 
@@ -8270,15 +8281,15 @@ TradingNoticeInfoField Converter::CThostFtdcTradingNoticeInfoFieldToRust(CThostF
 CThostFtdcTradingNoticeField Converter::TradingNoticeFieldToCpp(TradingNoticeField x) {
     CThostFtdcTradingNoticeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.SequenceSeries = x.SequenceSeries;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.SendTime, x.SendTime.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.SendTime, x.SendTime.c_str());
     y.SequenceNo = x.SequenceNo;
     memcpy(y.FieldContent, x.FieldContent.data(), x.FieldContent.size() * sizeof(uint8_t));
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
     return y;
 }
 
@@ -8302,9 +8313,9 @@ TradingNoticeField Converter::CThostFtdcTradingNoticeFieldToRust(CThostFtdcTradi
 CThostFtdcQryTradingNoticeField Converter::QryTradingNoticeFieldToCpp(QryTradingNoticeField x) {
     CThostFtdcQryTradingNoticeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
     return y;
 }
 
@@ -8321,8 +8332,8 @@ QryTradingNoticeField Converter::CThostFtdcQryTradingNoticeFieldToRust(CThostFtd
 CThostFtdcQryErrOrderField Converter::QryErrOrderFieldToCpp(QryErrOrderField x) {
     CThostFtdcQryErrOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     return y;
 }
 
@@ -8338,39 +8349,39 @@ QryErrOrderField Converter::CThostFtdcQryErrOrderFieldToRust(CThostFtdcQryErrOrd
 CThostFtdcErrOrderField Converter::ErrOrderFieldToCpp(ErrOrderField x) {
     CThostFtdcErrOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.OrderRef, x.OrderRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.OrderPriceType = x.OrderPriceType;
     y.Direction = x.Direction;
-    strcpy(y.CombOffsetFlag, x.CombOffsetFlag.c_str());
-    strcpy(y.CombHedgeFlag, x.CombHedgeFlag.c_str());
+    CTP_SET_FIELD(y.CombOffsetFlag, x.CombOffsetFlag.c_str());
+    CTP_SET_FIELD(y.CombHedgeFlag, x.CombHedgeFlag.c_str());
     y.LimitPrice = x.LimitPrice;
     y.VolumeTotalOriginal = x.VolumeTotalOriginal;
     y.TimeCondition = x.TimeCondition;
-    strcpy(y.GTDDate, x.GTDDate.c_str());
+    CTP_SET_FIELD(y.GTDDate, x.GTDDate.c_str());
     y.VolumeCondition = x.VolumeCondition;
     y.MinVolume = x.MinVolume;
     y.ContingentCondition = x.ContingentCondition;
     y.StopPrice = x.StopPrice;
     y.ForceCloseReason = x.ForceCloseReason;
     y.IsAutoSuspend = x.IsAutoSuspend;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.RequestID = x.RequestID;
     y.UserForceClose = x.UserForceClose;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     y.IsSwapOrder = x.IsSwapOrder;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
-    strcpy(y.OrderMemo, x.OrderMemo.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.OrderMemo, x.OrderMemo.c_str());
     y.SessionReqSeq = x.SessionReqSeq;
     return y;
 }
@@ -8419,71 +8430,71 @@ ErrOrderField Converter::CThostFtdcErrOrderFieldToRust(CThostFtdcErrOrderField* 
 CThostFtdcErrorConditionalOrderField Converter::ErrorConditionalOrderFieldToCpp(ErrorConditionalOrderField x) {
     CThostFtdcErrorConditionalOrderField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.OrderRef, x.OrderRef.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.OrderPriceType = x.OrderPriceType;
     y.Direction = x.Direction;
-    strcpy(y.CombOffsetFlag, x.CombOffsetFlag.c_str());
-    strcpy(y.CombHedgeFlag, x.CombHedgeFlag.c_str());
+    CTP_SET_FIELD(y.CombOffsetFlag, x.CombOffsetFlag.c_str());
+    CTP_SET_FIELD(y.CombHedgeFlag, x.CombHedgeFlag.c_str());
     y.LimitPrice = x.LimitPrice;
     y.VolumeTotalOriginal = x.VolumeTotalOriginal;
     y.TimeCondition = x.TimeCondition;
-    strcpy(y.GTDDate, x.GTDDate.c_str());
+    CTP_SET_FIELD(y.GTDDate, x.GTDDate.c_str());
     y.VolumeCondition = x.VolumeCondition;
     y.MinVolume = x.MinVolume;
     y.ContingentCondition = x.ContingentCondition;
     y.StopPrice = x.StopPrice;
     y.ForceCloseReason = x.ForceCloseReason;
     y.IsAutoSuspend = x.IsAutoSuspend;
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.RequestID = x.RequestID;
-    strcpy(y.OrderLocalID, x.OrderLocalID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
     y.OrderSubmitStatus = x.OrderSubmitStatus;
     y.NotifySequence = x.NotifySequence;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
-    strcpy(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
     y.OrderSource = x.OrderSource;
     y.OrderStatus = x.OrderStatus;
     y.OrderType = x.OrderType;
     y.VolumeTraded = x.VolumeTraded;
     y.VolumeTotal = x.VolumeTotal;
-    strcpy(y.InsertDate, x.InsertDate.c_str());
-    strcpy(y.InsertTime, x.InsertTime.c_str());
-    strcpy(y.ActiveTime, x.ActiveTime.c_str());
-    strcpy(y.SuspendTime, x.SuspendTime.c_str());
-    strcpy(y.UpdateTime, x.UpdateTime.c_str());
-    strcpy(y.CancelTime, x.CancelTime.c_str());
-    strcpy(y.ActiveTraderID, x.ActiveTraderID.c_str());
-    strcpy(y.ClearingPartID, x.ClearingPartID.c_str());
+    CTP_SET_FIELD(y.InsertDate, x.InsertDate.c_str());
+    CTP_SET_FIELD(y.InsertTime, x.InsertTime.c_str());
+    CTP_SET_FIELD(y.ActiveTime, x.ActiveTime.c_str());
+    CTP_SET_FIELD(y.SuspendTime, x.SuspendTime.c_str());
+    CTP_SET_FIELD(y.UpdateTime, x.UpdateTime.c_str());
+    CTP_SET_FIELD(y.CancelTime, x.CancelTime.c_str());
+    CTP_SET_FIELD(y.ActiveTraderID, x.ActiveTraderID.c_str());
+    CTP_SET_FIELD(y.ClearingPartID, x.ClearingPartID.c_str());
     y.SequenceNo = x.SequenceNo;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
     y.UserForceClose = x.UserForceClose;
-    strcpy(y.ActiveUserID, x.ActiveUserID.c_str());
+    CTP_SET_FIELD(y.ActiveUserID, x.ActiveUserID.c_str());
     y.BrokerOrderSeq = x.BrokerOrderSeq;
-    strcpy(y.RelativeOrderSysID, x.RelativeOrderSysID.c_str());
+    CTP_SET_FIELD(y.RelativeOrderSysID, x.RelativeOrderSysID.c_str());
     y.ZCETotalTradedVolume = x.ZCETotalTradedVolume;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     y.IsSwapOrder = x.IsSwapOrder;
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -8562,8 +8573,8 @@ ErrorConditionalOrderField Converter::CThostFtdcErrorConditionalOrderFieldToRust
 CThostFtdcQryErrOrderActionField Converter::QryErrOrderActionFieldToCpp(QryErrOrderActionField x) {
     CThostFtdcQryErrOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     return y;
 }
 
@@ -8579,38 +8590,38 @@ QryErrOrderActionField Converter::CThostFtdcQryErrOrderActionFieldToRust(CThostF
 CThostFtdcErrOrderActionField Converter::ErrOrderActionFieldToCpp(ErrOrderActionField x) {
     CThostFtdcErrOrderActionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.OrderActionRef = x.OrderActionRef;
-    strcpy(y.OrderRef, x.OrderRef.c_str());
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
     y.RequestID = x.RequestID;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
     y.ActionFlag = x.ActionFlag;
     y.LimitPrice = x.LimitPrice;
     y.VolumeChange = x.VolumeChange;
-    strcpy(y.ActionDate, x.ActionDate.c_str());
-    strcpy(y.ActionTime, x.ActionTime.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ActionDate, x.ActionDate.c_str());
+    CTP_SET_FIELD(y.ActionTime, x.ActionTime.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.OrderLocalID, x.OrderLocalID.c_str());
-    strcpy(y.ActionLocalID, x.ActionLocalID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.BusinessUnit, x.BusinessUnit.c_str());
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.BusinessUnit, x.BusinessUnit.c_str());
     y.OrderActionStatus = x.OrderActionStatus;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.StatusMsg, x.StatusMsg.c_str());
-    strcpy(y.BranchID, x.BranchID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.BranchID, x.BranchID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
-    strcpy(y.OrderMemo, x.OrderMemo.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.OrderMemo, x.OrderMemo.c_str());
     y.SessionReqSeq = x.SessionReqSeq;
     return y;
 }
@@ -8658,7 +8669,7 @@ ErrOrderActionField Converter::CThostFtdcErrOrderActionFieldToRust(CThostFtdcErr
 CThostFtdcQryExchangeSequenceField Converter::QryExchangeSequenceFieldToCpp(QryExchangeSequenceField x) {
     CThostFtdcQryExchangeSequenceField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     return y;
 }
 
@@ -8673,7 +8684,7 @@ QryExchangeSequenceField Converter::CThostFtdcQryExchangeSequenceFieldToRust(CTh
 CThostFtdcExchangeSequenceField Converter::ExchangeSequenceFieldToCpp(ExchangeSequenceField x) {
     CThostFtdcExchangeSequenceField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.SequenceNo = x.SequenceNo;
     y.MarketStatus = x.MarketStatus;
     return y;
@@ -8692,16 +8703,16 @@ ExchangeSequenceField Converter::CThostFtdcExchangeSequenceFieldToRust(CThostFtd
 CThostFtdcQryMaxOrderVolumeWithPriceField Converter::QryMaxOrderVolumeWithPriceFieldToCpp(QryMaxOrderVolumeWithPriceField x) {
     CThostFtdcQryMaxOrderVolumeWithPriceField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.Direction = x.Direction;
     y.OffsetFlag = x.OffsetFlag;
     y.HedgeFlag = x.HedgeFlag;
     y.MaxVolume = x.MaxVolume;
     y.Price = x.Price;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -8725,10 +8736,10 @@ QryMaxOrderVolumeWithPriceField Converter::CThostFtdcQryMaxOrderVolumeWithPriceF
 CThostFtdcQryBrokerTradingParamsField Converter::QryBrokerTradingParamsFieldToCpp(QryBrokerTradingParamsField x) {
     CThostFtdcQryBrokerTradingParamsField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     return y;
 }
 
@@ -8746,14 +8757,14 @@ QryBrokerTradingParamsField Converter::CThostFtdcQryBrokerTradingParamsFieldToRu
 CThostFtdcBrokerTradingParamsField Converter::BrokerTradingParamsFieldToCpp(BrokerTradingParamsField x) {
     CThostFtdcBrokerTradingParamsField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.MarginPriceType = x.MarginPriceType;
     y.Algorithm = x.Algorithm;
     y.AvailIncludeCloseProfit = x.AvailIncludeCloseProfit;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.OptionRoyaltyPriceType = x.OptionRoyaltyPriceType;
-    strcpy(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     return y;
 }
 
@@ -8775,9 +8786,9 @@ BrokerTradingParamsField Converter::CThostFtdcBrokerTradingParamsFieldToRust(CTh
 CThostFtdcQryBrokerTradingAlgosField Converter::QryBrokerTradingAlgosFieldToCpp(QryBrokerTradingAlgosField x) {
     CThostFtdcQryBrokerTradingAlgosField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -8794,12 +8805,12 @@ QryBrokerTradingAlgosField Converter::CThostFtdcQryBrokerTradingAlgosFieldToRust
 CThostFtdcBrokerTradingAlgosField Converter::BrokerTradingAlgosFieldToCpp(BrokerTradingAlgosField x) {
     CThostFtdcBrokerTradingAlgosField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.HandlePositionAlgoID = x.HandlePositionAlgoID;
     y.FindMarginRateAlgoID = x.FindMarginRateAlgoID;
     y.HandleTradingAccountAlgoID = x.HandleTradingAccountAlgoID;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -8819,8 +8830,8 @@ BrokerTradingAlgosField Converter::CThostFtdcBrokerTradingAlgosFieldToRust(CThos
 CThostFtdcQueryBrokerDepositField Converter::QueryBrokerDepositFieldToCpp(QueryBrokerDepositField x) {
     CThostFtdcQueryBrokerDepositField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     return y;
 }
 
@@ -8836,10 +8847,10 @@ QueryBrokerDepositField Converter::CThostFtdcQueryBrokerDepositFieldToRust(CThos
 CThostFtdcBrokerDepositField Converter::BrokerDepositFieldToCpp(BrokerDepositField x) {
     CThostFtdcBrokerDepositField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.PreBalance = x.PreBalance;
     y.CurrMargin = x.CurrMargin;
     y.CloseProfit = x.CloseProfit;
@@ -8875,7 +8886,7 @@ BrokerDepositField Converter::CThostFtdcBrokerDepositFieldToRust(CThostFtdcBroke
 CThostFtdcQryCFMMCBrokerKeyField Converter::QryCFMMCBrokerKeyFieldToCpp(QryCFMMCBrokerKeyField x) {
     CThostFtdcQryCFMMCBrokerKeyField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     return y;
 }
 
@@ -8890,10 +8901,10 @@ QryCFMMCBrokerKeyField Converter::CThostFtdcQryCFMMCBrokerKeyFieldToRust(CThostF
 CThostFtdcCFMMCBrokerKeyField Converter::CFMMCBrokerKeyFieldToCpp(CFMMCBrokerKeyField x) {
     CThostFtdcCFMMCBrokerKeyField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.CreateDate, x.CreateDate.c_str());
-    strcpy(y.CreateTime, x.CreateTime.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.CreateDate, x.CreateDate.c_str());
+    CTP_SET_FIELD(y.CreateTime, x.CreateTime.c_str());
     y.KeyID = x.KeyID;
     memcpy(y.CurrentKey, x.CurrentKey.data(), x.CurrentKey.size() * sizeof(uint8_t));
     y.KeyKind = x.KeyKind;
@@ -8918,9 +8929,9 @@ CFMMCBrokerKeyField Converter::CThostFtdcCFMMCBrokerKeyFieldToRust(CThostFtdcCFM
 CThostFtdcCFMMCTradingAccountKeyField Converter::CFMMCTradingAccountKeyFieldToCpp(CFMMCTradingAccountKeyField x) {
     CThostFtdcCFMMCTradingAccountKeyField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     y.KeyID = x.KeyID;
     memcpy(y.CurrentKey, x.CurrentKey.data(), x.CurrentKey.size() * sizeof(uint8_t));
     return y;
@@ -8942,8 +8953,8 @@ CFMMCTradingAccountKeyField Converter::CThostFtdcCFMMCTradingAccountKeyFieldToRu
 CThostFtdcQryCFMMCTradingAccountKeyField Converter::QryCFMMCTradingAccountKeyFieldToCpp(QryCFMMCTradingAccountKeyField x) {
     CThostFtdcQryCFMMCTradingAccountKeyField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     return y;
 }
 
@@ -8959,9 +8970,9 @@ QryCFMMCTradingAccountKeyField Converter::CThostFtdcQryCFMMCTradingAccountKeyFie
 CThostFtdcBrokerUserOTPParamField Converter::BrokerUserOTPParamFieldToCpp(BrokerUserOTPParamField x) {
     CThostFtdcBrokerUserOTPParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.OTPVendorsID, x.OTPVendorsID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.OTPVendorsID, x.OTPVendorsID.c_str());
     memcpy(y.SerialNumber, x.SerialNumber.data(), x.SerialNumber.size() * sizeof(uint8_t));
     memcpy(y.AuthKey, x.AuthKey.data(), x.AuthKey.size() * sizeof(uint8_t));
     y.LastDrift = x.LastDrift;
@@ -8990,8 +9001,8 @@ BrokerUserOTPParamField Converter::CThostFtdcBrokerUserOTPParamFieldToRust(CThos
 CThostFtdcManualSyncBrokerUserOTPField Converter::ManualSyncBrokerUserOTPFieldToCpp(ManualSyncBrokerUserOTPField x) {
     CThostFtdcManualSyncBrokerUserOTPField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.OTPType = x.OTPType;
     memcpy(y.FirstOTP, x.FirstOTP.data(), x.FirstOTP.size() * sizeof(uint8_t));
     memcpy(y.SecondOTP, x.SecondOTP.data(), x.SecondOTP.size() * sizeof(uint8_t));
@@ -9015,9 +9026,9 @@ ManualSyncBrokerUserOTPField Converter::CThostFtdcManualSyncBrokerUserOTPFieldTo
 CThostFtdcCommRateModelField Converter::CommRateModelFieldToCpp(CommRateModelField x) {
     CThostFtdcCommRateModelField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.CommModelID, x.CommModelID.c_str());
-    strcpy(y.CommModelName, x.CommModelName.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.CommModelID, x.CommModelID.c_str());
+    CTP_SET_FIELD(y.CommModelName, x.CommModelName.c_str());
     return y;
 }
 
@@ -9034,8 +9045,8 @@ CommRateModelField Converter::CThostFtdcCommRateModelFieldToRust(CThostFtdcCommR
 CThostFtdcQryCommRateModelField Converter::QryCommRateModelFieldToCpp(QryCommRateModelField x) {
     CThostFtdcQryCommRateModelField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.CommModelID, x.CommModelID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.CommModelID, x.CommModelID.c_str());
     return y;
 }
 
@@ -9051,9 +9062,9 @@ QryCommRateModelField Converter::CThostFtdcQryCommRateModelFieldToRust(CThostFtd
 CThostFtdcMarginModelField Converter::MarginModelFieldToCpp(MarginModelField x) {
     CThostFtdcMarginModelField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.MarginModelID, x.MarginModelID.c_str());
-    strcpy(y.MarginModelName, x.MarginModelName.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.MarginModelID, x.MarginModelID.c_str());
+    CTP_SET_FIELD(y.MarginModelName, x.MarginModelName.c_str());
     return y;
 }
 
@@ -9070,8 +9081,8 @@ MarginModelField Converter::CThostFtdcMarginModelFieldToRust(CThostFtdcMarginMod
 CThostFtdcQryMarginModelField Converter::QryMarginModelFieldToCpp(QryMarginModelField x) {
     CThostFtdcQryMarginModelField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.MarginModelID, x.MarginModelID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.MarginModelID, x.MarginModelID.c_str());
     return y;
 }
 
@@ -9087,15 +9098,15 @@ QryMarginModelField Converter::CThostFtdcQryMarginModelFieldToRust(CThostFtdcQry
 CThostFtdcEWarrantOffsetField Converter::EWarrantOffsetFieldToCpp(EWarrantOffsetField x) {
     CThostFtdcEWarrantOffsetField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.Direction = x.Direction;
     y.HedgeFlag = x.HedgeFlag;
     y.Volume = x.Volume;
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -9118,11 +9129,11 @@ EWarrantOffsetField Converter::CThostFtdcEWarrantOffsetFieldToRust(CThostFtdcEWa
 CThostFtdcQryEWarrantOffsetField Converter::QryEWarrantOffsetFieldToCpp(QryEWarrantOffsetField x) {
     CThostFtdcQryEWarrantOffsetField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -9141,12 +9152,12 @@ QryEWarrantOffsetField Converter::CThostFtdcQryEWarrantOffsetFieldToRust(CThostF
 CThostFtdcQryInvestorProductGroupMarginField Converter::QryInvestorProductGroupMarginFieldToCpp(QryInvestorProductGroupMarginField x) {
     CThostFtdcQryInvestorProductGroupMarginField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.HedgeFlag = x.HedgeFlag;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.ProductGroupID, x.ProductGroupID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.ProductGroupID, x.ProductGroupID.c_str());
     return y;
 }
 
@@ -9166,9 +9177,9 @@ QryInvestorProductGroupMarginField Converter::CThostFtdcQryInvestorProductGroupM
 CThostFtdcInvestorProductGroupMarginField Converter::InvestorProductGroupMarginFieldToCpp(InvestorProductGroupMarginField x) {
     CThostFtdcInvestorProductGroupMarginField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
     y.FrozenMargin = x.FrozenMargin;
     y.LongFrozenMargin = x.LongFrozenMargin;
@@ -9192,9 +9203,9 @@ CThostFtdcInvestorProductGroupMarginField Converter::InvestorProductGroupMarginF
     y.LongExchOffsetAmount = x.LongExchOffsetAmount;
     y.ShortExchOffsetAmount = x.ShortExchOffsetAmount;
     y.HedgeFlag = x.HedgeFlag;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
-    strcpy(y.ProductGroupID, x.ProductGroupID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.ProductGroupID, x.ProductGroupID.c_str());
     return y;
 }
 
@@ -9237,9 +9248,9 @@ InvestorProductGroupMarginField Converter::CThostFtdcInvestorProductGroupMarginF
 CThostFtdcQueryCFMMCTradingAccountTokenField Converter::QueryCFMMCTradingAccountTokenFieldToCpp(QueryCFMMCTradingAccountTokenField x) {
     CThostFtdcQueryCFMMCTradingAccountTokenField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
     return y;
 }
 
@@ -9256,9 +9267,9 @@ QueryCFMMCTradingAccountTokenField Converter::CThostFtdcQueryCFMMCTradingAccount
 CThostFtdcCFMMCTradingAccountTokenField Converter::CFMMCTradingAccountTokenFieldToCpp(CFMMCTradingAccountTokenField x) {
     CThostFtdcCFMMCTradingAccountTokenField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     y.KeyID = x.KeyID;
     memcpy(y.Token, x.Token.data(), x.Token.size() * sizeof(uint8_t));
     return y;
@@ -9280,8 +9291,8 @@ CFMMCTradingAccountTokenField Converter::CThostFtdcCFMMCTradingAccountTokenField
 CThostFtdcQryProductGroupField Converter::QryProductGroupFieldToCpp(QryProductGroupField x) {
     CThostFtdcQryProductGroupField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     return y;
 }
 
@@ -9297,9 +9308,9 @@ QryProductGroupField Converter::CThostFtdcQryProductGroupFieldToRust(CThostFtdcQ
 CThostFtdcProductGroupField Converter::ProductGroupFieldToCpp(ProductGroupField x) {
     CThostFtdcProductGroupField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
-    strcpy(y.ProductGroupID, x.ProductGroupID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ProductGroupID, x.ProductGroupID.c_str());
     return y;
 }
 
@@ -9316,18 +9327,18 @@ ProductGroupField Converter::CThostFtdcProductGroupFieldToRust(CThostFtdcProduct
 CThostFtdcBulletinField Converter::BulletinFieldToCpp(BulletinField x) {
     CThostFtdcBulletinField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.BulletinID = x.BulletinID;
     y.SequenceNo = x.SequenceNo;
     memcpy(y.NewsType, x.NewsType.data(), x.NewsType.size() * sizeof(uint8_t));
     y.NewsUrgency = x.NewsUrgency;
-    strcpy(y.SendTime, x.SendTime.c_str());
+    CTP_SET_FIELD(y.SendTime, x.SendTime.c_str());
     memcpy(y.Abstract, x.Abstract.data(), x.Abstract.size() * sizeof(uint8_t));
     memcpy(y.ComeFrom, x.ComeFrom.data(), x.ComeFrom.size() * sizeof(uint8_t));
     memcpy(y.Content, x.Content.data(), x.Content.size() * sizeof(uint8_t));
     memcpy(y.URLLink, x.URLLink.data(), x.URLLink.size() * sizeof(uint8_t));
-    strcpy(y.MarketID, x.MarketID.c_str());
+    CTP_SET_FIELD(y.MarketID, x.MarketID.c_str());
     return y;
 }
 
@@ -9358,7 +9369,7 @@ BulletinField Converter::CThostFtdcBulletinFieldToRust(CThostFtdcBulletinField* 
 CThostFtdcQryBulletinField Converter::QryBulletinFieldToCpp(QryBulletinField x) {
     CThostFtdcQryBulletinField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.BulletinID = x.BulletinID;
     y.SequenceNo = x.SequenceNo;
     memcpy(y.NewsType, x.NewsType.data(), x.NewsType.size() * sizeof(uint8_t));
@@ -9387,7 +9398,7 @@ CThostFtdcMulticastInstrumentField Converter::MulticastInstrumentFieldToCpp(Mult
     y.CodePrice = x.CodePrice;
     y.VolumeMultiple = x.VolumeMultiple;
     y.PriceTick = x.PriceTick;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -9408,7 +9419,7 @@ CThostFtdcQryMulticastInstrumentField Converter::QryMulticastInstrumentFieldToCp
     CThostFtdcQryMulticastInstrumentField y;
     memset(&y, 0, sizeof(y));
     y.TopicID = x.TopicID;
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -9424,8 +9435,8 @@ QryMulticastInstrumentField Converter::CThostFtdcQryMulticastInstrumentFieldToRu
 CThostFtdcAppIDAuthAssignField Converter::AppIDAuthAssignFieldToCpp(AppIDAuthAssignField x) {
     CThostFtdcAppIDAuthAssignField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AppID, x.AppID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AppID, x.AppID.c_str());
     y.DRIdentityID = x.DRIdentityID;
     return y;
 }
@@ -9443,51 +9454,51 @@ AppIDAuthAssignField Converter::CThostFtdcAppIDAuthAssignFieldToRust(CThostFtdcA
 CThostFtdcReqOpenAccountField Converter::ReqOpenAccountFieldToCpp(ReqOpenAccountField x) {
     CThostFtdcReqOpenAccountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.Gender = x.Gender;
-    strcpy(y.CountryCode, x.CountryCode.c_str());
+    CTP_SET_FIELD(y.CountryCode, x.CountryCode.c_str());
     y.CustType = x.CustType;
-    strcpy(y.Address, x.Address.c_str());
-    strcpy(y.ZipCode, x.ZipCode.c_str());
-    strcpy(y.Telephone, x.Telephone.c_str());
-    strcpy(y.MobilePhone, x.MobilePhone.c_str());
-    strcpy(y.Fax, x.Fax.c_str());
-    strcpy(y.EMail, x.EMail.c_str());
+    CTP_SET_FIELD(y.Address, x.Address.c_str());
+    CTP_SET_FIELD(y.ZipCode, x.ZipCode.c_str());
+    CTP_SET_FIELD(y.Telephone, x.Telephone.c_str());
+    CTP_SET_FIELD(y.MobilePhone, x.MobilePhone.c_str());
+    CTP_SET_FIELD(y.Fax, x.Fax.c_str());
+    CTP_SET_FIELD(y.EMail, x.EMail.c_str());
     y.MoneyAccountStatus = x.MoneyAccountStatus;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.InstallID = x.InstallID;
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.CashExchangeCode = x.CashExchangeCode;
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.TID = x.TID;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -9549,51 +9560,51 @@ ReqOpenAccountField Converter::CThostFtdcReqOpenAccountFieldToRust(CThostFtdcReq
 CThostFtdcReqCancelAccountField Converter::ReqCancelAccountFieldToCpp(ReqCancelAccountField x) {
     CThostFtdcReqCancelAccountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.Gender = x.Gender;
-    strcpy(y.CountryCode, x.CountryCode.c_str());
+    CTP_SET_FIELD(y.CountryCode, x.CountryCode.c_str());
     y.CustType = x.CustType;
-    strcpy(y.Address, x.Address.c_str());
-    strcpy(y.ZipCode, x.ZipCode.c_str());
-    strcpy(y.Telephone, x.Telephone.c_str());
-    strcpy(y.MobilePhone, x.MobilePhone.c_str());
-    strcpy(y.Fax, x.Fax.c_str());
-    strcpy(y.EMail, x.EMail.c_str());
+    CTP_SET_FIELD(y.Address, x.Address.c_str());
+    CTP_SET_FIELD(y.ZipCode, x.ZipCode.c_str());
+    CTP_SET_FIELD(y.Telephone, x.Telephone.c_str());
+    CTP_SET_FIELD(y.MobilePhone, x.MobilePhone.c_str());
+    CTP_SET_FIELD(y.Fax, x.Fax.c_str());
+    CTP_SET_FIELD(y.EMail, x.EMail.c_str());
     y.MoneyAccountStatus = x.MoneyAccountStatus;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.InstallID = x.InstallID;
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.CashExchangeCode = x.CashExchangeCode;
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.TID = x.TID;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -9655,47 +9666,47 @@ ReqCancelAccountField Converter::CThostFtdcReqCancelAccountFieldToRust(CThostFtd
 CThostFtdcReqChangeAccountField Converter::ReqChangeAccountFieldToCpp(ReqChangeAccountField x) {
     CThostFtdcReqChangeAccountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.Gender = x.Gender;
-    strcpy(y.CountryCode, x.CountryCode.c_str());
+    CTP_SET_FIELD(y.CountryCode, x.CountryCode.c_str());
     y.CustType = x.CustType;
-    strcpy(y.Address, x.Address.c_str());
-    strcpy(y.ZipCode, x.ZipCode.c_str());
-    strcpy(y.Telephone, x.Telephone.c_str());
-    strcpy(y.MobilePhone, x.MobilePhone.c_str());
-    strcpy(y.Fax, x.Fax.c_str());
-    strcpy(y.EMail, x.EMail.c_str());
+    CTP_SET_FIELD(y.Address, x.Address.c_str());
+    CTP_SET_FIELD(y.ZipCode, x.ZipCode.c_str());
+    CTP_SET_FIELD(y.Telephone, x.Telephone.c_str());
+    CTP_SET_FIELD(y.MobilePhone, x.MobilePhone.c_str());
+    CTP_SET_FIELD(y.Fax, x.Fax.c_str());
+    CTP_SET_FIELD(y.EMail, x.EMail.c_str());
     y.MoneyAccountStatus = x.MoneyAccountStatus;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.NewBankAccount, x.NewBankAccount.c_str());
-    strcpy(y.NewBankPassWord, x.NewBankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.NewBankAccount, x.NewBankAccount.c_str());
+    CTP_SET_FIELD(y.NewBankPassWord, x.NewBankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.BankAccType = x.BankAccType;
     y.InstallID = x.InstallID;
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     y.TID = x.TID;
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -9752,31 +9763,31 @@ ReqChangeAccountField Converter::CThostFtdcReqChangeAccountFieldToRust(CThostFtd
 CThostFtdcReqTransferField Converter::ReqTransferFieldToCpp(ReqTransferField x) {
     CThostFtdcReqTransferField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.CustType = x.CustType;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.InstallID = x.InstallID;
     y.FutureSerial = x.FutureSerial;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.TradeAmount = x.TradeAmount;
     y.FutureFetchAmount = x.FutureFetchAmount;
     y.FeePayFlag = x.FeePayFlag;
@@ -9785,17 +9796,17 @@ CThostFtdcReqTransferField Converter::ReqTransferFieldToCpp(ReqTransferField x) 
     memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.TransferStatus = x.TransferStatus;
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -9857,31 +9868,31 @@ ReqTransferField Converter::CThostFtdcReqTransferFieldToRust(CThostFtdcReqTransf
 CThostFtdcRspTransferField Converter::RspTransferFieldToCpp(RspTransferField x) {
     CThostFtdcRspTransferField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.CustType = x.CustType;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.InstallID = x.InstallID;
     y.FutureSerial = x.FutureSerial;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.TradeAmount = x.TradeAmount;
     y.FutureFetchAmount = x.FutureFetchAmount;
     y.FeePayFlag = x.FeePayFlag;
@@ -9890,19 +9901,19 @@ CThostFtdcRspTransferField Converter::RspTransferFieldToCpp(RspTransferField x) 
     memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.TransferStatus = x.TransferStatus;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -9971,33 +9982,33 @@ CThostFtdcReqRepealField Converter::ReqRepealFieldToCpp(ReqRepealField x) {
     y.BankRepealFlag = x.BankRepealFlag;
     y.BrokerRepealFlag = x.BrokerRepealFlag;
     y.PlateRepealSerial = x.PlateRepealSerial;
-    strcpy(y.BankRepealSerial, x.BankRepealSerial.c_str());
+    CTP_SET_FIELD(y.BankRepealSerial, x.BankRepealSerial.c_str());
     y.FutureRepealSerial = x.FutureRepealSerial;
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.CustType = x.CustType;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.InstallID = x.InstallID;
     y.FutureSerial = x.FutureSerial;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.TradeAmount = x.TradeAmount;
     y.FutureFetchAmount = x.FutureFetchAmount;
     y.FeePayFlag = x.FeePayFlag;
@@ -10006,17 +10017,17 @@ CThostFtdcReqRepealField Converter::ReqRepealFieldToCpp(ReqRepealField x) {
     memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.TransferStatus = x.TransferStatus;
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -10090,33 +10101,33 @@ CThostFtdcRspRepealField Converter::RspRepealFieldToCpp(RspRepealField x) {
     y.BankRepealFlag = x.BankRepealFlag;
     y.BrokerRepealFlag = x.BrokerRepealFlag;
     y.PlateRepealSerial = x.PlateRepealSerial;
-    strcpy(y.BankRepealSerial, x.BankRepealSerial.c_str());
+    CTP_SET_FIELD(y.BankRepealSerial, x.BankRepealSerial.c_str());
     y.FutureRepealSerial = x.FutureRepealSerial;
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.CustType = x.CustType;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.InstallID = x.InstallID;
     y.FutureSerial = x.FutureSerial;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.TradeAmount = x.TradeAmount;
     y.FutureFetchAmount = x.FutureFetchAmount;
     y.FeePayFlag = x.FeePayFlag;
@@ -10125,19 +10136,19 @@ CThostFtdcRspRepealField Converter::RspRepealFieldToCpp(RspRepealField x) {
     memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.TransferStatus = x.TransferStatus;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -10208,43 +10219,43 @@ RspRepealField Converter::CThostFtdcRspRepealFieldToRust(CThostFtdcRspRepealFiel
 CThostFtdcReqQueryAccountField Converter::ReqQueryAccountFieldToCpp(ReqQueryAccountField x) {
     CThostFtdcReqQueryAccountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.CustType = x.CustType;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.FutureSerial = x.FutureSerial;
     y.InstallID = x.InstallID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -10298,45 +10309,45 @@ ReqQueryAccountField Converter::CThostFtdcReqQueryAccountFieldToRust(CThostFtdcR
 CThostFtdcRspQueryAccountField Converter::RspQueryAccountFieldToCpp(RspQueryAccountField x) {
     CThostFtdcRspQueryAccountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.CustType = x.CustType;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.FutureSerial = x.FutureSerial;
     y.InstallID = x.InstallID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.BankUseAmount = x.BankUseAmount;
     y.BankFetchAmount = x.BankFetchAmount;
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -10392,25 +10403,25 @@ RspQueryAccountField Converter::CThostFtdcRspQueryAccountFieldToRust(CThostFtdcR
 CThostFtdcFutureSignIOField Converter::FutureSignIOFieldToCpp(FutureSignIOField x) {
     CThostFtdcFutureSignIOField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     return y;
@@ -10449,29 +10460,29 @@ FutureSignIOField Converter::CThostFtdcFutureSignIOFieldToRust(CThostFtdcFutureS
 CThostFtdcRspFutureSignInField Converter::RspFutureSignInFieldToCpp(RspFutureSignInField x) {
     CThostFtdcRspFutureSignInField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     memcpy(y.PinKey, x.PinKey.data(), x.PinKey.size() * sizeof(uint8_t));
     memcpy(y.MacKey, x.MacKey.data(), x.MacKey.size() * sizeof(uint8_t));
     return y;
@@ -10516,25 +10527,25 @@ RspFutureSignInField Converter::CThostFtdcRspFutureSignInFieldToRust(CThostFtdcR
 CThostFtdcReqFutureSignOutField Converter::ReqFutureSignOutFieldToCpp(ReqFutureSignOutField x) {
     CThostFtdcReqFutureSignOutField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     return y;
@@ -10573,29 +10584,29 @@ ReqFutureSignOutField Converter::CThostFtdcReqFutureSignOutFieldToRust(CThostFtd
 CThostFtdcRspFutureSignOutField Converter::RspFutureSignOutFieldToCpp(RspFutureSignOutField x) {
     CThostFtdcRspFutureSignOutField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     return y;
 }
 
@@ -10634,33 +10645,33 @@ RspFutureSignOutField Converter::CThostFtdcRspFutureSignOutFieldToRust(CThostFtd
 CThostFtdcReqQueryTradeResultBySerialField Converter::ReqQueryTradeResultBySerialFieldToCpp(ReqQueryTradeResultBySerialField x) {
     CThostFtdcReqQueryTradeResultBySerialField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
     y.Reference = x.Reference;
     y.RefrenceIssureType = x.RefrenceIssureType;
     memcpy(y.RefrenceIssure, x.RefrenceIssure.data(), x.RefrenceIssure.size() * sizeof(uint8_t));
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.CustType = x.CustType;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.TradeAmount = x.TradeAmount;
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -10703,30 +10714,30 @@ ReqQueryTradeResultBySerialField Converter::CThostFtdcReqQueryTradeResultBySeria
 CThostFtdcRspQueryTradeResultBySerialField Converter::RspQueryTradeResultBySerialFieldToCpp(RspQueryTradeResultBySerialField x) {
     CThostFtdcRspQueryTradeResultBySerialField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     y.Reference = x.Reference;
     y.RefrenceIssureType = x.RefrenceIssureType;
     memcpy(y.RefrenceIssure, x.RefrenceIssure.data(), x.RefrenceIssure.size() * sizeof(uint8_t));
-    strcpy(y.OriginReturnCode, x.OriginReturnCode.c_str());
-    strcpy(y.OriginDescrInfoForReturnCode, x.OriginDescrInfoForReturnCode.c_str());
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.OriginReturnCode, x.OriginReturnCode.c_str());
+    CTP_SET_FIELD(y.OriginDescrInfoForReturnCode, x.OriginDescrInfoForReturnCode.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.TradeAmount = x.TradeAmount;
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     return y;
@@ -10770,15 +10781,15 @@ RspQueryTradeResultBySerialField Converter::CThostFtdcRspQueryTradeResultBySeria
 CThostFtdcReqDayEndFileReadyField Converter::ReqDayEndFileReadyFieldToCpp(ReqDayEndFileReadyField x) {
     CThostFtdcReqDayEndFileReadyField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
@@ -10812,8 +10823,8 @@ ReqDayEndFileReadyField Converter::CThostFtdcReqDayEndFileReadyFieldToRust(CThos
 CThostFtdcReturnResultField Converter::ReturnResultFieldToCpp(ReturnResultField x) {
     CThostFtdcReturnResultField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ReturnCode, x.ReturnCode.c_str());
-    strcpy(y.DescrInfoForReturnCode, x.DescrInfoForReturnCode.c_str());
+    CTP_SET_FIELD(y.ReturnCode, x.ReturnCode.c_str());
+    CTP_SET_FIELD(y.DescrInfoForReturnCode, x.DescrInfoForReturnCode.c_str());
     return y;
 }
 
@@ -10829,25 +10840,25 @@ ReturnResultField Converter::CThostFtdcReturnResultFieldToRust(CThostFtdcReturnR
 CThostFtdcVerifyFuturePasswordField Converter::VerifyFuturePasswordFieldToCpp(VerifyFuturePasswordField x) {
     CThostFtdcVerifyFuturePasswordField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
     y.InstallID = x.InstallID;
     y.TID = x.TID;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
 }
 
@@ -10880,11 +10891,11 @@ VerifyFuturePasswordField Converter::CThostFtdcVerifyFuturePasswordFieldToRust(C
 CThostFtdcVerifyCustInfoField Converter::VerifyCustInfoFieldToCpp(VerifyCustInfoField x) {
     CThostFtdcVerifyCustInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.CustType = x.CustType;
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -10903,14 +10914,14 @@ VerifyCustInfoField Converter::CThostFtdcVerifyCustInfoFieldToRust(CThostFtdcVer
 CThostFtdcVerifyFuturePasswordAndCustInfoField Converter::VerifyFuturePasswordAndCustInfoFieldToCpp(VerifyFuturePasswordAndCustInfoField x) {
     CThostFtdcVerifyFuturePasswordAndCustInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.CustType = x.CustType;
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -10933,12 +10944,12 @@ CThostFtdcDepositResultInformField Converter::DepositResultInformFieldToCpp(Depo
     CThostFtdcDepositResultInformField y;
     memset(&y, 0, sizeof(y));
     memcpy(y.DepositSeqNo, x.DepositSeqNo.data(), x.DepositSeqNo.size() * sizeof(uint8_t));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.Deposit = x.Deposit;
     y.RequestID = x.RequestID;
-    strcpy(y.ReturnCode, x.ReturnCode.c_str());
-    strcpy(y.DescrInfoForReturnCode, x.DescrInfoForReturnCode.c_str());
+    CTP_SET_FIELD(y.ReturnCode, x.ReturnCode.c_str());
+    CTP_SET_FIELD(y.DescrInfoForReturnCode, x.DescrInfoForReturnCode.c_str());
     return y;
 }
 
@@ -10960,24 +10971,24 @@ DepositResultInformField Converter::CThostFtdcDepositResultInformFieldToRust(CTh
 CThostFtdcReqSyncKeyField Converter::ReqSyncKeyFieldToCpp(ReqSyncKeyField x) {
     CThostFtdcReqSyncKeyField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     return y;
@@ -11015,28 +11026,28 @@ ReqSyncKeyField Converter::CThostFtdcReqSyncKeyFieldToRust(CThostFtdcReqSyncKeyF
 CThostFtdcRspSyncKeyField Converter::RspSyncKeyFieldToCpp(RspSyncKeyField x) {
     CThostFtdcRspSyncKeyField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     return y;
 }
 
@@ -11074,47 +11085,47 @@ RspSyncKeyField Converter::CThostFtdcRspSyncKeyFieldToRust(CThostFtdcRspSyncKeyF
 CThostFtdcNotifyQueryAccountField Converter::NotifyQueryAccountFieldToCpp(NotifyQueryAccountField x) {
     CThostFtdcNotifyQueryAccountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.CustType = x.CustType;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.FutureSerial = x.FutureSerial;
     y.InstallID = x.InstallID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.BankUseAmount = x.BankUseAmount;
     y.BankFetchAmount = x.BankFetchAmount;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -11173,33 +11184,33 @@ CThostFtdcTransferSerialField Converter::TransferSerialFieldToCpp(TransferSerial
     CThostFtdcTransferSerialField y;
     memset(&y, 0, sizeof(y));
     y.PlateSerial = x.PlateSerial;
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
     y.SessionID = x.SessionID;
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
     y.BankAccType = x.BankAccType;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
     y.FutureAccType = x.FutureAccType;
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.FutureSerial = x.FutureSerial;
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.TradeAmount = x.TradeAmount;
     y.CustFee = x.CustFee;
     y.BrokerFee = x.BrokerFee;
     y.AvailabilityFlag = x.AvailabilityFlag;
-    strcpy(y.OperatorCode, x.OperatorCode.c_str());
-    strcpy(y.BankNewAccount, x.BankNewAccount.c_str());
+    CTP_SET_FIELD(y.OperatorCode, x.OperatorCode.c_str());
+    CTP_SET_FIELD(y.BankNewAccount, x.BankNewAccount.c_str());
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     return y;
 }
 
@@ -11241,10 +11252,10 @@ TransferSerialField Converter::CThostFtdcTransferSerialFieldToRust(CThostFtdcTra
 CThostFtdcQryTransferSerialField Converter::QryTransferSerialFieldToCpp(QryTransferSerialField x) {
     CThostFtdcQryTransferSerialField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
 }
 
@@ -11262,29 +11273,29 @@ QryTransferSerialField Converter::CThostFtdcQryTransferSerialFieldToRust(CThostF
 CThostFtdcNotifyFutureSignInField Converter::NotifyFutureSignInFieldToCpp(NotifyFutureSignInField x) {
     CThostFtdcNotifyFutureSignInField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     memcpy(y.PinKey, x.PinKey.data(), x.PinKey.size() * sizeof(uint8_t));
     memcpy(y.MacKey, x.MacKey.data(), x.MacKey.size() * sizeof(uint8_t));
     return y;
@@ -11329,29 +11340,29 @@ NotifyFutureSignInField Converter::CThostFtdcNotifyFutureSignInFieldToRust(CThos
 CThostFtdcNotifyFutureSignOutField Converter::NotifyFutureSignOutFieldToCpp(NotifyFutureSignOutField x) {
     CThostFtdcNotifyFutureSignOutField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     return y;
 }
 
@@ -11390,28 +11401,28 @@ NotifyFutureSignOutField Converter::CThostFtdcNotifyFutureSignOutFieldToRust(CTh
 CThostFtdcNotifySyncKeyField Converter::NotifySyncKeyFieldToCpp(NotifySyncKeyField x) {
     CThostFtdcNotifySyncKeyField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     return y;
 }
 
@@ -11449,11 +11460,11 @@ NotifySyncKeyField Converter::CThostFtdcNotifySyncKeyFieldToRust(CThostFtdcNotif
 CThostFtdcQryAccountregisterField Converter::QryAccountregisterFieldToCpp(QryAccountregisterField x) {
     CThostFtdcQryAccountregisterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
 }
 
@@ -11472,24 +11483,24 @@ QryAccountregisterField Converter::CThostFtdcQryAccountregisterFieldToRust(CThos
 CThostFtdcAccountregisterField Converter::AccountregisterFieldToCpp(AccountregisterField x) {
     CThostFtdcAccountregisterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeDay, x.TradeDay.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.TradeDay, x.TradeDay.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
-    strcpy(y.CustomerName, x.CustomerName.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.OpenOrDestroy = x.OpenOrDestroy;
-    strcpy(y.RegDate, x.RegDate.c_str());
-    strcpy(y.OutDate, x.OutDate.c_str());
+    CTP_SET_FIELD(y.RegDate, x.RegDate.c_str());
+    CTP_SET_FIELD(y.OutDate, x.OutDate.c_str());
     y.TID = x.TID;
     y.CustType = x.CustType;
     y.BankAccType = x.BankAccType;
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -11521,53 +11532,53 @@ AccountregisterField Converter::CThostFtdcAccountregisterFieldToRust(CThostFtdcA
 CThostFtdcOpenAccountField Converter::OpenAccountFieldToCpp(OpenAccountField x) {
     CThostFtdcOpenAccountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.Gender = x.Gender;
-    strcpy(y.CountryCode, x.CountryCode.c_str());
+    CTP_SET_FIELD(y.CountryCode, x.CountryCode.c_str());
     y.CustType = x.CustType;
-    strcpy(y.Address, x.Address.c_str());
-    strcpy(y.ZipCode, x.ZipCode.c_str());
-    strcpy(y.Telephone, x.Telephone.c_str());
-    strcpy(y.MobilePhone, x.MobilePhone.c_str());
-    strcpy(y.Fax, x.Fax.c_str());
-    strcpy(y.EMail, x.EMail.c_str());
+    CTP_SET_FIELD(y.Address, x.Address.c_str());
+    CTP_SET_FIELD(y.ZipCode, x.ZipCode.c_str());
+    CTP_SET_FIELD(y.Telephone, x.Telephone.c_str());
+    CTP_SET_FIELD(y.MobilePhone, x.MobilePhone.c_str());
+    CTP_SET_FIELD(y.Fax, x.Fax.c_str());
+    CTP_SET_FIELD(y.EMail, x.EMail.c_str());
     y.MoneyAccountStatus = x.MoneyAccountStatus;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.InstallID = x.InstallID;
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.CashExchangeCode = x.CashExchangeCode;
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.TID = x.TID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -11631,53 +11642,53 @@ OpenAccountField Converter::CThostFtdcOpenAccountFieldToRust(CThostFtdcOpenAccou
 CThostFtdcCancelAccountField Converter::CancelAccountFieldToCpp(CancelAccountField x) {
     CThostFtdcCancelAccountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.Gender = x.Gender;
-    strcpy(y.CountryCode, x.CountryCode.c_str());
+    CTP_SET_FIELD(y.CountryCode, x.CountryCode.c_str());
     y.CustType = x.CustType;
-    strcpy(y.Address, x.Address.c_str());
-    strcpy(y.ZipCode, x.ZipCode.c_str());
-    strcpy(y.Telephone, x.Telephone.c_str());
-    strcpy(y.MobilePhone, x.MobilePhone.c_str());
-    strcpy(y.Fax, x.Fax.c_str());
-    strcpy(y.EMail, x.EMail.c_str());
+    CTP_SET_FIELD(y.Address, x.Address.c_str());
+    CTP_SET_FIELD(y.ZipCode, x.ZipCode.c_str());
+    CTP_SET_FIELD(y.Telephone, x.Telephone.c_str());
+    CTP_SET_FIELD(y.MobilePhone, x.MobilePhone.c_str());
+    CTP_SET_FIELD(y.Fax, x.Fax.c_str());
+    CTP_SET_FIELD(y.EMail, x.EMail.c_str());
     y.MoneyAccountStatus = x.MoneyAccountStatus;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.InstallID = x.InstallID;
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.CashExchangeCode = x.CashExchangeCode;
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.TID = x.TID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -11741,49 +11752,49 @@ CancelAccountField Converter::CThostFtdcCancelAccountFieldToRust(CThostFtdcCance
 CThostFtdcChangeAccountField Converter::ChangeAccountFieldToCpp(ChangeAccountField x) {
     CThostFtdcChangeAccountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.Gender = x.Gender;
-    strcpy(y.CountryCode, x.CountryCode.c_str());
+    CTP_SET_FIELD(y.CountryCode, x.CountryCode.c_str());
     y.CustType = x.CustType;
-    strcpy(y.Address, x.Address.c_str());
-    strcpy(y.ZipCode, x.ZipCode.c_str());
-    strcpy(y.Telephone, x.Telephone.c_str());
-    strcpy(y.MobilePhone, x.MobilePhone.c_str());
-    strcpy(y.Fax, x.Fax.c_str());
-    strcpy(y.EMail, x.EMail.c_str());
+    CTP_SET_FIELD(y.Address, x.Address.c_str());
+    CTP_SET_FIELD(y.ZipCode, x.ZipCode.c_str());
+    CTP_SET_FIELD(y.Telephone, x.Telephone.c_str());
+    CTP_SET_FIELD(y.MobilePhone, x.MobilePhone.c_str());
+    CTP_SET_FIELD(y.Fax, x.Fax.c_str());
+    CTP_SET_FIELD(y.EMail, x.EMail.c_str());
     y.MoneyAccountStatus = x.MoneyAccountStatus;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.NewBankAccount, x.NewBankAccount.c_str());
-    strcpy(y.NewBankPassWord, x.NewBankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.NewBankAccount, x.NewBankAccount.c_str());
+    CTP_SET_FIELD(y.NewBankPassWord, x.NewBankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.BankAccType = x.BankAccType;
     y.InstallID = x.InstallID;
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     y.TID = x.TID;
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
 
@@ -11842,11 +11853,11 @@ ChangeAccountField Converter::CThostFtdcChangeAccountFieldToRust(CThostFtdcChang
 CThostFtdcSecAgentACIDMapField Converter::SecAgentACIDMapFieldToCpp(SecAgentACIDMapField x) {
     CThostFtdcSecAgentACIDMapField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
-    strcpy(y.BrokerSecAgentID, x.BrokerSecAgentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerSecAgentID, x.BrokerSecAgentID.c_str());
     return y;
 }
 
@@ -11865,10 +11876,10 @@ SecAgentACIDMapField Converter::CThostFtdcSecAgentACIDMapFieldToRust(CThostFtdcS
 CThostFtdcQrySecAgentACIDMapField Converter::QrySecAgentACIDMapFieldToCpp(QrySecAgentACIDMapField x) {
     CThostFtdcQrySecAgentACIDMapField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
 }
 
@@ -11886,8 +11897,8 @@ QrySecAgentACIDMapField Converter::CThostFtdcQrySecAgentACIDMapFieldToRust(CThos
 CThostFtdcUserRightsAssignField Converter::UserRightsAssignFieldToCpp(UserRightsAssignField x) {
     CThostFtdcUserRightsAssignField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.DRIdentityID = x.DRIdentityID;
     return y;
 }
@@ -11905,7 +11916,7 @@ UserRightsAssignField Converter::CThostFtdcUserRightsAssignFieldToRust(CThostFtd
 CThostFtdcBrokerUserRightAssignField Converter::BrokerUserRightAssignFieldToCpp(BrokerUserRightAssignField x) {
     CThostFtdcBrokerUserRightAssignField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     y.DRIdentityID = x.DRIdentityID;
     y.Tradeable = x.Tradeable;
     return y;
@@ -11926,8 +11937,8 @@ CThostFtdcDRTransferField Converter::DRTransferFieldToCpp(DRTransferField x) {
     memset(&y, 0, sizeof(y));
     y.OrigDRIdentityID = x.OrigDRIdentityID;
     y.DestDRIdentityID = x.DestDRIdentityID;
-    strcpy(y.OrigBrokerID, x.OrigBrokerID.c_str());
-    strcpy(y.DestBrokerID, x.DestBrokerID.c_str());
+    CTP_SET_FIELD(y.OrigBrokerID, x.OrigBrokerID.c_str());
+    CTP_SET_FIELD(y.DestBrokerID, x.DestBrokerID.c_str());
     return y;
 }
 
@@ -11945,8 +11956,8 @@ DRTransferField Converter::CThostFtdcDRTransferFieldToRust(CThostFtdcDRTransferF
 CThostFtdcFensUserInfoField Converter::FensUserInfoFieldToCpp(FensUserInfoField x) {
     CThostFtdcFensUserInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.LoginMode = x.LoginMode;
     return y;
 }
@@ -11979,9 +11990,9 @@ CurrTransferIdentityField Converter::CThostFtdcCurrTransferIdentityFieldToRust(C
 CThostFtdcLoginForbiddenUserField Converter::LoginForbiddenUserFieldToCpp(LoginForbiddenUserField x) {
     CThostFtdcLoginForbiddenUserField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -11998,8 +12009,8 @@ LoginForbiddenUserField Converter::CThostFtdcLoginForbiddenUserFieldToRust(CThos
 CThostFtdcQryLoginForbiddenUserField Converter::QryLoginForbiddenUserFieldToCpp(QryLoginForbiddenUserField x) {
     CThostFtdcQryLoginForbiddenUserField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     return y;
 }
 
@@ -12015,10 +12026,10 @@ QryLoginForbiddenUserField Converter::CThostFtdcQryLoginForbiddenUserFieldToRust
 CThostFtdcTradingAccountReserveField Converter::TradingAccountReserveFieldToCpp(TradingAccountReserveField x) {
     CThostFtdcTradingAccountReserveField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     y.Reserve = x.Reserve;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
 }
 
@@ -12036,7 +12047,7 @@ TradingAccountReserveField Converter::CThostFtdcTradingAccountReserveFieldToRust
 CThostFtdcQryLoginForbiddenIPField Converter::QryLoginForbiddenIPFieldToCpp(QryLoginForbiddenIPField x) {
     CThostFtdcQryLoginForbiddenIPField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -12051,7 +12062,7 @@ QryLoginForbiddenIPField Converter::CThostFtdcQryLoginForbiddenIPFieldToRust(CTh
 CThostFtdcQryIPListField Converter::QryIPListFieldToCpp(QryIPListField x) {
     CThostFtdcQryIPListField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -12066,8 +12077,8 @@ QryIPListField Converter::CThostFtdcQryIPListFieldToRust(CThostFtdcQryIPListFiel
 CThostFtdcQryUserRightsAssignField Converter::QryUserRightsAssignFieldToCpp(QryUserRightsAssignField x) {
     CThostFtdcQryUserRightsAssignField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     return y;
 }
 
@@ -12083,47 +12094,47 @@ QryUserRightsAssignField Converter::CThostFtdcQryUserRightsAssignFieldToRust(CTh
 CThostFtdcReserveOpenAccountConfirmField Converter::ReserveOpenAccountConfirmFieldToCpp(ReserveOpenAccountConfirmField x) {
     CThostFtdcReserveOpenAccountConfirmField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.Gender = x.Gender;
-    strcpy(y.CountryCode, x.CountryCode.c_str());
+    CTP_SET_FIELD(y.CountryCode, x.CountryCode.c_str());
     y.CustType = x.CustType;
-    strcpy(y.Address, x.Address.c_str());
-    strcpy(y.ZipCode, x.ZipCode.c_str());
-    strcpy(y.Telephone, x.Telephone.c_str());
-    strcpy(y.MobilePhone, x.MobilePhone.c_str());
-    strcpy(y.Fax, x.Fax.c_str());
-    strcpy(y.EMail, x.EMail.c_str());
+    CTP_SET_FIELD(y.Address, x.Address.c_str());
+    CTP_SET_FIELD(y.ZipCode, x.ZipCode.c_str());
+    CTP_SET_FIELD(y.Telephone, x.Telephone.c_str());
+    CTP_SET_FIELD(y.MobilePhone, x.MobilePhone.c_str());
+    CTP_SET_FIELD(y.Fax, x.Fax.c_str());
+    CTP_SET_FIELD(y.EMail, x.EMail.c_str());
     y.MoneyAccountStatus = x.MoneyAccountStatus;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
     y.InstallID = x.InstallID;
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     y.TID = x.TID;
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     memcpy(y.BankReserveOpenSeq, x.BankReserveOpenSeq.data(), x.BankReserveOpenSeq.size() * sizeof(uint8_t));
-    strcpy(y.BookDate, x.BookDate.c_str());
+    CTP_SET_FIELD(y.BookDate, x.BookDate.c_str());
     memcpy(y.BookPsw, x.BookPsw.data(), x.BookPsw.size() * sizeof(uint8_t));
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     return y;
 }
 
@@ -12182,43 +12193,43 @@ ReserveOpenAccountConfirmField Converter::CThostFtdcReserveOpenAccountConfirmFie
 CThostFtdcReserveOpenAccountField Converter::ReserveOpenAccountFieldToCpp(ReserveOpenAccountField x) {
     CThostFtdcReserveOpenAccountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.Gender = x.Gender;
-    strcpy(y.CountryCode, x.CountryCode.c_str());
+    CTP_SET_FIELD(y.CountryCode, x.CountryCode.c_str());
     y.CustType = x.CustType;
-    strcpy(y.Address, x.Address.c_str());
-    strcpy(y.ZipCode, x.ZipCode.c_str());
-    strcpy(y.Telephone, x.Telephone.c_str());
-    strcpy(y.MobilePhone, x.MobilePhone.c_str());
-    strcpy(y.Fax, x.Fax.c_str());
-    strcpy(y.EMail, x.EMail.c_str());
+    CTP_SET_FIELD(y.Address, x.Address.c_str());
+    CTP_SET_FIELD(y.ZipCode, x.ZipCode.c_str());
+    CTP_SET_FIELD(y.Telephone, x.Telephone.c_str());
+    CTP_SET_FIELD(y.MobilePhone, x.MobilePhone.c_str());
+    CTP_SET_FIELD(y.Fax, x.Fax.c_str());
+    CTP_SET_FIELD(y.EMail, x.EMail.c_str());
     y.MoneyAccountStatus = x.MoneyAccountStatus;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
     y.InstallID = x.InstallID;
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     y.TID = x.TID;
     y.ReserveOpenAccStas = x.ReserveOpenAccStas;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     return y;
 }
 
@@ -12271,20 +12282,20 @@ ReserveOpenAccountField Converter::CThostFtdcReserveOpenAccountFieldToRust(CThos
 CThostFtdcAccountPropertyField Converter::AccountPropertyFieldToCpp(AccountPropertyField x) {
     CThostFtdcAccountPropertyField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.OpenName, x.OpenName.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.OpenName, x.OpenName.c_str());
     memcpy(y.OpenBank, x.OpenBank.data(), x.OpenBank.size() * sizeof(uint8_t));
     y.IsActive = x.IsActive;
     y.AccountSourceType = x.AccountSourceType;
-    strcpy(y.OpenDate, x.OpenDate.c_str());
-    strcpy(y.CancelDate, x.CancelDate.c_str());
-    strcpy(y.OperatorID, x.OperatorID.c_str());
-    strcpy(y.OperateDate, x.OperateDate.c_str());
-    strcpy(y.OperateTime, x.OperateTime.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.OpenDate, x.OpenDate.c_str());
+    CTP_SET_FIELD(y.CancelDate, x.CancelDate.c_str());
+    CTP_SET_FIELD(y.OperatorID, x.OperatorID.c_str());
+    CTP_SET_FIELD(y.OperateDate, x.OperateDate.c_str());
+    CTP_SET_FIELD(y.OperateTime, x.OperateTime.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
 }
 
@@ -12343,8 +12354,8 @@ CurrDRIdentityField Converter::CThostFtdcCurrDRIdentityFieldToRust(CThostFtdcCur
 CThostFtdcQrySecAgentCheckModeField Converter::QrySecAgentCheckModeFieldToCpp(QrySecAgentCheckModeField x) {
     CThostFtdcQrySecAgentCheckModeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     return y;
 }
 
@@ -12360,8 +12371,8 @@ QrySecAgentCheckModeField Converter::CThostFtdcQrySecAgentCheckModeFieldToRust(C
 CThostFtdcQrySecAgentTradeInfoField Converter::QrySecAgentTradeInfoFieldToCpp(QrySecAgentTradeInfoField x) {
     CThostFtdcQrySecAgentTradeInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerSecAgentID, x.BrokerSecAgentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerSecAgentID, x.BrokerSecAgentID.c_str());
     return y;
 }
 
@@ -12377,9 +12388,9 @@ QrySecAgentTradeInfoField Converter::CThostFtdcQrySecAgentTradeInfoFieldToRust(C
 CThostFtdcReqUserAuthMethodField Converter::ReqUserAuthMethodFieldToCpp(ReqUserAuthMethodField x) {
     CThostFtdcReqUserAuthMethodField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     return y;
 }
 
@@ -12411,9 +12422,9 @@ RspUserAuthMethodField Converter::CThostFtdcRspUserAuthMethodFieldToRust(CThostF
 CThostFtdcReqGenUserCaptchaField Converter::ReqGenUserCaptchaFieldToCpp(ReqGenUserCaptchaField x) {
     CThostFtdcReqGenUserCaptchaField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     return y;
 }
 
@@ -12430,10 +12441,10 @@ ReqGenUserCaptchaField Converter::CThostFtdcReqGenUserCaptchaFieldToRust(CThostF
 CThostFtdcRspGenUserCaptchaField Converter::RspGenUserCaptchaFieldToCpp(RspGenUserCaptchaField x) {
     CThostFtdcRspGenUserCaptchaField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.CaptchaInfoLen = x.CaptchaInfoLen;
-    strcpy(y.CaptchaInfo, x.CaptchaInfo.c_str());
+    CTP_SET_FIELD(y.CaptchaInfo, x.CaptchaInfo.c_str());
     return y;
 }
 
@@ -12451,9 +12462,9 @@ RspGenUserCaptchaField Converter::CThostFtdcRspGenUserCaptchaFieldToRust(CThostF
 CThostFtdcReqGenUserTextField Converter::ReqGenUserTextFieldToCpp(ReqGenUserTextField x) {
     CThostFtdcReqGenUserTextField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     return y;
 }
 
@@ -12485,18 +12496,18 @@ RspGenUserTextField Converter::CThostFtdcRspGenUserTextFieldToRust(CThostFtdcRsp
 CThostFtdcReqUserLoginWithCaptchaField Converter::ReqUserLoginWithCaptchaFieldToCpp(ReqUserLoginWithCaptchaField x) {
     CThostFtdcReqUserLoginWithCaptchaField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.Password, x.Password.c_str());
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.InterfaceProductInfo, x.InterfaceProductInfo.c_str());
-    strcpy(y.ProtocolInfo, x.ProtocolInfo.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.LoginRemark, x.LoginRemark.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.InterfaceProductInfo, x.InterfaceProductInfo.c_str());
+    CTP_SET_FIELD(y.ProtocolInfo, x.ProtocolInfo.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.LoginRemark, x.LoginRemark.c_str());
     memcpy(y.Captcha, x.Captcha.data(), x.Captcha.size() * sizeof(uint8_t));
     y.ClientIPPort = x.ClientIPPort;
-    strcpy(y.ClientIPAddress, x.ClientIPAddress.c_str());
+    CTP_SET_FIELD(y.ClientIPAddress, x.ClientIPAddress.c_str());
     return y;
 }
 
@@ -12523,18 +12534,18 @@ ReqUserLoginWithCaptchaField Converter::CThostFtdcReqUserLoginWithCaptchaFieldTo
 CThostFtdcReqUserLoginWithTextField Converter::ReqUserLoginWithTextFieldToCpp(ReqUserLoginWithTextField x) {
     CThostFtdcReqUserLoginWithTextField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.Password, x.Password.c_str());
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.InterfaceProductInfo, x.InterfaceProductInfo.c_str());
-    strcpy(y.ProtocolInfo, x.ProtocolInfo.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.LoginRemark, x.LoginRemark.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.InterfaceProductInfo, x.InterfaceProductInfo.c_str());
+    CTP_SET_FIELD(y.ProtocolInfo, x.ProtocolInfo.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.LoginRemark, x.LoginRemark.c_str());
     memcpy(y.Text, x.Text.data(), x.Text.size() * sizeof(uint8_t));
     y.ClientIPPort = x.ClientIPPort;
-    strcpy(y.ClientIPAddress, x.ClientIPAddress.c_str());
+    CTP_SET_FIELD(y.ClientIPAddress, x.ClientIPAddress.c_str());
     return y;
 }
 
@@ -12561,18 +12572,18 @@ ReqUserLoginWithTextField Converter::CThostFtdcReqUserLoginWithTextFieldToRust(C
 CThostFtdcReqUserLoginWithOTPField Converter::ReqUserLoginWithOTPFieldToCpp(ReqUserLoginWithOTPField x) {
     CThostFtdcReqUserLoginWithOTPField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.Password, x.Password.c_str());
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.InterfaceProductInfo, x.InterfaceProductInfo.c_str());
-    strcpy(y.ProtocolInfo, x.ProtocolInfo.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.LoginRemark, x.LoginRemark.c_str());
-    strcpy(y.OTPPassword, x.OTPPassword.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.InterfaceProductInfo, x.InterfaceProductInfo.c_str());
+    CTP_SET_FIELD(y.ProtocolInfo, x.ProtocolInfo.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.LoginRemark, x.LoginRemark.c_str());
+    CTP_SET_FIELD(y.OTPPassword, x.OTPPassword.c_str());
     y.ClientIPPort = x.ClientIPPort;
-    strcpy(y.ClientIPAddress, x.ClientIPAddress.c_str());
+    CTP_SET_FIELD(y.ClientIPAddress, x.ClientIPAddress.c_str());
     return y;
 }
 
@@ -12598,7 +12609,7 @@ ReqUserLoginWithOTPField Converter::CThostFtdcReqUserLoginWithOTPFieldToRust(CTh
 CThostFtdcReqApiHandshakeField Converter::ReqApiHandshakeFieldToCpp(ReqApiHandshakeField x) {
     CThostFtdcReqApiHandshakeField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.CryptoKeyVersion, x.CryptoKeyVersion.c_str());
+    CTP_SET_FIELD(y.CryptoKeyVersion, x.CryptoKeyVersion.c_str());
     return y;
 }
 
@@ -12651,10 +12662,10 @@ ReqVerifyApiKeyField Converter::CThostFtdcReqVerifyApiKeyFieldToRust(CThostFtdcR
 CThostFtdcDepartmentUserField Converter::DepartmentUserFieldToCpp(DepartmentUserField x) {
     CThostFtdcDepartmentUserField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     return y;
 }
 
@@ -12689,7 +12700,7 @@ QueryFreqField Converter::CThostFtdcQueryFreqFieldToRust(CThostFtdcQueryFreqFiel
 CThostFtdcAuthForbiddenIPField Converter::AuthForbiddenIPFieldToCpp(AuthForbiddenIPField x) {
     CThostFtdcAuthForbiddenIPField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -12704,7 +12715,7 @@ AuthForbiddenIPField Converter::CThostFtdcAuthForbiddenIPFieldToRust(CThostFtdcA
 CThostFtdcQryAuthForbiddenIPField Converter::QryAuthForbiddenIPFieldToCpp(QryAuthForbiddenIPField x) {
     CThostFtdcQryAuthForbiddenIPField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -12720,9 +12731,9 @@ CThostFtdcSyncDelaySwapFrozenField Converter::SyncDelaySwapFrozenFieldToCpp(Sync
     CThostFtdcSyncDelaySwapFrozenField y;
     memset(&y, 0, sizeof(y));
     memcpy(y.DelaySwapSeqNo, x.DelaySwapSeqNo.data(), x.DelaySwapSeqNo.size() * sizeof(uint8_t));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.FromCurrencyID, x.FromCurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.FromCurrencyID, x.FromCurrencyID.c_str());
     y.FromRemainSwap = x.FromRemainSwap;
     y.IsManualSwap = x.IsManualSwap;
     return y;
@@ -12745,15 +12756,15 @@ SyncDelaySwapFrozenField Converter::CThostFtdcSyncDelaySwapFrozenFieldToRust(CTh
 CThostFtdcUserSystemInfoField Converter::UserSystemInfoFieldToCpp(UserSystemInfoField x) {
     CThostFtdcUserSystemInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.ClientSystemInfoLen = x.ClientSystemInfoLen;
-    strcpy(y.ClientSystemInfo, x.ClientSystemInfo.c_str());
+    CTP_SET_FIELD(y.ClientSystemInfo, x.ClientSystemInfo.c_str());
     y.ClientIPPort = x.ClientIPPort;
-    strcpy(y.ClientLoginTime, x.ClientLoginTime.c_str());
-    strcpy(y.ClientAppID, x.ClientAppID.c_str());
-    strcpy(y.ClientPublicIP, x.ClientPublicIP.c_str());
-    strcpy(y.ClientLoginRemark, x.ClientLoginRemark.c_str());
+    CTP_SET_FIELD(y.ClientLoginTime, x.ClientLoginTime.c_str());
+    CTP_SET_FIELD(y.ClientAppID, x.ClientAppID.c_str());
+    CTP_SET_FIELD(y.ClientPublicIP, x.ClientPublicIP.c_str());
+    CTP_SET_FIELD(y.ClientLoginRemark, x.ClientLoginRemark.c_str());
     return y;
 }
 
@@ -12776,9 +12787,9 @@ UserSystemInfoField Converter::CThostFtdcUserSystemInfoFieldToRust(CThostFtdcUse
 CThostFtdcAuthUserIDField Converter::AuthUserIDFieldToCpp(AuthUserIDField x) {
     CThostFtdcAuthUserIDField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AppID, x.AppID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AppID, x.AppID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.AuthType = x.AuthType;
     return y;
 }
@@ -12797,9 +12808,9 @@ AuthUserIDField Converter::CThostFtdcAuthUserIDFieldToRust(CThostFtdcAuthUserIDF
 CThostFtdcAuthIPField Converter::AuthIPFieldToCpp(AuthIPField x) {
     CThostFtdcAuthIPField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AppID, x.AppID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AppID, x.AppID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     return y;
 }
 
@@ -12816,10 +12827,10 @@ AuthIPField Converter::CThostFtdcAuthIPFieldToRust(CThostFtdcAuthIPField* x) {
 CThostFtdcQryClassifiedInstrumentField Converter::QryClassifiedInstrumentFieldToCpp(QryClassifiedInstrumentField x) {
     CThostFtdcQryClassifiedInstrumentField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     y.TradingType = x.TradingType;
     y.ClassType = x.ClassType;
     return y;
@@ -12841,8 +12852,8 @@ QryClassifiedInstrumentField Converter::CThostFtdcQryClassifiedInstrumentFieldTo
 CThostFtdcQryCombPromotionParamField Converter::QryCombPromotionParamFieldToCpp(QryCombPromotionParamField x) {
     CThostFtdcQryCombPromotionParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -12858,9 +12869,9 @@ QryCombPromotionParamField Converter::CThostFtdcQryCombPromotionParamFieldToRust
 CThostFtdcCombPromotionParamField Converter::CombPromotionParamFieldToCpp(CombPromotionParamField x) {
     CThostFtdcCombPromotionParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.CombHedgeFlag, x.CombHedgeFlag.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.CombHedgeFlag, x.CombHedgeFlag.c_str());
     y.Xparameter = x.Xparameter;
     return y;
 }
@@ -12879,21 +12890,21 @@ CombPromotionParamField Converter::CThostFtdcCombPromotionParamFieldToRust(CThos
 CThostFtdcReqUserLoginSMField Converter::ReqUserLoginSMFieldToCpp(ReqUserLoginSMField x) {
     CThostFtdcReqUserLoginSMField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.Password, x.Password.c_str());
-    strcpy(y.UserProductInfo, x.UserProductInfo.c_str());
-    strcpy(y.InterfaceProductInfo, x.InterfaceProductInfo.c_str());
-    strcpy(y.ProtocolInfo, x.ProtocolInfo.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.OneTimePassword, x.OneTimePassword.c_str());
-    strcpy(y.LoginRemark, x.LoginRemark.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.UserProductInfo, x.UserProductInfo.c_str());
+    CTP_SET_FIELD(y.InterfaceProductInfo, x.InterfaceProductInfo.c_str());
+    CTP_SET_FIELD(y.ProtocolInfo, x.ProtocolInfo.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.OneTimePassword, x.OneTimePassword.c_str());
+    CTP_SET_FIELD(y.LoginRemark, x.LoginRemark.c_str());
     y.ClientIPPort = x.ClientIPPort;
-    strcpy(y.ClientIPAddress, x.ClientIPAddress.c_str());
-    strcpy(y.BrokerName, x.BrokerName.c_str());
-    strcpy(y.AuthCode, x.AuthCode.c_str());
-    strcpy(y.AppID, x.AppID.c_str());
+    CTP_SET_FIELD(y.ClientIPAddress, x.ClientIPAddress.c_str());
+    CTP_SET_FIELD(y.BrokerName, x.BrokerName.c_str());
+    CTP_SET_FIELD(y.AuthCode, x.AuthCode.c_str());
+    CTP_SET_FIELD(y.AppID, x.AppID.c_str());
     memcpy(y.PIN, x.PIN.data(), x.PIN.size() * sizeof(uint8_t));
     return y;
 }
@@ -12925,9 +12936,9 @@ ReqUserLoginSMField Converter::CThostFtdcReqUserLoginSMFieldToRust(CThostFtdcReq
 CThostFtdcQryRiskSettleInvstPositionField Converter::QryRiskSettleInvstPositionFieldToCpp(QryRiskSettleInvstPositionField x) {
     CThostFtdcQryRiskSettleInvstPositionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -12944,7 +12955,7 @@ QryRiskSettleInvstPositionField Converter::CThostFtdcQryRiskSettleInvstPositionF
 CThostFtdcQryRiskSettleProductStatusField Converter::QryRiskSettleProductStatusFieldToCpp(QryRiskSettleProductStatusField x) {
     CThostFtdcQryRiskSettleProductStatusField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     return y;
 }
 
@@ -12959,9 +12970,9 @@ QryRiskSettleProductStatusField Converter::CThostFtdcQryRiskSettleProductStatusF
 CThostFtdcRiskSettleInvstPositionField Converter::RiskSettleInvstPositionFieldToCpp(RiskSettleInvstPositionField x) {
     CThostFtdcRiskSettleInvstPositionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.PosiDirection = x.PosiDirection;
     y.HedgeFlag = x.HedgeFlag;
     y.PositionDate = x.PositionDate;
@@ -12987,7 +12998,7 @@ CThostFtdcRiskSettleInvstPositionField Converter::RiskSettleInvstPositionFieldTo
     y.PositionProfit = x.PositionProfit;
     y.PreSettlementPrice = x.PreSettlementPrice;
     y.SettlementPrice = x.SettlementPrice;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
     y.OpenCost = x.OpenCost;
     y.ExchangeMargin = x.ExchangeMargin;
@@ -13002,9 +13013,9 @@ CThostFtdcRiskSettleInvstPositionField Converter::RiskSettleInvstPositionFieldTo
     y.StrikeFrozen = x.StrikeFrozen;
     y.StrikeFrozenAmount = x.StrikeFrozenAmount;
     y.AbandonFrozen = x.AbandonFrozen;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.YdStrikeFrozen = x.YdStrikeFrozen;
-    strcpy(y.InvestUnitID, x.InvestUnitID.c_str());
+    CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
     y.PositionCostOffset = x.PositionCostOffset;
     y.TasPosition = x.TasPosition;
     y.TasPositionCost = x.TasPositionCost;
@@ -13070,8 +13081,8 @@ RiskSettleInvstPositionField Converter::CThostFtdcRiskSettleInvstPositionFieldTo
 CThostFtdcRiskSettleProductStatusField Converter::RiskSettleProductStatusFieldToCpp(RiskSettleProductStatusField x) {
     CThostFtdcRiskSettleProductStatusField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     y.ProductStatus = x.ProductStatus;
     return y;
 }
@@ -13112,8 +13123,8 @@ CThostFtdcSyncDeltaProductStatusField Converter::SyncDeltaProductStatusFieldToCp
     CThostFtdcSyncDeltaProductStatusField y;
     memset(&y, 0, sizeof(y));
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     y.ProductStatus = x.ProductStatus;
     return y;
 }
@@ -13132,20 +13143,20 @@ SyncDeltaProductStatusField Converter::CThostFtdcSyncDeltaProductStatusFieldToRu
 CThostFtdcSyncDeltaInvstPosDtlField Converter::SyncDeltaInvstPosDtlFieldToCpp(SyncDeltaInvstPosDtlField x) {
     CThostFtdcSyncDeltaInvstPosDtlField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.Direction = x.Direction;
-    strcpy(y.OpenDate, x.OpenDate.c_str());
-    strcpy(y.TradeID, x.TradeID.c_str());
+    CTP_SET_FIELD(y.OpenDate, x.OpenDate.c_str());
+    CTP_SET_FIELD(y.TradeID, x.TradeID.c_str());
     y.Volume = x.Volume;
     y.OpenPrice = x.OpenPrice;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
     y.TradeType = x.TradeType;
-    strcpy(y.CombInstrumentID, x.CombInstrumentID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.CombInstrumentID, x.CombInstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.CloseProfitByDate = x.CloseProfitByDate;
     y.CloseProfitByTrade = x.CloseProfitByTrade;
     y.PositionProfitByDate = x.PositionProfitByDate;
@@ -13205,15 +13216,15 @@ SyncDeltaInvstPosDtlField Converter::CThostFtdcSyncDeltaInvstPosDtlFieldToRust(C
 CThostFtdcSyncDeltaInvstPosCombDtlField Converter::SyncDeltaInvstPosCombDtlFieldToCpp(SyncDeltaInvstPosCombDtlField x) {
     CThostFtdcSyncDeltaInvstPosCombDtlField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.OpenDate, x.OpenDate.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.OpenDate, x.OpenDate.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.SettlementID = x.SettlementID;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ComTradeID, x.ComTradeID.c_str());
-    strcpy(y.TradeID, x.TradeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ComTradeID, x.ComTradeID.c_str());
+    CTP_SET_FIELD(y.TradeID, x.TradeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.Direction = x.Direction;
     y.TotalAmt = x.TotalAmt;
@@ -13260,8 +13271,8 @@ SyncDeltaInvstPosCombDtlField Converter::CThostFtdcSyncDeltaInvstPosCombDtlField
 CThostFtdcSyncDeltaTradingAccountField Converter::SyncDeltaTradingAccountFieldToCpp(SyncDeltaTradingAccountField x) {
     CThostFtdcSyncDeltaTradingAccountField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     y.PreMortgage = x.PreMortgage;
     y.PreCredit = x.PreCredit;
     y.PreDeposit = x.PreDeposit;
@@ -13283,7 +13294,7 @@ CThostFtdcSyncDeltaTradingAccountField Converter::SyncDeltaTradingAccountFieldTo
     y.Available = x.Available;
     y.WithdrawQuota = x.WithdrawQuota;
     y.Reserve = x.Reserve;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
     y.Credit = x.Credit;
     y.Mortgage = x.Mortgage;
@@ -13291,7 +13302,7 @@ CThostFtdcSyncDeltaTradingAccountField Converter::SyncDeltaTradingAccountFieldTo
     y.DeliveryMargin = x.DeliveryMargin;
     y.ExchangeDeliveryMargin = x.ExchangeDeliveryMargin;
     y.ReserveBalance = x.ReserveBalance;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.PreFundMortgageIn = x.PreFundMortgageIn;
     y.PreFundMortgageOut = x.PreFundMortgageOut;
     y.FundMortgageIn = x.FundMortgageIn;
@@ -13373,8 +13384,8 @@ SyncDeltaTradingAccountField Converter::CThostFtdcSyncDeltaTradingAccountFieldTo
 CThostFtdcSyncDeltaInitInvstMarginField Converter::SyncDeltaInitInvstMarginFieldToCpp(SyncDeltaInitInvstMarginField x) {
     CThostFtdcSyncDeltaInitInvstMarginField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.LastRiskTotalInvstMargin = x.LastRiskTotalInvstMargin;
     y.LastRiskTotalExchMargin = x.LastRiskTotalExchMargin;
     y.ThisSyncInvstMargin = x.ThisSyncInvstMargin;
@@ -13416,14 +13427,14 @@ SyncDeltaInitInvstMarginField Converter::CThostFtdcSyncDeltaInitInvstMarginField
 CThostFtdcSyncDeltaDceCombInstrumentField Converter::SyncDeltaDceCombInstrumentFieldToCpp(SyncDeltaDceCombInstrumentField x) {
     CThostFtdcSyncDeltaDceCombInstrumentField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.CombInstrumentID, x.CombInstrumentID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.CombInstrumentID, x.CombInstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     y.TradeGroupID = x.TradeGroupID;
     y.CombHedgeFlag = x.CombHedgeFlag;
     y.CombinationType = x.CombinationType;
     y.Direction = x.Direction;
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     y.Xparameter = x.Xparameter;
     y.ActionDirection = x.ActionDirection;
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
@@ -13451,10 +13462,10 @@ SyncDeltaDceCombInstrumentField Converter::CThostFtdcSyncDeltaDceCombInstrumentF
 CThostFtdcSyncDeltaInvstMarginRateField Converter::SyncDeltaInvstMarginRateFieldToCpp(SyncDeltaInvstMarginRateField x) {
     CThostFtdcSyncDeltaInvstMarginRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.LongMarginRatioByMoney = x.LongMarginRatioByMoney;
     y.LongMarginRatioByVolume = x.LongMarginRatioByVolume;
@@ -13488,8 +13499,8 @@ SyncDeltaInvstMarginRateField Converter::CThostFtdcSyncDeltaInvstMarginRateField
 CThostFtdcSyncDeltaExchMarginRateField Converter::SyncDeltaExchMarginRateFieldToCpp(SyncDeltaExchMarginRateField x) {
     CThostFtdcSyncDeltaExchMarginRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.LongMarginRatioByMoney = x.LongMarginRatioByMoney;
     y.LongMarginRatioByVolume = x.LongMarginRatioByVolume;
@@ -13519,8 +13530,8 @@ SyncDeltaExchMarginRateField Converter::CThostFtdcSyncDeltaExchMarginRateFieldTo
 CThostFtdcSyncDeltaOptExchMarginField Converter::SyncDeltaOptExchMarginFieldToCpp(SyncDeltaOptExchMarginField x) {
     CThostFtdcSyncDeltaOptExchMarginField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.SShortMarginRatioByMoney = x.SShortMarginRatioByMoney;
     y.SShortMarginRatioByVolume = x.SShortMarginRatioByVolume;
     y.HShortMarginRatioByMoney = x.HShortMarginRatioByMoney;
@@ -13556,10 +13567,10 @@ SyncDeltaOptExchMarginField Converter::CThostFtdcSyncDeltaOptExchMarginFieldToRu
 CThostFtdcSyncDeltaOptInvstMarginField Converter::SyncDeltaOptInvstMarginFieldToCpp(SyncDeltaOptInvstMarginField x) {
     CThostFtdcSyncDeltaOptInvstMarginField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.SShortMarginRatioByMoney = x.SShortMarginRatioByMoney;
     y.SShortMarginRatioByVolume = x.SShortMarginRatioByVolume;
     y.HShortMarginRatioByMoney = x.HShortMarginRatioByMoney;
@@ -13599,10 +13610,10 @@ SyncDeltaOptInvstMarginField Converter::CThostFtdcSyncDeltaOptInvstMarginFieldTo
 CThostFtdcSyncDeltaInvstMarginRateULField Converter::SyncDeltaInvstMarginRateULFieldToCpp(SyncDeltaInvstMarginRateULField x) {
     CThostFtdcSyncDeltaInvstMarginRateULField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.LongMarginRatioByMoney = x.LongMarginRatioByMoney;
     y.LongMarginRatioByVolume = x.LongMarginRatioByVolume;
@@ -13634,10 +13645,10 @@ SyncDeltaInvstMarginRateULField Converter::CThostFtdcSyncDeltaInvstMarginRateULF
 CThostFtdcSyncDeltaOptInvstCommRateField Converter::SyncDeltaOptInvstCommRateFieldToCpp(SyncDeltaOptInvstCommRateField x) {
     CThostFtdcSyncDeltaOptInvstCommRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.OpenRatioByMoney = x.OpenRatioByMoney;
     y.OpenRatioByVolume = x.OpenRatioByVolume;
     y.CloseRatioByMoney = x.CloseRatioByMoney;
@@ -13675,10 +13686,10 @@ SyncDeltaOptInvstCommRateField Converter::CThostFtdcSyncDeltaOptInvstCommRateFie
 CThostFtdcSyncDeltaInvstCommRateField Converter::SyncDeltaInvstCommRateFieldToCpp(SyncDeltaInvstCommRateField x) {
     CThostFtdcSyncDeltaInvstCommRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.OpenRatioByMoney = x.OpenRatioByMoney;
     y.OpenRatioByVolume = x.OpenRatioByVolume;
     y.CloseRatioByMoney = x.CloseRatioByMoney;
@@ -13712,8 +13723,8 @@ SyncDeltaInvstCommRateField Converter::CThostFtdcSyncDeltaInvstCommRateFieldToRu
 CThostFtdcSyncDeltaProductExchRateField Converter::SyncDeltaProductExchRateFieldToCpp(SyncDeltaProductExchRateField x) {
     CThostFtdcSyncDeltaProductExchRateField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ProductID, x.ProductID.c_str());
-    strcpy(y.QuoteCurrencyID, x.QuoteCurrencyID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.QuoteCurrencyID, x.QuoteCurrencyID.c_str());
     y.ExchangeRate = x.ExchangeRate;
     y.ActionDirection = x.ActionDirection;
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
@@ -13735,10 +13746,10 @@ SyncDeltaProductExchRateField Converter::CThostFtdcSyncDeltaProductExchRateField
 CThostFtdcSyncDeltaDepthMarketDataField Converter::SyncDeltaDepthMarketDataFieldToCpp(SyncDeltaDepthMarketDataField x) {
     CThostFtdcSyncDeltaDepthMarketDataField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     y.LastPrice = x.LastPrice;
     y.PreSettlementPrice = x.PreSettlementPrice;
     y.PreClosePrice = x.PreClosePrice;
@@ -13755,7 +13766,7 @@ CThostFtdcSyncDeltaDepthMarketDataField Converter::SyncDeltaDepthMarketDataField
     y.LowerLimitPrice = x.LowerLimitPrice;
     y.PreDelta = x.PreDelta;
     y.CurrDelta = x.CurrDelta;
-    strcpy(y.UpdateTime, x.UpdateTime.c_str());
+    CTP_SET_FIELD(y.UpdateTime, x.UpdateTime.c_str());
     y.UpdateMillisec = x.UpdateMillisec;
     y.BidPrice1 = x.BidPrice1;
     y.BidVolume1 = x.BidVolume1;
@@ -13778,7 +13789,7 @@ CThostFtdcSyncDeltaDepthMarketDataField Converter::SyncDeltaDepthMarketDataField
     y.AskPrice5 = x.AskPrice5;
     y.AskVolume5 = x.AskVolume5;
     y.AveragePrice = x.AveragePrice;
-    strcpy(y.ActionDay, x.ActionDay.c_str());
+    CTP_SET_FIELD(y.ActionDay, x.ActionDay.c_str());
     y.BandingUpperPrice = x.BandingUpperPrice;
     y.BandingLowerPrice = x.BandingLowerPrice;
     y.ActionDirection = x.ActionDirection;
@@ -13844,8 +13855,8 @@ SyncDeltaDepthMarketDataField Converter::CThostFtdcSyncDeltaDepthMarketDataField
 CThostFtdcSyncDeltaIndexPriceField Converter::SyncDeltaIndexPriceFieldToCpp(SyncDeltaIndexPriceField x) {
     CThostFtdcSyncDeltaIndexPriceField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.ClosePrice = x.ClosePrice;
     y.ActionDirection = x.ActionDirection;
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
@@ -13867,11 +13878,11 @@ SyncDeltaIndexPriceField Converter::CThostFtdcSyncDeltaIndexPriceFieldToRust(CTh
 CThostFtdcSyncDeltaEWarrantOffsetField Converter::SyncDeltaEWarrantOffsetFieldToCpp(SyncDeltaEWarrantOffsetField x) {
     CThostFtdcSyncDeltaEWarrantOffsetField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.Direction = x.Direction;
     y.HedgeFlag = x.HedgeFlag;
     y.Volume = x.Volume;
@@ -13900,10 +13911,10 @@ SyncDeltaEWarrantOffsetField Converter::CThostFtdcSyncDeltaEWarrantOffsetFieldTo
 CThostFtdcSPBMFutureParameterField Converter::SPBMFutureParameterFieldToCpp(SPBMFutureParameterField x) {
     CThostFtdcSPBMFutureParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     y.Cvf = x.Cvf;
     y.TimeRange = x.TimeRange;
     y.MarginRate = x.MarginRate;
@@ -13935,10 +13946,10 @@ SPBMFutureParameterField Converter::CThostFtdcSPBMFutureParameterFieldToRust(CTh
 CThostFtdcSPBMOptionParameterField Converter::SPBMOptionParameterFieldToCpp(SPBMOptionParameterField x) {
     CThostFtdcSPBMOptionParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     y.Cvf = x.Cvf;
     y.DownPrice = x.DownPrice;
     y.Delta = x.Delta;
@@ -13966,9 +13977,9 @@ SPBMOptionParameterField Converter::CThostFtdcSPBMOptionParameterFieldToRust(CTh
 CThostFtdcSPBMIntraParameterField Converter::SPBMIntraParameterFieldToCpp(SPBMIntraParameterField x) {
     CThostFtdcSPBMIntraParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     y.IntraRateY = x.IntraRateY;
     y.AddOnIntraRateY2 = x.AddOnIntraRateY2;
     return y;
@@ -13989,12 +14000,12 @@ SPBMIntraParameterField Converter::CThostFtdcSPBMIntraParameterFieldToRust(CThos
 CThostFtdcSPBMInterParameterField Converter::SPBMInterParameterFieldToCpp(SPBMInterParameterField x) {
     CThostFtdcSPBMInterParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.SpreadId = x.SpreadId;
     y.InterRateZ = x.InterRateZ;
-    strcpy(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
-    strcpy(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
     return y;
 }
 
@@ -14014,7 +14025,7 @@ SPBMInterParameterField Converter::CThostFtdcSPBMInterParameterFieldToRust(CThos
 CThostFtdcSyncSPBMParameterEndField Converter::SyncSPBMParameterEndFieldToCpp(SyncSPBMParameterEndField x) {
     CThostFtdcSyncSPBMParameterEndField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     return y;
 }
 
@@ -14029,9 +14040,9 @@ SyncSPBMParameterEndField Converter::CThostFtdcSyncSPBMParameterEndFieldToRust(C
 CThostFtdcQrySPBMFutureParameterField Converter::QrySPBMFutureParameterFieldToCpp(QrySPBMFutureParameterField x) {
     CThostFtdcQrySPBMFutureParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     return y;
 }
 
@@ -14048,9 +14059,9 @@ QrySPBMFutureParameterField Converter::CThostFtdcQrySPBMFutureParameterFieldToRu
 CThostFtdcQrySPBMOptionParameterField Converter::QrySPBMOptionParameterFieldToCpp(QrySPBMOptionParameterField x) {
     CThostFtdcQrySPBMOptionParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     return y;
 }
 
@@ -14067,8 +14078,8 @@ QrySPBMOptionParameterField Converter::CThostFtdcQrySPBMOptionParameterFieldToRu
 CThostFtdcQrySPBMIntraParameterField Converter::QrySPBMIntraParameterFieldToCpp(QrySPBMIntraParameterField x) {
     CThostFtdcQrySPBMIntraParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     return y;
 }
 
@@ -14084,9 +14095,9 @@ QrySPBMIntraParameterField Converter::CThostFtdcQrySPBMIntraParameterFieldToRust
 CThostFtdcQrySPBMInterParameterField Converter::QrySPBMInterParameterFieldToCpp(QrySPBMInterParameterField x) {
     CThostFtdcQrySPBMInterParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
-    strcpy(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
     return y;
 }
 
@@ -14103,9 +14114,9 @@ QrySPBMInterParameterField Converter::CThostFtdcQrySPBMInterParameterFieldToRust
 CThostFtdcSPBMPortfDefinitionField Converter::SPBMPortfDefinitionFieldToCpp(SPBMPortfDefinitionField x) {
     CThostFtdcSPBMPortfDefinitionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.PortfolioDefID = x.PortfolioDefID;
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     y.IsSPBM = x.IsSPBM;
     return y;
 }
@@ -14124,9 +14135,9 @@ SPBMPortfDefinitionField Converter::CThostFtdcSPBMPortfDefinitionFieldToRust(CTh
 CThostFtdcSPBMInvestorPortfDefField Converter::SPBMInvestorPortfDefFieldToCpp(SPBMInvestorPortfDefField x) {
     CThostFtdcSPBMInvestorPortfDefField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.PortfolioDefID = x.PortfolioDefID;
     return y;
 }
@@ -14146,11 +14157,11 @@ CThostFtdcInvestorPortfMarginRatioField Converter::InvestorPortfMarginRatioField
     CThostFtdcInvestorPortfMarginRatioField y;
     memset(&y, 0, sizeof(y));
     y.InvestorRange = x.InvestorRange;
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.MarginRatio = x.MarginRatio;
-    strcpy(y.ProductGroupID, x.ProductGroupID.c_str());
+    CTP_SET_FIELD(y.ProductGroupID, x.ProductGroupID.c_str());
     return y;
 }
 
@@ -14170,9 +14181,9 @@ InvestorPortfMarginRatioField Converter::CThostFtdcInvestorPortfMarginRatioField
 CThostFtdcQrySPBMPortfDefinitionField Converter::QrySPBMPortfDefinitionFieldToCpp(QrySPBMPortfDefinitionField x) {
     CThostFtdcQrySPBMPortfDefinitionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.PortfolioDefID = x.PortfolioDefID;
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     return y;
 }
 
@@ -14189,9 +14200,9 @@ QrySPBMPortfDefinitionField Converter::CThostFtdcQrySPBMPortfDefinitionFieldToRu
 CThostFtdcQrySPBMInvestorPortfDefField Converter::QrySPBMInvestorPortfDefFieldToCpp(QrySPBMInvestorPortfDefField x) {
     CThostFtdcQrySPBMInvestorPortfDefField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     return y;
 }
 
@@ -14208,10 +14219,10 @@ QrySPBMInvestorPortfDefField Converter::CThostFtdcQrySPBMInvestorPortfDefFieldTo
 CThostFtdcQryInvestorPortfMarginRatioField Converter::QryInvestorPortfMarginRatioFieldToCpp(QryInvestorPortfMarginRatioField x) {
     CThostFtdcQryInvestorPortfMarginRatioField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductGroupID, x.ProductGroupID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductGroupID, x.ProductGroupID.c_str());
     return y;
 }
 
@@ -14229,10 +14240,10 @@ QryInvestorPortfMarginRatioField Converter::CThostFtdcQryInvestorPortfMarginRati
 CThostFtdcInvestorProdSPBMDetailField Converter::InvestorProdSPBMDetailFieldToCpp(InvestorProdSPBMDetailField x) {
     CThostFtdcInvestorProdSPBMDetailField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     y.IntraInstrMargin = x.IntraInstrMargin;
     y.BCollectingMargin = x.BCollectingMargin;
     y.SCollectingMargin = x.SCollectingMargin;
@@ -14284,10 +14295,10 @@ InvestorProdSPBMDetailField Converter::CThostFtdcInvestorProdSPBMDetailFieldToRu
 CThostFtdcQryInvestorProdSPBMDetailField Converter::QryInvestorProdSPBMDetailFieldToCpp(QryInvestorProdSPBMDetailField x) {
     CThostFtdcQryInvestorProdSPBMDetailField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     return y;
 }
 
@@ -14305,9 +14316,9 @@ QryInvestorProdSPBMDetailField Converter::CThostFtdcQryInvestorProdSPBMDetailFie
 CThostFtdcPortfTradeParamSettingField Converter::PortfTradeParamSettingFieldToCpp(PortfTradeParamSettingField x) {
     CThostFtdcPortfTradeParamSettingField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.Portfolio = x.Portfolio;
     y.IsActionVerify = x.IsActionVerify;
     y.IsCloseVerify = x.IsCloseVerify;
@@ -14330,8 +14341,8 @@ PortfTradeParamSettingField Converter::CThostFtdcPortfTradeParamSettingFieldToRu
 CThostFtdcInvestorTradingRightField Converter::InvestorTradingRightFieldToCpp(InvestorTradingRightField x) {
     CThostFtdcInvestorTradingRightField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.InvstTradingRight = x.InvstTradingRight;
     return y;
 }
@@ -14349,8 +14360,8 @@ InvestorTradingRightField Converter::CThostFtdcInvestorTradingRightFieldToRust(C
 CThostFtdcMortgageParamField Converter::MortgageParamFieldToCpp(MortgageParamField x) {
     CThostFtdcMortgageParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     y.MortgageBalance = x.MortgageBalance;
     y.CheckMortgageRatio = x.CheckMortgageRatio;
     return y;
@@ -14370,8 +14381,8 @@ MortgageParamField Converter::CThostFtdcMortgageParamFieldToRust(CThostFtdcMortg
 CThostFtdcWithDrawParamField Converter::WithDrawParamFieldToCpp(WithDrawParamField x) {
     CThostFtdcWithDrawParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     y.WithDrawParamID = x.WithDrawParamID;
     memcpy(y.WithDrawParamValue, x.WithDrawParamValue.data(), x.WithDrawParamValue.size() * sizeof(uint8_t));
     return y;
@@ -14392,8 +14403,8 @@ WithDrawParamField Converter::CThostFtdcWithDrawParamFieldToRust(CThostFtdcWithD
 CThostFtdcThostUserFunctionField Converter::ThostUserFunctionFieldToCpp(ThostUserFunctionField x) {
     CThostFtdcThostUserFunctionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.ThostFunctionCode = x.ThostFunctionCode;
     return y;
 }
@@ -14411,8 +14422,8 @@ ThostUserFunctionField Converter::CThostFtdcThostUserFunctionFieldToRust(CThostF
 CThostFtdcQryThostUserFunctionField Converter::QryThostUserFunctionFieldToCpp(QryThostUserFunctionField x) {
     CThostFtdcQryThostUserFunctionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     return y;
 }
 
@@ -14428,12 +14439,12 @@ QryThostUserFunctionField Converter::CThostFtdcQryThostUserFunctionFieldToRust(C
 CThostFtdcSPBMAddOnInterParameterField Converter::SPBMAddOnInterParameterFieldToCpp(SPBMAddOnInterParameterField x) {
     CThostFtdcSPBMAddOnInterParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.SpreadId = x.SpreadId;
     y.AddOnInterRateZ2 = x.AddOnInterRateZ2;
-    strcpy(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
-    strcpy(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
     return y;
 }
 
@@ -14453,9 +14464,9 @@ SPBMAddOnInterParameterField Converter::CThostFtdcSPBMAddOnInterParameterFieldTo
 CThostFtdcQrySPBMAddOnInterParameterField Converter::QrySPBMAddOnInterParameterFieldToCpp(QrySPBMAddOnInterParameterField x) {
     CThostFtdcQrySPBMAddOnInterParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
-    strcpy(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
     return y;
 }
 
@@ -14472,9 +14483,9 @@ QrySPBMAddOnInterParameterField Converter::CThostFtdcQrySPBMAddOnInterParameterF
 CThostFtdcQryInvestorCommoditySPMMMarginField Converter::QryInvestorCommoditySPMMMarginFieldToCpp(QryInvestorCommoditySPMMMarginField x) {
     CThostFtdcQryInvestorCommoditySPMMMarginField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.CommodityID, x.CommodityID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.CommodityID, x.CommodityID.c_str());
     return y;
 }
 
@@ -14491,9 +14502,9 @@ QryInvestorCommoditySPMMMarginField Converter::CThostFtdcQryInvestorCommoditySPM
 CThostFtdcQryInvestorCommodityGroupSPMMMarginField Converter::QryInvestorCommodityGroupSPMMMarginFieldToCpp(QryInvestorCommodityGroupSPMMMarginField x) {
     CThostFtdcQryInvestorCommodityGroupSPMMMarginField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.CommodityGroupID, x.CommodityGroupID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.CommodityGroupID, x.CommodityGroupID.c_str());
     return y;
 }
 
@@ -14510,7 +14521,7 @@ QryInvestorCommodityGroupSPMMMarginField Converter::CThostFtdcQryInvestorCommodi
 CThostFtdcQrySPMMInstParamField Converter::QrySPMMInstParamFieldToCpp(QrySPMMInstParamField x) {
     CThostFtdcQrySPMMInstParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -14525,7 +14536,7 @@ QrySPMMInstParamField Converter::CThostFtdcQrySPMMInstParamFieldToRust(CThostFtd
 CThostFtdcQrySPMMProductParamField Converter::QrySPMMProductParamFieldToCpp(QrySPMMProductParamField x) {
     CThostFtdcQrySPMMProductParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     return y;
 }
 
@@ -14540,10 +14551,10 @@ QrySPMMProductParamField Converter::CThostFtdcQrySPMMProductParamFieldToRust(CTh
 CThostFtdcInvestorCommoditySPMMMarginField Converter::InvestorCommoditySPMMMarginFieldToCpp(InvestorCommoditySPMMMarginField x) {
     CThostFtdcInvestorCommoditySPMMMarginField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.CommodityID, x.CommodityID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.CommodityID, x.CommodityID.c_str());
     y.MarginBeforeDiscount = x.MarginBeforeDiscount;
     y.MarginNoDiscount = x.MarginNoDiscount;
     y.LongPosRisk = x.LongPosRisk;
@@ -14599,10 +14610,10 @@ InvestorCommoditySPMMMarginField Converter::CThostFtdcInvestorCommoditySPMMMargi
 CThostFtdcInvestorCommodityGroupSPMMMarginField Converter::InvestorCommodityGroupSPMMMarginFieldToCpp(InvestorCommodityGroupSPMMMarginField x) {
     CThostFtdcInvestorCommodityGroupSPMMMarginField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.CommodityGroupID, x.CommodityGroupID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.CommodityGroupID, x.CommodityGroupID.c_str());
     y.MarginBeforeDiscount = x.MarginBeforeDiscount;
     y.MarginNoDiscount = x.MarginNoDiscount;
     y.LongRisk = x.LongRisk;
@@ -14654,11 +14665,11 @@ InvestorCommodityGroupSPMMMarginField Converter::CThostFtdcInvestorCommodityGrou
 CThostFtdcSPMMInstParamField Converter::SPMMInstParamFieldToCpp(SPMMInstParamField x) {
     CThostFtdcSPMMInstParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.InstMarginCalID = x.InstMarginCalID;
-    strcpy(y.CommodityID, x.CommodityID.c_str());
-    strcpy(y.CommodityGroupID, x.CommodityGroupID.c_str());
+    CTP_SET_FIELD(y.CommodityID, x.CommodityID.c_str());
+    CTP_SET_FIELD(y.CommodityGroupID, x.CommodityGroupID.c_str());
     return y;
 }
 
@@ -14677,10 +14688,10 @@ SPMMInstParamField Converter::CThostFtdcSPMMInstParamFieldToRust(CThostFtdcSPMMI
 CThostFtdcSPMMProductParamField Converter::SPMMProductParamFieldToCpp(SPMMProductParamField x) {
     CThostFtdcSPMMProductParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
-    strcpy(y.CommodityID, x.CommodityID.c_str());
-    strcpy(y.CommodityGroupID, x.CommodityGroupID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.CommodityID, x.CommodityID.c_str());
+    CTP_SET_FIELD(y.CommodityGroupID, x.CommodityGroupID.c_str());
     return y;
 }
 
@@ -14698,7 +14709,7 @@ SPMMProductParamField Converter::CThostFtdcSPMMProductParamFieldToRust(CThostFtd
 CThostFtdcQryTraderAssignField Converter::QryTraderAssignFieldToCpp(QryTraderAssignField x) {
     CThostFtdcQryTraderAssignField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     return y;
 }
 
@@ -14713,10 +14724,10 @@ QryTraderAssignField Converter::CThostFtdcQryTraderAssignFieldToRust(CThostFtdcQ
 CThostFtdcTraderAssignField Converter::TraderAssignFieldToCpp(TraderAssignField x) {
     CThostFtdcTraderAssignField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
     y.DRIdentityID = x.DRIdentityID;
     return y;
 }
@@ -14736,10 +14747,10 @@ TraderAssignField Converter::CThostFtdcTraderAssignFieldToRust(CThostFtdcTraderA
 CThostFtdcInvestorInfoCntSettingField Converter::InvestorInfoCntSettingFieldToCpp(InvestorInfoCntSettingField x) {
     CThostFtdcInvestorInfoCntSettingField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     y.IsCalInfoComm = x.IsCalInfoComm;
     y.IsLimitInfoMax = x.IsLimitInfoMax;
     y.InfoMaxLimit = x.InfoMaxLimit;
@@ -14763,11 +14774,11 @@ InvestorInfoCntSettingField Converter::CThostFtdcInvestorInfoCntSettingFieldToRu
 CThostFtdcRCAMSCombProductInfoField Converter::RCAMSCombProductInfoFieldToCpp(RCAMSCombProductInfoField x) {
     CThostFtdcRCAMSCombProductInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
-    strcpy(y.CombProductID, x.CombProductID.c_str());
-    strcpy(y.ProductGroupID, x.ProductGroupID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.CombProductID, x.CombProductID.c_str());
+    CTP_SET_FIELD(y.ProductGroupID, x.ProductGroupID.c_str());
     return y;
 }
 
@@ -14786,9 +14797,9 @@ RCAMSCombProductInfoField Converter::CThostFtdcRCAMSCombProductInfoFieldToRust(C
 CThostFtdcRCAMSInstrParameterField Converter::RCAMSInstrParameterFieldToCpp(RCAMSInstrParameterField x) {
     CThostFtdcRCAMSInstrParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     y.HedgeRate = x.HedgeRate;
     return y;
 }
@@ -14807,9 +14818,9 @@ RCAMSInstrParameterField Converter::CThostFtdcRCAMSInstrParameterFieldToRust(CTh
 CThostFtdcRCAMSIntraParameterField Converter::RCAMSIntraParameterFieldToCpp(RCAMSIntraParameterField x) {
     CThostFtdcRCAMSIntraParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.CombProductID, x.CombProductID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.CombProductID, x.CombProductID.c_str());
     y.HedgeRate = x.HedgeRate;
     return y;
 }
@@ -14828,13 +14839,13 @@ RCAMSIntraParameterField Converter::CThostFtdcRCAMSIntraParameterFieldToRust(CTh
 CThostFtdcRCAMSInterParameterField Converter::RCAMSInterParameterFieldToCpp(RCAMSInterParameterField x) {
     CThostFtdcRCAMSInterParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductGroupID, x.ProductGroupID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductGroupID, x.ProductGroupID.c_str());
     y.Priority = x.Priority;
     y.CreditRate = x.CreditRate;
-    strcpy(y.CombProduct1, x.CombProduct1.c_str());
-    strcpy(y.CombProduct2, x.CombProduct2.c_str());
+    CTP_SET_FIELD(y.CombProduct1, x.CombProduct1.c_str());
+    CTP_SET_FIELD(y.CombProduct2, x.CombProduct2.c_str());
     return y;
 }
 
@@ -14855,9 +14866,9 @@ RCAMSInterParameterField Converter::CThostFtdcRCAMSInterParameterFieldToRust(CTh
 CThostFtdcRCAMSShortOptAdjustParamField Converter::RCAMSShortOptAdjustParamFieldToCpp(RCAMSShortOptAdjustParamField x) {
     CThostFtdcRCAMSShortOptAdjustParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.CombProductID, x.CombProductID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.CombProductID, x.CombProductID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.AdjustValue = x.AdjustValue;
     return y;
@@ -14878,15 +14889,15 @@ RCAMSShortOptAdjustParamField Converter::CThostFtdcRCAMSShortOptAdjustParamField
 CThostFtdcRCAMSInvestorCombPositionField Converter::RCAMSInvestorCombPositionFieldToCpp(RCAMSInvestorCombPositionField x) {
     CThostFtdcRCAMSInvestorCombPositionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.PosiDirection = x.PosiDirection;
-    strcpy(y.CombInstrumentID, x.CombInstrumentID.c_str());
+    CTP_SET_FIELD(y.CombInstrumentID, x.CombInstrumentID.c_str());
     y.LegID = x.LegID;
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     y.TotalAmt = x.TotalAmt;
     y.ExchMargin = x.ExchMargin;
     y.Margin = x.Margin;
@@ -14915,12 +14926,12 @@ RCAMSInvestorCombPositionField Converter::CThostFtdcRCAMSInvestorCombPositionFie
 CThostFtdcInvestorProdRCAMSMarginField Converter::InvestorProdRCAMSMarginFieldToCpp(InvestorProdRCAMSMarginField x) {
     CThostFtdcInvestorProdRCAMSMarginField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.CombProductID, x.CombProductID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.CombProductID, x.CombProductID.c_str());
     y.HedgeFlag = x.HedgeFlag;
-    strcpy(y.ProductGroupID, x.ProductGroupID.c_str());
+    CTP_SET_FIELD(y.ProductGroupID, x.ProductGroupID.c_str());
     y.RiskBeforeDiscount = x.RiskBeforeDiscount;
     y.IntraInstrRisk = x.IntraInstrRisk;
     y.BPosRisk = x.BPosRisk;
@@ -14982,9 +14993,9 @@ InvestorProdRCAMSMarginField Converter::CThostFtdcInvestorProdRCAMSMarginFieldTo
 CThostFtdcQryRCAMSCombProductInfoField Converter::QryRCAMSCombProductInfoFieldToCpp(QryRCAMSCombProductInfoField x) {
     CThostFtdcQryRCAMSCombProductInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ProductID, x.ProductID.c_str());
-    strcpy(y.CombProductID, x.CombProductID.c_str());
-    strcpy(y.ProductGroupID, x.ProductGroupID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.CombProductID, x.CombProductID.c_str());
+    CTP_SET_FIELD(y.ProductGroupID, x.ProductGroupID.c_str());
     return y;
 }
 
@@ -15001,7 +15012,7 @@ QryRCAMSCombProductInfoField Converter::CThostFtdcQryRCAMSCombProductInfoFieldTo
 CThostFtdcQryRCAMSInstrParameterField Converter::QryRCAMSInstrParameterFieldToCpp(QryRCAMSInstrParameterField x) {
     CThostFtdcQryRCAMSInstrParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     return y;
 }
 
@@ -15016,7 +15027,7 @@ QryRCAMSInstrParameterField Converter::CThostFtdcQryRCAMSInstrParameterFieldToRu
 CThostFtdcQryRCAMSIntraParameterField Converter::QryRCAMSIntraParameterFieldToCpp(QryRCAMSIntraParameterField x) {
     CThostFtdcQryRCAMSIntraParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.CombProductID, x.CombProductID.c_str());
+    CTP_SET_FIELD(y.CombProductID, x.CombProductID.c_str());
     return y;
 }
 
@@ -15031,9 +15042,9 @@ QryRCAMSIntraParameterField Converter::CThostFtdcQryRCAMSIntraParameterFieldToRu
 CThostFtdcQryRCAMSInterParameterField Converter::QryRCAMSInterParameterFieldToCpp(QryRCAMSInterParameterField x) {
     CThostFtdcQryRCAMSInterParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ProductGroupID, x.ProductGroupID.c_str());
-    strcpy(y.CombProduct1, x.CombProduct1.c_str());
-    strcpy(y.CombProduct2, x.CombProduct2.c_str());
+    CTP_SET_FIELD(y.ProductGroupID, x.ProductGroupID.c_str());
+    CTP_SET_FIELD(y.CombProduct1, x.CombProduct1.c_str());
+    CTP_SET_FIELD(y.CombProduct2, x.CombProduct2.c_str());
     return y;
 }
 
@@ -15050,7 +15061,7 @@ QryRCAMSInterParameterField Converter::CThostFtdcQryRCAMSInterParameterFieldToRu
 CThostFtdcQryRCAMSShortOptAdjustParamField Converter::QryRCAMSShortOptAdjustParamFieldToCpp(QryRCAMSShortOptAdjustParamField x) {
     CThostFtdcQryRCAMSShortOptAdjustParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.CombProductID, x.CombProductID.c_str());
+    CTP_SET_FIELD(y.CombProductID, x.CombProductID.c_str());
     return y;
 }
 
@@ -15065,10 +15076,10 @@ QryRCAMSShortOptAdjustParamField Converter::CThostFtdcQryRCAMSShortOptAdjustPara
 CThostFtdcQryRCAMSInvestorCombPositionField Converter::QryRCAMSInvestorCombPositionFieldToCpp(QryRCAMSInvestorCombPositionField x) {
     CThostFtdcQryRCAMSInvestorCombPositionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.CombInstrumentID, x.CombInstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.CombInstrumentID, x.CombInstrumentID.c_str());
     return y;
 }
 
@@ -15086,10 +15097,10 @@ QryRCAMSInvestorCombPositionField Converter::CThostFtdcQryRCAMSInvestorCombPosit
 CThostFtdcQryInvestorProdRCAMSMarginField Converter::QryInvestorProdRCAMSMarginFieldToCpp(QryInvestorProdRCAMSMarginField x) {
     CThostFtdcQryInvestorProdRCAMSMarginField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.CombProductID, x.CombProductID.c_str());
-    strcpy(y.ProductGroupID, x.ProductGroupID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.CombProductID, x.CombProductID.c_str());
+    CTP_SET_FIELD(y.ProductGroupID, x.ProductGroupID.c_str());
     return y;
 }
 
@@ -15107,11 +15118,11 @@ QryInvestorProdRCAMSMarginField Converter::CThostFtdcQryInvestorProdRCAMSMarginF
 CThostFtdcRULEInstrParameterField Converter::RULEInstrParameterFieldToCpp(RULEInstrParameterField x) {
     CThostFtdcRULEInstrParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.InstrumentClass = x.InstrumentClass;
-    strcpy(y.StdInstrumentID, x.StdInstrumentID.c_str());
+    CTP_SET_FIELD(y.StdInstrumentID, x.StdInstrumentID.c_str());
     y.BSpecRatio = x.BSpecRatio;
     y.SSpecRatio = x.SSpecRatio;
     y.BHedgeRatio = x.BHedgeRatio;
@@ -15144,10 +15155,10 @@ RULEInstrParameterField Converter::CThostFtdcRULEInstrParameterFieldToRust(CThos
 CThostFtdcRULEIntraParameterField Converter::RULEIntraParameterFieldToCpp(RULEIntraParameterField x) {
     CThostFtdcRULEIntraParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
-    strcpy(y.StdInstrumentID, x.StdInstrumentID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.StdInstrumentID, x.StdInstrumentID.c_str());
     y.StdInstrMargin = x.StdInstrMargin;
     y.UsualIntraRate = x.UsualIntraRate;
     y.DeliveryIntraRate = x.DeliveryIntraRate;
@@ -15171,16 +15182,16 @@ RULEIntraParameterField Converter::CThostFtdcRULEIntraParameterFieldToRust(CThos
 CThostFtdcRULEInterParameterField Converter::RULEInterParameterFieldToCpp(RULEInterParameterField x) {
     CThostFtdcRULEInterParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.SpreadId = x.SpreadId;
     y.InterRate = x.InterRate;
-    strcpy(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
-    strcpy(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
     y.Leg1PropFactor = x.Leg1PropFactor;
     y.Leg2PropFactor = x.Leg2PropFactor;
     y.CommodityGroupID = x.CommodityGroupID;
-    strcpy(y.CommodityGroupName, x.CommodityGroupName.c_str());
+    CTP_SET_FIELD(y.CommodityGroupName, x.CommodityGroupName.c_str());
     return y;
 }
 
@@ -15204,8 +15215,8 @@ RULEInterParameterField Converter::CThostFtdcRULEInterParameterFieldToRust(CThos
 CThostFtdcQryRULEInstrParameterField Converter::QryRULEInstrParameterFieldToCpp(QryRULEInstrParameterField x) {
     CThostFtdcQryRULEInstrParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     return y;
 }
 
@@ -15221,8 +15232,8 @@ QryRULEInstrParameterField Converter::CThostFtdcQryRULEInstrParameterFieldToRust
 CThostFtdcQryRULEIntraParameterField Converter::QryRULEIntraParameterFieldToCpp(QryRULEIntraParameterField x) {
     CThostFtdcQryRULEIntraParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     return y;
 }
 
@@ -15238,9 +15249,9 @@ QryRULEIntraParameterField Converter::CThostFtdcQryRULEIntraParameterFieldToRust
 CThostFtdcQryRULEInterParameterField Converter::QryRULEInterParameterFieldToCpp(QryRULEInterParameterField x) {
     CThostFtdcQryRULEInterParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
-    strcpy(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
     y.CommodityGroupID = x.CommodityGroupID;
     return y;
 }
@@ -15259,10 +15270,10 @@ QryRULEInterParameterField Converter::CThostFtdcQryRULEInterParameterFieldToRust
 CThostFtdcInvestorProdRULEMarginField Converter::InvestorProdRULEMarginFieldToCpp(InvestorProdRULEMarginField x) {
     CThostFtdcInvestorProdRULEMarginField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     y.InstrumentClass = x.InstrumentClass;
     y.CommodityGroupID = x.CommodityGroupID;
     y.BStdPosition = x.BStdPosition;
@@ -15326,10 +15337,10 @@ InvestorProdRULEMarginField Converter::CThostFtdcInvestorProdRULEMarginFieldToRu
 CThostFtdcQryInvestorProdRULEMarginField Converter::QryInvestorProdRULEMarginFieldToCpp(QryInvestorProdRULEMarginField x) {
     CThostFtdcQryInvestorProdRULEMarginField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     y.CommodityGroupID = x.CommodityGroupID;
     return y;
 }
@@ -15349,9 +15360,9 @@ QryInvestorProdRULEMarginField Converter::CThostFtdcQryInvestorProdRULEMarginFie
 CThostFtdcSyncDeltaSPBMPortfDefinitionField Converter::SyncDeltaSPBMPortfDefinitionFieldToCpp(SyncDeltaSPBMPortfDefinitionField x) {
     CThostFtdcSyncDeltaSPBMPortfDefinitionField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.PortfolioDefID = x.PortfolioDefID;
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     y.IsSPBM = x.IsSPBM;
     y.ActionDirection = x.ActionDirection;
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
@@ -15374,9 +15385,9 @@ SyncDeltaSPBMPortfDefinitionField Converter::CThostFtdcSyncDeltaSPBMPortfDefinit
 CThostFtdcSyncDeltaSPBMInvstPortfDefField Converter::SyncDeltaSPBMInvstPortfDefFieldToCpp(SyncDeltaSPBMInvstPortfDefField x) {
     CThostFtdcSyncDeltaSPBMInvstPortfDefField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.PortfolioDefID = x.PortfolioDefID;
     y.ActionDirection = x.ActionDirection;
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
@@ -15399,10 +15410,10 @@ SyncDeltaSPBMInvstPortfDefField Converter::CThostFtdcSyncDeltaSPBMInvstPortfDefF
 CThostFtdcSyncDeltaSPBMFutureParameterField Converter::SyncDeltaSPBMFutureParameterFieldToCpp(SyncDeltaSPBMFutureParameterField x) {
     CThostFtdcSyncDeltaSPBMFutureParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     y.Cvf = x.Cvf;
     y.TimeRange = x.TimeRange;
     y.MarginRate = x.MarginRate;
@@ -15438,10 +15449,10 @@ SyncDeltaSPBMFutureParameterField Converter::CThostFtdcSyncDeltaSPBMFutureParame
 CThostFtdcSyncDeltaSPBMOptionParameterField Converter::SyncDeltaSPBMOptionParameterFieldToCpp(SyncDeltaSPBMOptionParameterField x) {
     CThostFtdcSyncDeltaSPBMOptionParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     y.Cvf = x.Cvf;
     y.DownPrice = x.DownPrice;
     y.Delta = x.Delta;
@@ -15473,9 +15484,9 @@ SyncDeltaSPBMOptionParameterField Converter::CThostFtdcSyncDeltaSPBMOptionParame
 CThostFtdcSyncDeltaSPBMIntraParameterField Converter::SyncDeltaSPBMIntraParameterFieldToCpp(SyncDeltaSPBMIntraParameterField x) {
     CThostFtdcSyncDeltaSPBMIntraParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
     y.IntraRateY = x.IntraRateY;
     y.AddOnIntraRateY2 = x.AddOnIntraRateY2;
     y.ActionDirection = x.ActionDirection;
@@ -15500,12 +15511,12 @@ SyncDeltaSPBMIntraParameterField Converter::CThostFtdcSyncDeltaSPBMIntraParamete
 CThostFtdcSyncDeltaSPBMInterParameterField Converter::SyncDeltaSPBMInterParameterFieldToCpp(SyncDeltaSPBMInterParameterField x) {
     CThostFtdcSyncDeltaSPBMInterParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.SpreadId = x.SpreadId;
     y.InterRateZ = x.InterRateZ;
-    strcpy(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
-    strcpy(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
     y.ActionDirection = x.ActionDirection;
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
     return y;
@@ -15529,12 +15540,12 @@ SyncDeltaSPBMInterParameterField Converter::CThostFtdcSyncDeltaSPBMInterParamete
 CThostFtdcSyncDeltaSPBMAddOnInterParamField Converter::SyncDeltaSPBMAddOnInterParamFieldToCpp(SyncDeltaSPBMAddOnInterParamField x) {
     CThostFtdcSyncDeltaSPBMAddOnInterParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.SpreadId = x.SpreadId;
     y.AddOnInterRateZ2 = x.AddOnInterRateZ2;
-    strcpy(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
-    strcpy(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
     y.ActionDirection = x.ActionDirection;
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
     return y;
@@ -15558,11 +15569,11 @@ SyncDeltaSPBMAddOnInterParamField Converter::CThostFtdcSyncDeltaSPBMAddOnInterPa
 CThostFtdcSyncDeltaSPMMInstParamField Converter::SyncDeltaSPMMInstParamFieldToCpp(SyncDeltaSPMMInstParamField x) {
     CThostFtdcSyncDeltaSPMMInstParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.InstMarginCalID = x.InstMarginCalID;
-    strcpy(y.CommodityID, x.CommodityID.c_str());
-    strcpy(y.CommodityGroupID, x.CommodityGroupID.c_str());
+    CTP_SET_FIELD(y.CommodityID, x.CommodityID.c_str());
+    CTP_SET_FIELD(y.CommodityGroupID, x.CommodityGroupID.c_str());
     y.ActionDirection = x.ActionDirection;
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
     return y;
@@ -15585,10 +15596,10 @@ SyncDeltaSPMMInstParamField Converter::CThostFtdcSyncDeltaSPMMInstParamFieldToRu
 CThostFtdcSyncDeltaSPMMProductParamField Converter::SyncDeltaSPMMProductParamFieldToCpp(SyncDeltaSPMMProductParamField x) {
     CThostFtdcSyncDeltaSPMMProductParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
-    strcpy(y.CommodityID, x.CommodityID.c_str());
-    strcpy(y.CommodityGroupID, x.CommodityGroupID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.CommodityID, x.CommodityID.c_str());
+    CTP_SET_FIELD(y.CommodityGroupID, x.CommodityGroupID.c_str());
     y.ActionDirection = x.ActionDirection;
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
     return y;
@@ -15610,10 +15621,10 @@ SyncDeltaSPMMProductParamField Converter::CThostFtdcSyncDeltaSPMMProductParamFie
 CThostFtdcSyncDeltaInvestorSPMMModelField Converter::SyncDeltaInvestorSPMMModelFieldToCpp(SyncDeltaInvestorSPMMModelField x) {
     CThostFtdcSyncDeltaInvestorSPMMModelField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.SPMMModelID, x.SPMMModelID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.SPMMModelID, x.SPMMModelID.c_str());
     y.ActionDirection = x.ActionDirection;
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
     return y;
@@ -15635,9 +15646,9 @@ SyncDeltaInvestorSPMMModelField Converter::CThostFtdcSyncDeltaInvestorSPMMModelF
 CThostFtdcSyncDeltaSPMMModelParamField Converter::SyncDeltaSPMMModelParamFieldToCpp(SyncDeltaSPMMModelParamField x) {
     CThostFtdcSyncDeltaSPMMModelParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.SPMMModelID, x.SPMMModelID.c_str());
-    strcpy(y.CommodityGroupID, x.CommodityGroupID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.SPMMModelID, x.SPMMModelID.c_str());
+    CTP_SET_FIELD(y.CommodityGroupID, x.CommodityGroupID.c_str());
     y.IntraCommodityRate = x.IntraCommodityRate;
     y.InterCommodityRate = x.InterCommodityRate;
     y.OptionDiscountRate = x.OptionDiscountRate;
@@ -15666,11 +15677,11 @@ SyncDeltaSPMMModelParamField Converter::CThostFtdcSyncDeltaSPMMModelParamFieldTo
 CThostFtdcSyncDeltaRCAMSCombProdInfoField Converter::SyncDeltaRCAMSCombProdInfoFieldToCpp(SyncDeltaRCAMSCombProdInfoField x) {
     CThostFtdcSyncDeltaRCAMSCombProdInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
-    strcpy(y.CombProductID, x.CombProductID.c_str());
-    strcpy(y.ProductGroupID, x.ProductGroupID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.CombProductID, x.CombProductID.c_str());
+    CTP_SET_FIELD(y.ProductGroupID, x.ProductGroupID.c_str());
     y.ActionDirection = x.ActionDirection;
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
     return y;
@@ -15693,9 +15704,9 @@ SyncDeltaRCAMSCombProdInfoField Converter::CThostFtdcSyncDeltaRCAMSCombProdInfoF
 CThostFtdcSyncDeltaRCAMSInstrParameterField Converter::SyncDeltaRCAMSInstrParameterFieldToCpp(SyncDeltaRCAMSInstrParameterField x) {
     CThostFtdcSyncDeltaRCAMSInstrParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     y.HedgeRate = x.HedgeRate;
     y.ActionDirection = x.ActionDirection;
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
@@ -15718,9 +15729,9 @@ SyncDeltaRCAMSInstrParameterField Converter::CThostFtdcSyncDeltaRCAMSInstrParame
 CThostFtdcSyncDeltaRCAMSIntraParameterField Converter::SyncDeltaRCAMSIntraParameterFieldToCpp(SyncDeltaRCAMSIntraParameterField x) {
     CThostFtdcSyncDeltaRCAMSIntraParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.CombProductID, x.CombProductID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.CombProductID, x.CombProductID.c_str());
     y.HedgeRate = x.HedgeRate;
     y.ActionDirection = x.ActionDirection;
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
@@ -15743,13 +15754,13 @@ SyncDeltaRCAMSIntraParameterField Converter::CThostFtdcSyncDeltaRCAMSIntraParame
 CThostFtdcSyncDeltaRCAMSInterParameterField Converter::SyncDeltaRCAMSInterParameterFieldToCpp(SyncDeltaRCAMSInterParameterField x) {
     CThostFtdcSyncDeltaRCAMSInterParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProductGroupID, x.ProductGroupID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProductGroupID, x.ProductGroupID.c_str());
     y.Priority = x.Priority;
     y.CreditRate = x.CreditRate;
-    strcpy(y.CombProduct1, x.CombProduct1.c_str());
-    strcpy(y.CombProduct2, x.CombProduct2.c_str());
+    CTP_SET_FIELD(y.CombProduct1, x.CombProduct1.c_str());
+    CTP_SET_FIELD(y.CombProduct2, x.CombProduct2.c_str());
     y.ActionDirection = x.ActionDirection;
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
     return y;
@@ -15774,9 +15785,9 @@ SyncDeltaRCAMSInterParameterField Converter::CThostFtdcSyncDeltaRCAMSInterParame
 CThostFtdcSyncDeltaRCAMSSOptAdjParamField Converter::SyncDeltaRCAMSSOptAdjParamFieldToCpp(SyncDeltaRCAMSSOptAdjParamField x) {
     CThostFtdcSyncDeltaRCAMSSOptAdjParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.CombProductID, x.CombProductID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.CombProductID, x.CombProductID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.AdjustValue = x.AdjustValue;
     y.ActionDirection = x.ActionDirection;
@@ -15801,16 +15812,16 @@ SyncDeltaRCAMSSOptAdjParamField Converter::CThostFtdcSyncDeltaRCAMSSOptAdjParamF
 CThostFtdcSyncDeltaRCAMSCombRuleDtlField Converter::SyncDeltaRCAMSCombRuleDtlFieldToCpp(SyncDeltaRCAMSCombRuleDtlField x) {
     CThostFtdcSyncDeltaRCAMSCombRuleDtlField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     memcpy(y.ProdGroup, x.ProdGroup.data(), x.ProdGroup.size() * sizeof(uint8_t));
     memcpy(y.RuleId, x.RuleId.data(), x.RuleId.size() * sizeof(uint8_t));
     y.Priority = x.Priority;
     y.HedgeFlag = x.HedgeFlag;
     y.CombMargin = x.CombMargin;
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     y.LegID = x.LegID;
-    strcpy(y.LegInstrumentID, x.LegInstrumentID.c_str());
+    CTP_SET_FIELD(y.LegInstrumentID, x.LegInstrumentID.c_str());
     y.Direction = x.Direction;
     y.LegMultiple = x.LegMultiple;
     y.ActionDirection = x.ActionDirection;
@@ -15844,15 +15855,15 @@ SyncDeltaRCAMSCombRuleDtlField Converter::CThostFtdcSyncDeltaRCAMSCombRuleDtlFie
 CThostFtdcSyncDeltaRCAMSInvstCombPosField Converter::SyncDeltaRCAMSInvstCombPosFieldToCpp(SyncDeltaRCAMSInvstCombPosField x) {
     CThostFtdcSyncDeltaRCAMSInvstCombPosField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.PosiDirection = x.PosiDirection;
-    strcpy(y.CombInstrumentID, x.CombInstrumentID.c_str());
+    CTP_SET_FIELD(y.CombInstrumentID, x.CombInstrumentID.c_str());
     y.LegID = x.LegID;
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     y.TotalAmt = x.TotalAmt;
     y.ExchMargin = x.ExchMargin;
     y.Margin = x.Margin;
@@ -15885,11 +15896,11 @@ SyncDeltaRCAMSInvstCombPosField Converter::CThostFtdcSyncDeltaRCAMSInvstCombPosF
 CThostFtdcSyncDeltaRULEInstrParameterField Converter::SyncDeltaRULEInstrParameterFieldToCpp(SyncDeltaRULEInstrParameterField x) {
     CThostFtdcSyncDeltaRULEInstrParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.InstrumentClass = x.InstrumentClass;
-    strcpy(y.StdInstrumentID, x.StdInstrumentID.c_str());
+    CTP_SET_FIELD(y.StdInstrumentID, x.StdInstrumentID.c_str());
     y.BSpecRatio = x.BSpecRatio;
     y.SSpecRatio = x.SSpecRatio;
     y.BHedgeRatio = x.BHedgeRatio;
@@ -15926,10 +15937,10 @@ SyncDeltaRULEInstrParameterField Converter::CThostFtdcSyncDeltaRULEInstrParamete
 CThostFtdcSyncDeltaRULEIntraParameterField Converter::SyncDeltaRULEIntraParameterFieldToCpp(SyncDeltaRULEIntraParameterField x) {
     CThostFtdcSyncDeltaRULEIntraParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
-    strcpy(y.StdInstrumentID, x.StdInstrumentID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ProdFamilyCode, x.ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.StdInstrumentID, x.StdInstrumentID.c_str());
     y.StdInstrMargin = x.StdInstrMargin;
     y.UsualIntraRate = x.UsualIntraRate;
     y.DeliveryIntraRate = x.DeliveryIntraRate;
@@ -15957,16 +15968,16 @@ SyncDeltaRULEIntraParameterField Converter::CThostFtdcSyncDeltaRULEIntraParamete
 CThostFtdcSyncDeltaRULEInterParameterField Converter::SyncDeltaRULEInterParameterFieldToCpp(SyncDeltaRULEInterParameterField x) {
     CThostFtdcSyncDeltaRULEInterParameterField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradingDay, x.TradingDay.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.SpreadId = x.SpreadId;
     y.InterRate = x.InterRate;
-    strcpy(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
-    strcpy(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.Leg1ProdFamilyCode, x.Leg1ProdFamilyCode.c_str());
+    CTP_SET_FIELD(y.Leg2ProdFamilyCode, x.Leg2ProdFamilyCode.c_str());
     y.Leg1PropFactor = x.Leg1PropFactor;
     y.Leg2PropFactor = x.Leg2PropFactor;
     y.CommodityGroupID = x.CommodityGroupID;
-    strcpy(y.CommodityGroupName, x.CommodityGroupName.c_str());
+    CTP_SET_FIELD(y.CommodityGroupName, x.CommodityGroupName.c_str());
     y.ActionDirection = x.ActionDirection;
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
     return y;
@@ -15994,17 +16005,17 @@ SyncDeltaRULEInterParameterField Converter::CThostFtdcSyncDeltaRULEInterParamete
 CThostFtdcIpAddrParamField Converter::IpAddrParamFieldToCpp(IpAddrParamField x) {
     CThostFtdcIpAddrParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.Address, x.Address.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.Address, x.Address.c_str());
     y.DRIdentityID = x.DRIdentityID;
-    strcpy(y.DRIdentityName, x.DRIdentityName.c_str());
+    CTP_SET_FIELD(y.DRIdentityName, x.DRIdentityName.c_str());
     y.AddrSrvMode = x.AddrSrvMode;
     y.AddrVer = x.AddrVer;
     y.AddrNo = x.AddrNo;
-    strcpy(y.AddrName, x.AddrName.c_str());
+    CTP_SET_FIELD(y.AddrName, x.AddrName.c_str());
     y.IsSM = x.IsSM;
     y.IsLocalAddr = x.IsLocalAddr;
-    strcpy(y.Remark, x.Remark.c_str());
+    CTP_SET_FIELD(y.Remark, x.Remark.c_str());
     memcpy(y.Site, x.Site.data(), x.Site.size() * sizeof(uint8_t));
     memcpy(y.NetOperator, x.NetOperator.data(), x.NetOperator.size() * sizeof(uint8_t));
     return y;
@@ -16035,7 +16046,7 @@ IpAddrParamField Converter::CThostFtdcIpAddrParamFieldToRust(CThostFtdcIpAddrPar
 CThostFtdcQryIpAddrParamField Converter::QryIpAddrParamFieldToCpp(QryIpAddrParamField x) {
     CThostFtdcQryIpAddrParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     return y;
 }
 
@@ -16050,18 +16061,18 @@ QryIpAddrParamField Converter::CThostFtdcQryIpAddrParamFieldToRust(CThostFtdcQry
 CThostFtdcTGIpAddrParamField Converter::TGIpAddrParamFieldToCpp(TGIpAddrParamField x) {
     CThostFtdcTGIpAddrParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.Address, x.Address.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.Address, x.Address.c_str());
     y.DRIdentityID = x.DRIdentityID;
-    strcpy(y.DRIdentityName, x.DRIdentityName.c_str());
+    CTP_SET_FIELD(y.DRIdentityName, x.DRIdentityName.c_str());
     y.AddrSrvMode = x.AddrSrvMode;
     y.AddrVer = x.AddrVer;
     y.AddrNo = x.AddrNo;
-    strcpy(y.AddrName, x.AddrName.c_str());
+    CTP_SET_FIELD(y.AddrName, x.AddrName.c_str());
     y.IsSM = x.IsSM;
     y.IsLocalAddr = x.IsLocalAddr;
-    strcpy(y.Remark, x.Remark.c_str());
+    CTP_SET_FIELD(y.Remark, x.Remark.c_str());
     memcpy(y.Site, x.Site.data(), x.Site.size() * sizeof(uint8_t));
     memcpy(y.NetOperator, x.NetOperator.data(), x.NetOperator.size() * sizeof(uint8_t));
     return y;
@@ -16093,9 +16104,9 @@ TGIpAddrParamField Converter::CThostFtdcTGIpAddrParamFieldToRust(CThostFtdcTGIpA
 CThostFtdcQryTGIpAddrParamField Converter::QryTGIpAddrParamFieldToCpp(QryTGIpAddrParamField x) {
     CThostFtdcQryTGIpAddrParamField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.AppID, x.AppID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.AppID, x.AppID.c_str());
     return y;
 }
 
@@ -16129,11 +16140,11 @@ TGSessionQryStatusField Converter::CThostFtdcTGSessionQryStatusFieldToRust(CThos
 CThostFtdcLocalAddrConfigField Converter::LocalAddrConfigFieldToCpp(LocalAddrConfigField x) {
     CThostFtdcLocalAddrConfigField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.PeerAddr, x.PeerAddr.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.PeerAddr, x.PeerAddr.c_str());
     memcpy(y.NetMask, x.NetMask.data(), x.NetMask.size() * sizeof(uint8_t));
     y.DRIdentityID = x.DRIdentityID;
-    strcpy(y.LocalAddress, x.LocalAddress.c_str());
+    CTP_SET_FIELD(y.LocalAddress, x.LocalAddress.c_str());
     return y;
 }
 
@@ -16153,7 +16164,7 @@ LocalAddrConfigField Converter::CThostFtdcLocalAddrConfigFieldToRust(CThostFtdcL
 CThostFtdcQryLocalAddrConfigField Converter::QryLocalAddrConfigFieldToCpp(QryLocalAddrConfigField x) {
     CThostFtdcQryLocalAddrConfigField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     return y;
 }
 
@@ -16168,43 +16179,43 @@ QryLocalAddrConfigField Converter::CThostFtdcQryLocalAddrConfigFieldToRust(CThos
 CThostFtdcReqQueryBankAccountBySecField Converter::ReqQueryBankAccountBySecFieldToCpp(ReqQueryBankAccountBySecField x) {
     CThostFtdcReqQueryBankAccountBySecField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.CustType = x.CustType;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.FutureSerial = x.FutureSerial;
     y.InstallID = x.InstallID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     y.DRIdentityID = x.DRIdentityID;
     y.SecFutureSerial = x.SecFutureSerial;
     return y;
@@ -16262,45 +16273,45 @@ ReqQueryBankAccountBySecField Converter::CThostFtdcReqQueryBankAccountBySecField
 CThostFtdcRspQueryBankAccountBySecField Converter::RspQueryBankAccountBySecFieldToCpp(RspQueryBankAccountBySecField x) {
     CThostFtdcRspQueryBankAccountBySecField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.CustType = x.CustType;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.FutureSerial = x.FutureSerial;
     y.InstallID = x.InstallID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.BankUseAmount = x.BankUseAmount;
     y.BankFetchAmount = x.BankFetchAmount;
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     y.DRIdentityID = x.DRIdentityID;
     y.SecFutureSerial = x.SecFutureSerial;
     return y;
@@ -16360,31 +16371,31 @@ RspQueryBankAccountBySecField Converter::CThostFtdcRspQueryBankAccountBySecField
 CThostFtdcReqTransferBySecField Converter::ReqTransferBySecFieldToCpp(ReqTransferBySecField x) {
     CThostFtdcReqTransferBySecField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.CustType = x.CustType;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.InstallID = x.InstallID;
     y.FutureSerial = x.FutureSerial;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.TradeAmount = x.TradeAmount;
     y.FutureFetchAmount = x.FutureFetchAmount;
     y.FeePayFlag = x.FeePayFlag;
@@ -16393,17 +16404,17 @@ CThostFtdcReqTransferBySecField Converter::ReqTransferBySecFieldToCpp(ReqTransfe
     memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.TransferStatus = x.TransferStatus;
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     y.DRIdentityID = x.DRIdentityID;
     y.SecFutureSerial = x.SecFutureSerial;
     return y;
@@ -16469,31 +16480,31 @@ ReqTransferBySecField Converter::CThostFtdcReqTransferBySecFieldToRust(CThostFtd
 CThostFtdcRspTransferBySecField Converter::RspTransferBySecFieldToCpp(RspTransferBySecField x) {
     CThostFtdcRspTransferBySecField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.CustType = x.CustType;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.InstallID = x.InstallID;
     y.FutureSerial = x.FutureSerial;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.TradeAmount = x.TradeAmount;
     y.FutureFetchAmount = x.FutureFetchAmount;
     y.FeePayFlag = x.FeePayFlag;
@@ -16502,19 +16513,19 @@ CThostFtdcRspTransferBySecField Converter::RspTransferBySecFieldToCpp(RspTransfe
     memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.TransferStatus = x.TransferStatus;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     y.DRIdentityID = x.DRIdentityID;
     y.SecFutureSerial = x.SecFutureSerial;
     return y;
@@ -16582,47 +16593,47 @@ RspTransferBySecField Converter::CThostFtdcRspTransferBySecFieldToRust(CThostFtd
 CThostFtdcNotifyQueryFutureAccountBySecField Converter::NotifyQueryFutureAccountBySecFieldToCpp(NotifyQueryFutureAccountBySecField x) {
     CThostFtdcNotifyQueryFutureAccountBySecField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.TradeCode, x.TradeCode.c_str());
-    strcpy(y.BankID, x.BankID.c_str());
-    strcpy(y.BankBranchID, x.BankBranchID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.BrokerBranchID, x.BrokerBranchID.c_str());
-    strcpy(y.TradeDate, x.TradeDate.c_str());
-    strcpy(y.TradeTime, x.TradeTime.c_str());
-    strcpy(y.BankSerial, x.BankSerial.c_str());
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradeCode, x.TradeCode.c_str());
+    CTP_SET_FIELD(y.BankID, x.BankID.c_str());
+    CTP_SET_FIELD(y.BankBranchID, x.BankBranchID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerBranchID, x.BrokerBranchID.c_str());
+    CTP_SET_FIELD(y.TradeDate, x.TradeDate.c_str());
+    CTP_SET_FIELD(y.TradeTime, x.TradeTime.c_str());
+    CTP_SET_FIELD(y.BankSerial, x.BankSerial.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.PlateSerial = x.PlateSerial;
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
-    strcpy(y.CustomerName, x.CustomerName.c_str());
+    CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
-    strcpy(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
+    CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
     y.CustType = x.CustType;
-    strcpy(y.BankAccount, x.BankAccount.c_str());
-    strcpy(y.BankPassWord, x.BankPassWord.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.Password, x.Password.c_str());
+    CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
+    CTP_SET_FIELD(y.BankPassWord, x.BankPassWord.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.Password, x.Password.c_str());
     y.FutureSerial = x.FutureSerial;
     y.InstallID = x.InstallID;
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
     y.BankAccType = x.BankAccType;
-    strcpy(y.DeviceID, x.DeviceID.c_str());
+    CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
     memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
     memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
-    strcpy(y.OperNo, x.OperNo.c_str());
+    CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.BankUseAmount = x.BankUseAmount;
     y.BankFetchAmount = x.BankFetchAmount;
     y.ErrorID = x.ErrorID;
-    strcpy(y.ErrorMsg, x.ErrorMsg.c_str());
-    strcpy(y.LongCustomerName, x.LongCustomerName.c_str());
+    CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
+    CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     y.DRIdentityID = x.DRIdentityID;
     y.SecFutureSerial = x.SecFutureSerial;
     return y;
@@ -16684,7 +16695,7 @@ NotifyQueryFutureAccountBySecField Converter::CThostFtdcNotifyQueryFutureAccount
 CThostFtdcExitEmergencyField Converter::ExitEmergencyFieldToCpp(ExitEmergencyField x) {
     CThostFtdcExitEmergencyField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     return y;
 }
 
@@ -16699,9 +16710,9 @@ ExitEmergencyField Converter::CThostFtdcExitEmergencyFieldToRust(CThostFtdcExitE
 CThostFtdcInvestorPortfMarginModelField Converter::InvestorPortfMarginModelFieldToCpp(InvestorPortfMarginModelField x) {
     CThostFtdcInvestorPortfMarginModelField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.MarginModelID, x.MarginModelID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.MarginModelID, x.MarginModelID.c_str());
     return y;
 }
 
@@ -16718,9 +16729,9 @@ InvestorPortfMarginModelField Converter::CThostFtdcInvestorPortfMarginModelField
 CThostFtdcInvestorPortfSettingField Converter::InvestorPortfSettingFieldToCpp(InvestorPortfSettingField x) {
     CThostFtdcInvestorPortfSettingField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.HedgeFlag = x.HedgeFlag;
     y.UsePortf = x.UsePortf;
     return y;
@@ -16741,9 +16752,9 @@ InvestorPortfSettingField Converter::CThostFtdcInvestorPortfSettingFieldToRust(C
 CThostFtdcQryInvestorPortfSettingField Converter::QryInvestorPortfSettingFieldToCpp(QryInvestorPortfSettingField x) {
     CThostFtdcQryInvestorPortfSettingField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     return y;
 }
 
@@ -16760,10 +16771,10 @@ QryInvestorPortfSettingField Converter::CThostFtdcQryInvestorPortfSettingFieldTo
 CThostFtdcUserPasswordUpdateFromSecField Converter::UserPasswordUpdateFromSecFieldToCpp(UserPasswordUpdateFromSecField x) {
     CThostFtdcUserPasswordUpdateFromSecField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.OldPassword, x.OldPassword.c_str());
-    strcpy(y.NewPassword, x.NewPassword.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.OldPassword, x.OldPassword.c_str());
+    CTP_SET_FIELD(y.NewPassword, x.NewPassword.c_str());
     y.FromSec = x.FromSec;
     return y;
 }
@@ -16783,10 +16794,10 @@ UserPasswordUpdateFromSecField Converter::CThostFtdcUserPasswordUpdateFromSecFie
 CThostFtdcSettlementInfoConfirmFromSecField Converter::SettlementInfoConfirmFromSecFieldToCpp(SettlementInfoConfirmFromSecField x) {
     CThostFtdcSettlementInfoConfirmFromSecField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ConfirmDate, x.ConfirmDate.c_str());
-    strcpy(y.ConfirmTime, x.ConfirmTime.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ConfirmDate, x.ConfirmDate.c_str());
+    CTP_SET_FIELD(y.ConfirmTime, x.ConfirmTime.c_str());
     y.FromSec = x.FromSec;
     return y;
 }
@@ -16806,11 +16817,11 @@ SettlementInfoConfirmFromSecField Converter::CThostFtdcSettlementInfoConfirmFrom
 CThostFtdcTradingAccountPasswordUpdateFromSecField Converter::TradingAccountPasswordUpdateFromSecFieldToCpp(TradingAccountPasswordUpdateFromSecField x) {
     CThostFtdcTradingAccountPasswordUpdateFromSecField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.AccountID, x.AccountID.c_str());
-    strcpy(y.OldPassword, x.OldPassword.c_str());
-    strcpy(y.NewPassword, x.NewPassword.c_str());
-    strcpy(y.CurrencyID, x.CurrencyID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
+    CTP_SET_FIELD(y.OldPassword, x.OldPassword.c_str());
+    CTP_SET_FIELD(y.NewPassword, x.NewPassword.c_str());
+    CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.FromSec = x.FromSec;
     return y;
 }
@@ -16831,10 +16842,10 @@ TradingAccountPasswordUpdateFromSecField Converter::CThostFtdcTradingAccountPass
 CThostFtdcRiskForbiddenRightField Converter::RiskForbiddenRightFieldToCpp(RiskForbiddenRightField x) {
     CThostFtdcRiskForbiddenRightField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     return y;
 }
 
@@ -16852,16 +16863,16 @@ RiskForbiddenRightField Converter::CThostFtdcRiskForbiddenRightFieldToRust(CThos
 CThostFtdcInvestorInfoCommRecField Converter::InvestorInfoCommRecFieldToCpp(InvestorInfoCommRecField x) {
     CThostFtdcInvestorInfoCommRecField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
     y.OrderCount = x.OrderCount;
     y.OrderActionCount = x.OrderActionCount;
     y.ForQuoteCnt = x.ForQuoteCnt;
     y.InfoComm = x.InfoComm;
     y.IsOptSeries = x.IsOptSeries;
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     y.InfoCnt = x.InfoCnt;
     return y;
 }
@@ -16887,9 +16898,9 @@ InvestorInfoCommRecField Converter::CThostFtdcInvestorInfoCommRecFieldToRust(CTh
 CThostFtdcQryInvestorInfoCommRecField Converter::QryInvestorInfoCommRecFieldToCpp(QryInvestorInfoCommRecField x) {
     CThostFtdcQryInvestorInfoCommRecField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     return y;
 }
 
@@ -16906,9 +16917,9 @@ QryInvestorInfoCommRecField Converter::CThostFtdcQryInvestorInfoCommRecFieldToRu
 CThostFtdcCombLegField Converter::CombLegFieldToCpp(CombLegField x) {
     CThostFtdcCombLegField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.CombInstrumentID, x.CombInstrumentID.c_str());
+    CTP_SET_FIELD(y.CombInstrumentID, x.CombInstrumentID.c_str());
     y.LegID = x.LegID;
-    strcpy(y.LegInstrumentID, x.LegInstrumentID.c_str());
+    CTP_SET_FIELD(y.LegInstrumentID, x.LegInstrumentID.c_str());
     y.Direction = x.Direction;
     y.LegMultiple = x.LegMultiple;
     y.ImplyLevel = x.ImplyLevel;
@@ -16931,7 +16942,7 @@ CombLegField Converter::CThostFtdcCombLegFieldToRust(CThostFtdcCombLegField* x) 
 CThostFtdcQryCombLegField Converter::QryCombLegFieldToCpp(QryCombLegField x) {
     CThostFtdcQryCombLegField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.LegInstrumentID, x.LegInstrumentID.c_str());
+    CTP_SET_FIELD(y.LegInstrumentID, x.LegInstrumentID.c_str());
     return y;
 }
 
@@ -16946,19 +16957,19 @@ QryCombLegField Converter::CThostFtdcQryCombLegFieldToRust(CThostFtdcQryCombLegF
 CThostFtdcInputOffsetSettingField Converter::InputOffsetSettingFieldToCpp(InputOffsetSettingField x) {
     CThostFtdcInputOffsetSettingField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.UnderlyingInstrID, x.UnderlyingInstrID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.UnderlyingInstrID, x.UnderlyingInstrID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     y.OffsetType = x.OffsetType;
     y.Volume = x.Volume;
     y.IsOffset = x.IsOffset;
     y.RequestID = x.RequestID;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
     return y;
 }
 
@@ -16985,38 +16996,38 @@ InputOffsetSettingField Converter::CThostFtdcInputOffsetSettingFieldToRust(CThos
 CThostFtdcOffsetSettingField Converter::OffsetSettingFieldToCpp(OffsetSettingField x) {
     CThostFtdcOffsetSettingField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.UnderlyingInstrID, x.UnderlyingInstrID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.UnderlyingInstrID, x.UnderlyingInstrID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     y.OffsetType = x.OffsetType;
     y.Volume = x.Volume;
     y.IsOffset = x.IsOffset;
     y.RequestID = x.RequestID;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     memcpy(y.ExchangeSerialNo, x.ExchangeSerialNo.data(), x.ExchangeSerialNo.size() * sizeof(uint8_t));
-    strcpy(y.ExchangeProductID, x.ExchangeProductID.c_str());
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExchangeProductID, x.ExchangeProductID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
     y.OrderSubmitStatus = x.OrderSubmitStatus;
-    strcpy(y.TradingDay, x.TradingDay.c_str());
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.SettlementID = x.SettlementID;
-    strcpy(y.InsertDate, x.InsertDate.c_str());
-    strcpy(y.InsertTime, x.InsertTime.c_str());
-    strcpy(y.CancelTime, x.CancelTime.c_str());
+    CTP_SET_FIELD(y.InsertDate, x.InsertDate.c_str());
+    CTP_SET_FIELD(y.InsertTime, x.InsertTime.c_str());
+    CTP_SET_FIELD(y.CancelTime, x.CancelTime.c_str());
     y.ExecResult = x.ExecResult;
     y.SequenceNo = x.SequenceNo;
     y.FrontID = x.FrontID;
     y.SessionID = x.SessionID;
-    strcpy(y.StatusMsg, x.StatusMsg.c_str());
-    strcpy(y.ActiveUserID, x.ActiveUserID.c_str());
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.ActiveUserID, x.ActiveUserID.c_str());
     y.BrokerOffsetSettingSeq = x.BrokerOffsetSettingSeq;
 #ifdef CTP_6_7_11
     y.ApplySrc = x.ApplySrc;
@@ -17071,31 +17082,31 @@ OffsetSettingField Converter::CThostFtdcOffsetSettingFieldToRust(CThostFtdcOffse
 CThostFtdcCancelOffsetSettingField Converter::CancelOffsetSettingFieldToCpp(CancelOffsetSettingField x) {
     CThostFtdcCancelOffsetSettingField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.InstrumentID, x.InstrumentID.c_str());
-    strcpy(y.UnderlyingInstrID, x.UnderlyingInstrID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.UnderlyingInstrID, x.UnderlyingInstrID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     y.OffsetType = x.OffsetType;
     y.Volume = x.Volume;
     y.IsOffset = x.IsOffset;
     y.RequestID = x.RequestID;
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.ExchangeID, x.ExchangeID.c_str());
-    strcpy(y.IPAddress, x.IPAddress.c_str());
-    strcpy(y.MacAddress, x.MacAddress.c_str());
-    strcpy(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
     memcpy(y.ExchangeSerialNo, x.ExchangeSerialNo.data(), x.ExchangeSerialNo.size() * sizeof(uint8_t));
-    strcpy(y.ExchangeProductID, x.ExchangeProductID.c_str());
-    strcpy(y.TraderID, x.TraderID.c_str());
+    CTP_SET_FIELD(y.ExchangeProductID, x.ExchangeProductID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
-    strcpy(y.ParticipantID, x.ParticipantID.c_str());
-    strcpy(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
     y.OrderActionStatus = x.OrderActionStatus;
-    strcpy(y.StatusMsg, x.StatusMsg.c_str());
-    strcpy(y.ActionLocalID, x.ActionLocalID.c_str());
-    strcpy(y.ActionDate, x.ActionDate.c_str());
-    strcpy(y.ActionTime, x.ActionTime.c_str());
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ActionDate, x.ActionDate.c_str());
+    CTP_SET_FIELD(y.ActionTime, x.ActionTime.c_str());
     return y;
 }
 
@@ -17135,9 +17146,9 @@ CancelOffsetSettingField Converter::CThostFtdcCancelOffsetSettingFieldToRust(CTh
 CThostFtdcQryOffsetSettingField Converter::QryOffsetSettingFieldToCpp(QryOffsetSettingField x) {
     CThostFtdcQryOffsetSettingField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.ProductID, x.ProductID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ProductID, x.ProductID.c_str());
     y.OffsetType = x.OffsetType;
     return y;
 }
@@ -17156,10 +17167,10 @@ QryOffsetSettingField Converter::CThostFtdcQryOffsetSettingFieldToRust(CThostFtd
 CThostFtdcAddrAppIDRelationField Converter::AddrAppIDRelationFieldToCpp(AddrAppIDRelationField x) {
     CThostFtdcAddrAppIDRelationField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.Address, x.Address.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.Address, x.Address.c_str());
     y.DRIdentityID = x.DRIdentityID;
-    strcpy(y.AppID, x.AppID.c_str());
+    CTP_SET_FIELD(y.AppID, x.AppID.c_str());
     return y;
 }
 
@@ -17177,7 +17188,7 @@ AddrAppIDRelationField Converter::CThostFtdcAddrAppIDRelationFieldToRust(CThostF
 CThostFtdcQryAddrAppIDRelationField Converter::QryAddrAppIDRelationFieldToCpp(QryAddrAppIDRelationField x) {
     CThostFtdcQryAddrAppIDRelationField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     return y;
 }
 
@@ -17192,15 +17203,15 @@ QryAddrAppIDRelationField Converter::CThostFtdcQryAddrAppIDRelationFieldToRust(C
 CThostFtdcWechatUserSystemInfoField Converter::WechatUserSystemInfoFieldToCpp(WechatUserSystemInfoField x) {
     CThostFtdcWechatUserSystemInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.WechatCltSysInfoLen = x.WechatCltSysInfoLen;
-    strcpy(y.WechatCltSysInfo, x.WechatCltSysInfo.c_str());
+    CTP_SET_FIELD(y.WechatCltSysInfo, x.WechatCltSysInfo.c_str());
     y.ClientIPPort = x.ClientIPPort;
-    strcpy(y.ClientLoginTime, x.ClientLoginTime.c_str());
-    strcpy(y.ClientAppID, x.ClientAppID.c_str());
-    strcpy(y.ClientPublicIP, x.ClientPublicIP.c_str());
-    strcpy(y.ClientLoginRemark, x.ClientLoginRemark.c_str());
+    CTP_SET_FIELD(y.ClientLoginTime, x.ClientLoginTime.c_str());
+    CTP_SET_FIELD(y.ClientAppID, x.ClientAppID.c_str());
+    CTP_SET_FIELD(y.ClientPublicIP, x.ClientPublicIP.c_str());
+    CTP_SET_FIELD(y.ClientLoginRemark, x.ClientLoginRemark.c_str());
     return y;
 }
 
@@ -17224,9 +17235,9 @@ WechatUserSystemInfoField Converter::CThostFtdcWechatUserSystemInfoFieldToRust(C
 CThostFtdcInvestorReserveInfoField Converter::InvestorReserveInfoFieldToCpp(InvestorReserveInfoField x) {
     CThostFtdcInvestorReserveInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.UserID, x.UserID.c_str());
-    strcpy(y.ReserveInfo, x.ReserveInfo.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.ReserveInfo, x.ReserveInfo.c_str());
     return y;
 }
 
@@ -17243,7 +17254,7 @@ InvestorReserveInfoField Converter::CThostFtdcInvestorReserveInfoFieldToRust(CTh
 CThostFtdcQryInvestorDepartmentFlatField Converter::QryInvestorDepartmentFlatFieldToCpp(QryInvestorDepartmentFlatField x) {
     CThostFtdcQryInvestorDepartmentFlatField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     return y;
 }
 
@@ -17258,9 +17269,9 @@ QryInvestorDepartmentFlatField Converter::CThostFtdcQryInvestorDepartmentFlatFie
 CThostFtdcInvestorDepartmentFlatField Converter::InvestorDepartmentFlatFieldToCpp(InvestorDepartmentFlatField x) {
     CThostFtdcInvestorDepartmentFlatField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
-    strcpy(y.InvestorID, x.InvestorID.c_str());
-    strcpy(y.DepartmentID, x.DepartmentID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.DepartmentID, x.DepartmentID.c_str());
     return y;
 }
 
@@ -17277,7 +17288,7 @@ InvestorDepartmentFlatField Converter::CThostFtdcInvestorDepartmentFlatFieldToRu
 CThostFtdcQryDepartmentUserField Converter::QryDepartmentUserFieldToCpp(QryDepartmentUserField x) {
     CThostFtdcQryDepartmentUserField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     return y;
 }
 
@@ -17293,7 +17304,7 @@ QryDepartmentUserField Converter::CThostFtdcQryDepartmentUserFieldToRust(CThostF
 CThostFtdcFrontInfoField Converter::FrontInfoFieldToCpp(FrontInfoField x) {
     CThostFtdcFrontInfoField y;
     memset(&y, 0, sizeof(y));
-    strcpy(y.FrontAddr, x.FrontAddr.c_str());
+    CTP_SET_FIELD(y.FrontAddr, x.FrontAddr.c_str());
     y.QryFreq = x.QryFreq;
     y.FTDPkgFreq = x.FTDPkgFreq;
     return y;
