@@ -54,6 +54,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <string>
+#include <vector>
 
 #include "ThostFtdcUserApiStruct.h"
 
@@ -64,7 +65,7 @@
 // The over-long source is built at runtime from a heap std::string so
 // the optimiser cannot constant-fold the length and elide the check.
 
-enum Variant { VARIANT_STRCPY, VARIANT_FIXED };
+enum Variant { VARIANT_STRCPY, VARIANT_FIXED, VARIANT_MEMCPY, VARIANT_BYTES };
 
 // Runs one variant in a forked child. Returns the raw waitpid status.
 static int run_child(Variant v, const std::string &src) {
@@ -80,8 +81,21 @@ static int run_child(Variant v, const std::string &src) {
 
         if (v == VARIANT_STRCPY) {
             std::strcpy(y.InstrumentID, src.c_str());   // ← the shipped code
-        } else {
+        } else if (v == VARIANT_FIXED) {
             CTP_SET_FIELD(y.InstrumentID, src.c_str()); // ← the fix
+        } else {
+            // 字节块族:Rust 侧是 Vec<u8>,C 侧是定长 char[N]。
+            // 与字符串族同一个 abort 类,收敛 strcpy 时漏掉了。
+            CThostFtdcRspUserLogin2Field z;
+            std::memset(&z, 0, sizeof(z));
+            std::vector<unsigned char> blob(src.size(), 'Z');
+            if (v == VARIANT_MEMCPY) {
+                std::memcpy(z.RandomString, blob.data(), blob.size());  // ← 修前
+            } else {
+                CTP_SET_BYTES(z.RandomString, blob);                    // ← 修后
+            }
+            std::fprintf(stdout, "%zu\n", std::strlen(z.RandomString));
+            _exit(0);
         }
 
         // Consume the result so nothing above is dead-code eliminated.
@@ -182,6 +196,31 @@ int main() {
         std::printf("note        — InstrumentName capacity=%zu; %zu GB2312 "
                     "chars (%zu bytes on the wire) become %zu bytes as UTF-8\n",
                     name_cap, utf8.size() / 3, utf8.size() / 3 * 2, utf8.size());
+    }
+
+    // ── PART 6/7 — 字节块族(memcpy)是同一个 abort 类 ──────────────
+    {
+        const size_t cap = sizeof(CThostFtdcRspUserLogin2Field::RandomString);
+        const std::string over(cap + 8, 'Z');
+
+        int st_old = run_child(VARIANT_MEMCPY, over);
+        if (died_on_abort(st_old)) {
+            std::printf("PART 6 ok   — memcpy(%zu bytes → char[%zu]) 同样以 "
+                        "SIGABRT 死亡(__memcpy_chk)\n", over.size(), cap);
+        } else {
+            std::printf("PART 6 FAIL — memcpy 未 abort(status=%d);字节块族的 "
+                        "假设不成立,不要据此改代码\n", st_old);
+            ++failures;
+        }
+
+        int st_new = run_child(VARIANT_BYTES, over);
+        if (WIFEXITED(st_new) && WEXITSTATUS(st_new) == 0) {
+            std::printf("PART 7 ok   — ctp_set_bytes 同样输入下存活\n");
+        } else {
+            std::printf("PART 7 FAIL — ctp_set_bytes 未干净退出(status=%d)\n",
+                        st_new);
+            ++failures;
+        }
     }
 
     std::printf("\n%s (%d failure%s)\n", failures ? "FAILED" : "PASSED",

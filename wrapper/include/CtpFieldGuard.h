@@ -101,6 +101,36 @@ inline void ctp_set_field(char (&dst)[N], const char *src, const char *fn,
     dst[len] = '\0';
 }
 
+// Copies a **byte-blob** field (Rust side is `Vec<u8>`, C side a fixed
+// `char[N]`) with the same bound + report discipline as `ctp_set_field`.
+//
+// 与上面的字符串族是同一个 abort 类,2026-08-29 补齐。Converter.cpp 里约
+// 130 处写的是
+//
+//     memcpy(y.RandomString, x.RandomString.data(), x.RandomString.size());
+//
+// 目标 `TThostFtdcRandomStringType` 是 `char[17]`,源长度却完全由 Rust 侧
+// 决定。超长时 __memcpy_chk 同样 abort 整个进程 —— 与杀死生产引擎的
+// __strcpy_chk 一模一样,只是当初收敛 strcpy 时把这一族漏了。
+//
+// 不强制补 NUL:调用方拷贝前对整个结构做过 memset(0),未填满时天然以 0
+// 结尾;填满时按 CTP 定长语义本就无终止符。
+template <std::size_t N, typename Bytes>
+inline void ctp_set_bytes(char (&dst)[N], const Bytes &src, const char *fn,
+                          const char *field) {
+    static_assert(N > 0, "CTP field must be a non-empty char array");
+    const std::size_t len = src.size();
+    if (len > N) {
+        std::memcpy(dst, src.data(), N);
+        ctp_report_field_truncation(fn, field, len, N);
+        return;
+    }
+    std::memcpy(dst, src.data(), len);
+}
+
+// Drop-in for `memcpy(y.Field, x.Field.data(), x.Field.size() * sizeof(uint8_t))`.
+#define CTP_SET_BYTES(dst, src) ctp_set_bytes((dst), (src), __func__, #dst)
+
 // Drop-in for `strcpy(y.Field, x.Field.c_str())`. __func__ expands at
 // the call site, so the report carries the converter's name.
 #define CTP_SET_FIELD(dst, src) ctp_set_field((dst), (src), __func__, #dst)

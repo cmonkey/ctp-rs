@@ -277,7 +277,7 @@ CThostFtdcRspUserLogin2Field Converter::RspUserLogin2FieldToCpp(RspUserLogin2Fie
     CTP_SET_FIELD(y.CZCETime, x.CZCETime.c_str());
     CTP_SET_FIELD(y.FFEXTime, x.FFEXTime.c_str());
     CTP_SET_FIELD(y.INETime, x.INETime.c_str());
-    memcpy(y.RandomString, x.RandomString.data(), x.RandomString.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.RandomString, x.RandomString);
     return y;
 }
 
@@ -316,7 +316,7 @@ CThostFtdcTransferHeaderField Converter::TransferHeaderFieldToCpp(TransferHeader
     CTP_SET_FIELD(y.BankBrchID, x.BankBrchID.c_str());
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
-    memcpy(y.RecordNum, x.RecordNum.data(), x.RecordNum.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.RecordNum, x.RecordNum);
     y.SessionID = x.SessionID;
     y.RequestID = x.RequestID;
     return y;
@@ -1437,7 +1437,7 @@ CThostFtdcTraderOfferField Converter::TraderOfferFieldToCpp(TraderOfferField x) 
     CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     CTP_SET_FIELD(y.MaxTradeID, x.MaxTradeID.c_str());
-    memcpy(y.MaxOrderMessageReference, x.MaxOrderMessageReference.data(), x.MaxOrderMessageReference.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.MaxOrderMessageReference, x.MaxOrderMessageReference);
     y.OrderCancelAlg = x.OrderCancelAlg;
     return y;
 }
@@ -1478,7 +1478,7 @@ CThostFtdcSettlementInfoField Converter::SettlementInfoFieldToCpp(SettlementInfo
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.SequenceNo = x.SequenceNo;
-    memcpy(y.Content, x.Content.data(), x.Content.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Content, x.Content);
     CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     return y;
@@ -1698,7 +1698,7 @@ CThostFtdcLoginInfoField Converter::LoginInfoFieldToCpp(LoginInfoField x) {
     CTP_SET_FIELD(y.InterfaceProductInfo, x.InterfaceProductInfo.c_str());
     CTP_SET_FIELD(y.ProtocolInfo, x.ProtocolInfo.c_str());
     CTP_SET_FIELD(y.SystemName, x.SystemName.c_str());
-    memcpy(y.PasswordDeprecated, x.PasswordDeprecated.data(), x.PasswordDeprecated.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.PasswordDeprecated, x.PasswordDeprecated);
     CTP_SET_FIELD(y.MaxOrderRef, x.MaxOrderRef.c_str());
     CTP_SET_FIELD(y.SHFETime, x.SHFETime.c_str());
     CTP_SET_FIELD(y.DCETime, x.DCETime.c_str());
@@ -2594,7 +2594,7 @@ SettlementInfoConfirmField Converter::CThostFtdcSettlementInfoConfirmFieldToRust
 CThostFtdcSyncDepositField Converter::SyncDepositFieldToCpp(SyncDepositField x) {
     CThostFtdcSyncDepositField y;
     memset(&y, 0, sizeof(y));
-    memcpy(y.DepositSeqNo, x.DepositSeqNo.data(), x.DepositSeqNo.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.DepositSeqNo, x.DepositSeqNo);
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.Deposit = x.Deposit;
@@ -2626,7 +2626,7 @@ SyncDepositField Converter::CThostFtdcSyncDepositFieldToRust(CThostFtdcSyncDepos
 CThostFtdcSyncFundMortgageField Converter::SyncFundMortgageFieldToCpp(SyncFundMortgageField x) {
     CThostFtdcSyncFundMortgageField y;
     memset(&y, 0, sizeof(y));
-    memcpy(y.MortgageSeqNo, x.MortgageSeqNo.data(), x.MortgageSeqNo.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.MortgageSeqNo, x.MortgageSeqNo);
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     CTP_SET_FIELD(y.FromCurrencyID, x.FromCurrencyID.c_str());
@@ -3605,7 +3605,7 @@ CThostFtdcQrySyncDepositField Converter::QrySyncDepositFieldToCpp(QrySyncDeposit
     CThostFtdcQrySyncDepositField y;
     memset(&y, 0, sizeof(y));
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
-    memcpy(y.DepositSeqNo, x.DepositSeqNo.data(), x.DepositSeqNo.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.DepositSeqNo, x.DepositSeqNo);
     return y;
 }
 
@@ -3705,7 +3705,7 @@ CThostFtdcQrySyncFundMortgageField Converter::QrySyncFundMortgageFieldToCpp(QryS
     CThostFtdcQrySyncFundMortgageField y;
     memset(&y, 0, sizeof(y));
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
-    memcpy(y.MortgageSeqNo, x.MortgageSeqNo.data(), x.MortgageSeqNo.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.MortgageSeqNo, x.MortgageSeqNo);
     return y;
 }
 
@@ -6080,7 +6080,7 @@ CThostFtdcTradeParamField Converter::TradeParamFieldToCpp(TradeParamField x) {
     memset(&y, 0, sizeof(y));
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     y.TradeParamID = x.TradeParamID;
-    memcpy(y.TradeParamValue, x.TradeParamValue.data(), x.TradeParamValue.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.TradeParamValue, x.TradeParamValue);
     CTP_SET_FIELD(y.Memo, x.Memo.c_str());
     return y;
 }
@@ -6602,7 +6602,7 @@ ExchangeOptionSelfCloseActionField Converter::CThostFtdcExchangeOptionSelfCloseA
 CThostFtdcSyncDelaySwapField Converter::SyncDelaySwapFieldToCpp(SyncDelaySwapField x) {
     CThostFtdcSyncDelaySwapField y;
     memset(&y, 0, sizeof(y));
-    memcpy(y.DelaySwapSeqNo, x.DelaySwapSeqNo.data(), x.DelaySwapSeqNo.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.DelaySwapSeqNo, x.DelaySwapSeqNo);
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     CTP_SET_FIELD(y.FromCurrencyID, x.FromCurrencyID.c_str());
@@ -6639,7 +6639,7 @@ CThostFtdcQrySyncDelaySwapField Converter::QrySyncDelaySwapFieldToCpp(QrySyncDel
     CThostFtdcQrySyncDelaySwapField y;
     memset(&y, 0, sizeof(y));
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
-    memcpy(y.DelaySwapSeqNo, x.DelaySwapSeqNo.data(), x.DelaySwapSeqNo.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.DelaySwapSeqNo, x.DelaySwapSeqNo);
     return y;
 }
 
@@ -7337,7 +7337,7 @@ CThostFtdcMDTraderOfferField Converter::MDTraderOfferFieldToCpp(MDTraderOfferFie
     CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     CTP_SET_FIELD(y.MaxTradeID, x.MaxTradeID.c_str());
-    memcpy(y.MaxOrderMessageReference, x.MaxOrderMessageReference.data(), x.MaxOrderMessageReference.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.MaxOrderMessageReference, x.MaxOrderMessageReference);
     y.OrderCancelAlg = x.OrderCancelAlg;
     return y;
 }
@@ -7408,8 +7408,8 @@ CThostFtdcNoticeField Converter::NoticeFieldToCpp(NoticeField x) {
     CThostFtdcNoticeField y;
     memset(&y, 0, sizeof(y));
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
-    memcpy(y.Content, x.Content.data(), x.Content.size() * sizeof(uint8_t));
-    memcpy(y.SequenceLabel, x.SequenceLabel.data(), x.SequenceLabel.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Content, x.Content);
+    CTP_SET_BYTES(y.SequenceLabel, x.SequenceLabel);
     return y;
 }
 
@@ -8155,7 +8155,7 @@ CThostFtdcUserIPField Converter::UserIPFieldToCpp(UserIPField x) {
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
     CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
-    memcpy(y.IPMask, x.IPMask.data(), x.IPMask.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.IPMask, x.IPMask);
     return y;
 }
 
@@ -8178,7 +8178,7 @@ CThostFtdcTradingNoticeInfoField Converter::TradingNoticeInfoFieldToCpp(TradingN
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     CTP_SET_FIELD(y.SendTime, x.SendTime.c_str());
-    memcpy(y.FieldContent, x.FieldContent.data(), x.FieldContent.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.FieldContent, x.FieldContent);
     y.SequenceSeries = x.SequenceSeries;
     y.SequenceNo = x.SequenceNo;
     CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
@@ -8210,7 +8210,7 @@ CThostFtdcTradingNoticeField Converter::TradingNoticeFieldToCpp(TradingNoticeFie
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     CTP_SET_FIELD(y.SendTime, x.SendTime.c_str());
     y.SequenceNo = x.SequenceNo;
-    memcpy(y.FieldContent, x.FieldContent.data(), x.FieldContent.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.FieldContent, x.FieldContent);
     CTP_SET_FIELD(y.InvestUnitID, x.InvestUnitID.c_str());
     return y;
 }
@@ -8828,7 +8828,7 @@ CThostFtdcCFMMCBrokerKeyField Converter::CFMMCBrokerKeyFieldToCpp(CFMMCBrokerKey
     CTP_SET_FIELD(y.CreateDate, x.CreateDate.c_str());
     CTP_SET_FIELD(y.CreateTime, x.CreateTime.c_str());
     y.KeyID = x.KeyID;
-    memcpy(y.CurrentKey, x.CurrentKey.data(), x.CurrentKey.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.CurrentKey, x.CurrentKey);
     y.KeyKind = x.KeyKind;
     return y;
 }
@@ -8855,7 +8855,7 @@ CThostFtdcCFMMCTradingAccountKeyField Converter::CFMMCTradingAccountKeyFieldToCp
     CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
     CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     y.KeyID = x.KeyID;
-    memcpy(y.CurrentKey, x.CurrentKey.data(), x.CurrentKey.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.CurrentKey, x.CurrentKey);
     return y;
 }
 
@@ -8895,8 +8895,8 @@ CThostFtdcBrokerUserOTPParamField Converter::BrokerUserOTPParamFieldToCpp(Broker
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     CTP_SET_FIELD(y.OTPVendorsID, x.OTPVendorsID.c_str());
-    memcpy(y.SerialNumber, x.SerialNumber.data(), x.SerialNumber.size() * sizeof(uint8_t));
-    memcpy(y.AuthKey, x.AuthKey.data(), x.AuthKey.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.SerialNumber, x.SerialNumber);
+    CTP_SET_BYTES(y.AuthKey, x.AuthKey);
     y.LastDrift = x.LastDrift;
     y.LastSuccess = x.LastSuccess;
     y.OTPType = x.OTPType;
@@ -8926,8 +8926,8 @@ CThostFtdcManualSyncBrokerUserOTPField Converter::ManualSyncBrokerUserOTPFieldTo
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.OTPType = x.OTPType;
-    memcpy(y.FirstOTP, x.FirstOTP.data(), x.FirstOTP.size() * sizeof(uint8_t));
-    memcpy(y.SecondOTP, x.SecondOTP.data(), x.SecondOTP.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.FirstOTP, x.FirstOTP);
+    CTP_SET_BYTES(y.SecondOTP, x.SecondOTP);
     return y;
 }
 
@@ -9193,7 +9193,7 @@ CThostFtdcCFMMCTradingAccountTokenField Converter::CFMMCTradingAccountTokenField
     CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
     CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     y.KeyID = x.KeyID;
-    memcpy(y.Token, x.Token.data(), x.Token.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Token, x.Token);
     return y;
 }
 
@@ -9253,13 +9253,13 @@ CThostFtdcBulletinField Converter::BulletinFieldToCpp(BulletinField x) {
     CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     y.BulletinID = x.BulletinID;
     y.SequenceNo = x.SequenceNo;
-    memcpy(y.NewsType, x.NewsType.data(), x.NewsType.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.NewsType, x.NewsType);
     y.NewsUrgency = x.NewsUrgency;
     CTP_SET_FIELD(y.SendTime, x.SendTime.c_str());
-    memcpy(y.Abstract, x.Abstract.data(), x.Abstract.size() * sizeof(uint8_t));
-    memcpy(y.ComeFrom, x.ComeFrom.data(), x.ComeFrom.size() * sizeof(uint8_t));
-    memcpy(y.Content, x.Content.data(), x.Content.size() * sizeof(uint8_t));
-    memcpy(y.URLLink, x.URLLink.data(), x.URLLink.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Abstract, x.Abstract);
+    CTP_SET_BYTES(y.ComeFrom, x.ComeFrom);
+    CTP_SET_BYTES(y.Content, x.Content);
+    CTP_SET_BYTES(y.URLLink, x.URLLink);
     CTP_SET_FIELD(y.MarketID, x.MarketID.c_str());
     return y;
 }
@@ -9294,7 +9294,7 @@ CThostFtdcQryBulletinField Converter::QryBulletinFieldToCpp(QryBulletinField x) 
     CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
     y.BulletinID = x.BulletinID;
     y.SequenceNo = x.SequenceNo;
-    memcpy(y.NewsType, x.NewsType.data(), x.NewsType.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.NewsType, x.NewsType);
     y.NewsUrgency = x.NewsUrgency;
     return y;
 }
@@ -9409,12 +9409,12 @@ CThostFtdcReqOpenAccountField Converter::ReqOpenAccountFieldToCpp(ReqOpenAccount
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.CashExchangeCode = x.CashExchangeCode;
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -9515,12 +9515,12 @@ CThostFtdcReqCancelAccountField Converter::ReqCancelAccountFieldToCpp(ReqCancelA
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.CashExchangeCode = x.CashExchangeCode;
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -9623,11 +9623,11 @@ CThostFtdcReqChangeAccountField Converter::ReqChangeAccountFieldToCpp(ReqChangeA
     y.InstallID = x.InstallID;
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     y.TID = x.TID;
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
@@ -9715,13 +9715,13 @@ CThostFtdcReqTransferField Converter::ReqTransferFieldToCpp(ReqTransferField x) 
     y.FeePayFlag = x.FeePayFlag;
     y.CustFee = x.CustFee;
     y.BrokerFee = x.BrokerFee;
-    memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Message, x.Message);
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -9820,13 +9820,13 @@ CThostFtdcRspTransferField Converter::RspTransferFieldToCpp(RspTransferField x) 
     y.FeePayFlag = x.FeePayFlag;
     y.CustFee = x.CustFee;
     y.BrokerFee = x.BrokerFee;
-    memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Message, x.Message);
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -9936,13 +9936,13 @@ CThostFtdcReqRepealField Converter::ReqRepealFieldToCpp(ReqRepealField x) {
     y.FeePayFlag = x.FeePayFlag;
     y.CustFee = x.CustFee;
     y.BrokerFee = x.BrokerFee;
-    memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Message, x.Message);
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -10055,13 +10055,13 @@ CThostFtdcRspRepealField Converter::RspRepealFieldToCpp(RspRepealField x) {
     y.FeePayFlag = x.FeePayFlag;
     y.CustFee = x.CustFee;
     y.BrokerFee = x.BrokerFee;
-    memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Message, x.Message);
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -10166,12 +10166,12 @@ CThostFtdcReqQueryAccountField Converter::ReqQueryAccountFieldToCpp(ReqQueryAcco
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -10256,12 +10256,12 @@ CThostFtdcRspQueryAccountField Converter::RspQueryAccountFieldToCpp(RspQueryAcco
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -10339,10 +10339,10 @@ CThostFtdcFutureSignIOField Converter::FutureSignIOFieldToCpp(FutureSignIOField 
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
@@ -10396,17 +10396,17 @@ CThostFtdcRspFutureSignInField Converter::RspFutureSignInFieldToCpp(RspFutureSig
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.ErrorID = x.ErrorID;
     CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
-    memcpy(y.PinKey, x.PinKey.data(), x.PinKey.size() * sizeof(uint8_t));
-    memcpy(y.MacKey, x.MacKey.data(), x.MacKey.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.PinKey, x.PinKey);
+    CTP_SET_BYTES(y.MacKey, x.MacKey);
     return y;
 }
 
@@ -10463,10 +10463,10 @@ CThostFtdcReqFutureSignOutField Converter::ReqFutureSignOutFieldToCpp(ReqFutureS
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
@@ -10520,10 +10520,10 @@ CThostFtdcRspFutureSignOutField Converter::RspFutureSignOutFieldToCpp(RspFutureS
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
@@ -10581,7 +10581,7 @@ CThostFtdcReqQueryTradeResultBySerialField Converter::ReqQueryTradeResultBySeria
     y.SessionID = x.SessionID;
     y.Reference = x.Reference;
     y.RefrenceIssureType = x.RefrenceIssureType;
-    memcpy(y.RefrenceIssure, x.RefrenceIssure.data(), x.RefrenceIssure.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.RefrenceIssure, x.RefrenceIssure);
     CTP_SET_FIELD(y.CustomerName, x.CustomerName.c_str());
     y.IdCardType = x.IdCardType;
     CTP_SET_FIELD(y.IdentifiedCardNo, x.IdentifiedCardNo.c_str());
@@ -10592,7 +10592,7 @@ CThostFtdcReqQueryTradeResultBySerialField Converter::ReqQueryTradeResultBySeria
     CTP_SET_FIELD(y.Password, x.Password.c_str());
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.TradeAmount = x.TradeAmount;
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
     return y;
 }
@@ -10652,7 +10652,7 @@ CThostFtdcRspQueryTradeResultBySerialField Converter::RspQueryTradeResultBySeria
     CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     y.Reference = x.Reference;
     y.RefrenceIssureType = x.RefrenceIssureType;
-    memcpy(y.RefrenceIssure, x.RefrenceIssure.data(), x.RefrenceIssure.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.RefrenceIssure, x.RefrenceIssure);
     CTP_SET_FIELD(y.OriginReturnCode, x.OriginReturnCode.c_str());
     CTP_SET_FIELD(y.OriginDescrInfoForReturnCode, x.OriginDescrInfoForReturnCode.c_str());
     CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
@@ -10661,7 +10661,7 @@ CThostFtdcRspQueryTradeResultBySerialField Converter::RspQueryTradeResultBySeria
     CTP_SET_FIELD(y.Password, x.Password.c_str());
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.TradeAmount = x.TradeAmount;
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     return y;
 }
 
@@ -10716,7 +10716,7 @@ CThostFtdcReqDayEndFileReadyField Converter::ReqDayEndFileReadyFieldToCpp(ReqDay
     y.LastFragment = x.LastFragment;
     y.SessionID = x.SessionID;
     y.FileBusinessCode = x.FileBusinessCode;
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     return y;
 }
 
@@ -10865,7 +10865,7 @@ VerifyFuturePasswordAndCustInfoField Converter::CThostFtdcVerifyFuturePasswordAn
 CThostFtdcDepositResultInformField Converter::DepositResultInformFieldToCpp(DepositResultInformField x) {
     CThostFtdcDepositResultInformField y;
     memset(&y, 0, sizeof(y));
-    memcpy(y.DepositSeqNo, x.DepositSeqNo.data(), x.DepositSeqNo.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.DepositSeqNo, x.DepositSeqNo);
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     y.Deposit = x.Deposit;
@@ -10907,9 +10907,9 @@ CThostFtdcReqSyncKeyField Converter::ReqSyncKeyFieldToCpp(ReqSyncKeyField x) {
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
-    memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Message, x.Message);
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
@@ -10962,9 +10962,9 @@ CThostFtdcRspSyncKeyField Converter::RspSyncKeyFieldToCpp(RspSyncKeyField x) {
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
-    memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Message, x.Message);
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
@@ -11032,12 +11032,12 @@ CThostFtdcNotifyQueryAccountField Converter::NotifyQueryAccountFieldToCpp(Notify
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -11209,17 +11209,17 @@ CThostFtdcNotifyFutureSignInField Converter::NotifyFutureSignInFieldToCpp(Notify
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
     y.ErrorID = x.ErrorID;
     CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
-    memcpy(y.PinKey, x.PinKey.data(), x.PinKey.size() * sizeof(uint8_t));
-    memcpy(y.MacKey, x.MacKey.data(), x.MacKey.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.PinKey, x.PinKey);
+    CTP_SET_BYTES(y.MacKey, x.MacKey);
     return y;
 }
 
@@ -11276,10 +11276,10 @@ CThostFtdcNotifyFutureSignOutField Converter::NotifyFutureSignOutFieldToCpp(Noti
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
@@ -11337,9 +11337,9 @@ CThostFtdcNotifySyncKeyField Converter::NotifySyncKeyFieldToCpp(NotifySyncKeyFie
     y.SessionID = x.SessionID;
     y.InstallID = x.InstallID;
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
-    memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Message, x.Message);
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
     y.RequestID = x.RequestID;
     y.TID = x.TID;
@@ -11487,12 +11487,12 @@ CThostFtdcOpenAccountField Converter::OpenAccountFieldToCpp(OpenAccountField x) 
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.CashExchangeCode = x.CashExchangeCode;
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -11597,12 +11597,12 @@ CThostFtdcCancelAccountField Converter::CancelAccountFieldToCpp(CancelAccountFie
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
     y.CashExchangeCode = x.CashExchangeCode;
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -11709,11 +11709,11 @@ CThostFtdcChangeAccountField Converter::ChangeAccountFieldToCpp(ChangeAccountFie
     y.InstallID = x.InstallID;
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     y.TID = x.TID;
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.ErrorID = x.ErrorID;
     CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     CTP_SET_FIELD(y.LongCustomerName, x.LongCustomerName.c_str());
@@ -12046,15 +12046,15 @@ CThostFtdcReserveOpenAccountConfirmField Converter::ReserveOpenAccountConfirmFie
     y.InstallID = x.InstallID;
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
     y.TID = x.TID;
     CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     CTP_SET_FIELD(y.Password, x.Password.c_str());
-    memcpy(y.BankReserveOpenSeq, x.BankReserveOpenSeq.data(), x.BankReserveOpenSeq.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BankReserveOpenSeq, x.BankReserveOpenSeq);
     CTP_SET_FIELD(y.BookDate, x.BookDate.c_str());
-    memcpy(y.BookPsw, x.BookPsw.data(), x.BookPsw.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BookPsw, x.BookPsw);
     y.ErrorID = x.ErrorID;
     CTP_SET_FIELD(y.ErrorMsg, x.ErrorMsg.c_str());
     return y;
@@ -12145,9 +12145,9 @@ CThostFtdcReserveOpenAccountField Converter::ReserveOpenAccountFieldToCpp(Reserv
     y.InstallID = x.InstallID;
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
     y.TID = x.TID;
     y.ReserveOpenAccStas = x.ReserveOpenAccStas;
     y.ErrorID = x.ErrorID;
@@ -12209,7 +12209,7 @@ CThostFtdcAccountPropertyField Converter::AccountPropertyFieldToCpp(AccountPrope
     CTP_SET_FIELD(y.BankID, x.BankID.c_str());
     CTP_SET_FIELD(y.BankAccount, x.BankAccount.c_str());
     CTP_SET_FIELD(y.OpenName, x.OpenName.c_str());
-    memcpy(y.OpenBank, x.OpenBank.data(), x.OpenBank.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.OpenBank, x.OpenBank);
     y.IsActive = x.IsActive;
     y.AccountSourceType = x.AccountSourceType;
     CTP_SET_FIELD(y.OpenDate, x.OpenDate.c_str());
@@ -12427,7 +12427,7 @@ CThostFtdcReqUserLoginWithCaptchaField Converter::ReqUserLoginWithCaptchaFieldTo
     CTP_SET_FIELD(y.ProtocolInfo, x.ProtocolInfo.c_str());
     CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
     CTP_SET_FIELD(y.LoginRemark, x.LoginRemark.c_str());
-    memcpy(y.Captcha, x.Captcha.data(), x.Captcha.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Captcha, x.Captcha);
     y.ClientIPPort = x.ClientIPPort;
     CTP_SET_FIELD(y.ClientIPAddress, x.ClientIPAddress.c_str());
     return y;
@@ -12465,7 +12465,7 @@ CThostFtdcReqUserLoginWithTextField Converter::ReqUserLoginWithTextFieldToCpp(Re
     CTP_SET_FIELD(y.ProtocolInfo, x.ProtocolInfo.c_str());
     CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
     CTP_SET_FIELD(y.LoginRemark, x.LoginRemark.c_str());
-    memcpy(y.Text, x.Text.data(), x.Text.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Text, x.Text);
     y.ClientIPPort = x.ClientIPPort;
     CTP_SET_FIELD(y.ClientIPAddress, x.ClientIPAddress.c_str());
     return y;
@@ -12547,7 +12547,7 @@ CThostFtdcRspApiHandshakeField Converter::RspApiHandshakeFieldToCpp(RspApiHandsh
     CThostFtdcRspApiHandshakeField y;
     memset(&y, 0, sizeof(y));
     y.FrontHandshakeDataLen = x.FrontHandshakeDataLen;
-    memcpy(y.FrontHandshakeData, x.FrontHandshakeData.data(), x.FrontHandshakeData.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.FrontHandshakeData, x.FrontHandshakeData);
     y.IsApiAuthEnabled = x.IsApiAuthEnabled;
     return y;
 }
@@ -12567,7 +12567,7 @@ CThostFtdcReqVerifyApiKeyField Converter::ReqVerifyApiKeyFieldToCpp(ReqVerifyApi
     CThostFtdcReqVerifyApiKeyField y;
     memset(&y, 0, sizeof(y));
     y.ApiHandshakeDataLen = x.ApiHandshakeDataLen;
-    memcpy(y.ApiHandshakeData, x.ApiHandshakeData.data(), x.ApiHandshakeData.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.ApiHandshakeData, x.ApiHandshakeData);
     return y;
 }
 
@@ -12652,7 +12652,7 @@ QryAuthForbiddenIPField Converter::CThostFtdcQryAuthForbiddenIPFieldToRust(CThos
 CThostFtdcSyncDelaySwapFrozenField Converter::SyncDelaySwapFrozenFieldToCpp(SyncDelaySwapFrozenField x) {
     CThostFtdcSyncDelaySwapFrozenField y;
     memset(&y, 0, sizeof(y));
-    memcpy(y.DelaySwapSeqNo, x.DelaySwapSeqNo.data(), x.DelaySwapSeqNo.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.DelaySwapSeqNo, x.DelaySwapSeqNo);
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
     CTP_SET_FIELD(y.FromCurrencyID, x.FromCurrencyID.c_str());
@@ -12827,7 +12827,7 @@ CThostFtdcReqUserLoginSMField Converter::ReqUserLoginSMFieldToCpp(ReqUserLoginSM
     CTP_SET_FIELD(y.BrokerName, x.BrokerName.c_str());
     CTP_SET_FIELD(y.AuthCode, x.AuthCode.c_str());
     CTP_SET_FIELD(y.AppID, x.AppID.c_str());
-    memcpy(y.PIN, x.PIN.data(), x.PIN.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.PIN, x.PIN);
     return y;
 }
 
@@ -13024,7 +13024,7 @@ CThostFtdcSyncDeltaInfoField Converter::SyncDeltaInfoFieldToCpp(SyncDeltaInfoFie
     memset(&y, 0, sizeof(y));
     y.SyncDeltaSequenceNo = x.SyncDeltaSequenceNo;
     y.SyncDeltaStatus = x.SyncDeltaStatus;
-    memcpy(y.SyncDescription, x.SyncDescription.data(), x.SyncDescription.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.SyncDescription, x.SyncDescription);
     y.IsOnlyTrdDelta = x.IsOnlyTrdDelta;
     return y;
 }
@@ -14306,7 +14306,7 @@ CThostFtdcWithDrawParamField Converter::WithDrawParamFieldToCpp(WithDrawParamFie
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     CTP_SET_FIELD(y.AccountID, x.AccountID.c_str());
     y.WithDrawParamID = x.WithDrawParamID;
-    memcpy(y.WithDrawParamValue, x.WithDrawParamValue.data(), x.WithDrawParamValue.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.WithDrawParamValue, x.WithDrawParamValue);
     return y;
 }
 
@@ -15736,8 +15736,8 @@ CThostFtdcSyncDeltaRCAMSCombRuleDtlField Converter::SyncDeltaRCAMSCombRuleDtlFie
     memset(&y, 0, sizeof(y));
     CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
     CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
-    memcpy(y.ProdGroup, x.ProdGroup.data(), x.ProdGroup.size() * sizeof(uint8_t));
-    memcpy(y.RuleId, x.RuleId.data(), x.RuleId.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.ProdGroup, x.ProdGroup);
+    CTP_SET_BYTES(y.RuleId, x.RuleId);
     y.Priority = x.Priority;
     y.HedgeFlag = x.HedgeFlag;
     y.CombMargin = x.CombMargin;
@@ -15938,8 +15938,8 @@ CThostFtdcIpAddrParamField Converter::IpAddrParamFieldToCpp(IpAddrParamField x) 
     y.IsSM = x.IsSM;
     y.IsLocalAddr = x.IsLocalAddr;
     CTP_SET_FIELD(y.Remark, x.Remark.c_str());
-    memcpy(y.Site, x.Site.data(), x.Site.size() * sizeof(uint8_t));
-    memcpy(y.NetOperator, x.NetOperator.data(), x.NetOperator.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Site, x.Site);
+    CTP_SET_BYTES(y.NetOperator, x.NetOperator);
     return y;
 }
 
@@ -15995,8 +15995,8 @@ CThostFtdcTGIpAddrParamField Converter::TGIpAddrParamFieldToCpp(TGIpAddrParamFie
     y.IsSM = x.IsSM;
     y.IsLocalAddr = x.IsLocalAddr;
     CTP_SET_FIELD(y.Remark, x.Remark.c_str());
-    memcpy(y.Site, x.Site.data(), x.Site.size() * sizeof(uint8_t));
-    memcpy(y.NetOperator, x.NetOperator.data(), x.NetOperator.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Site, x.Site);
+    CTP_SET_BYTES(y.NetOperator, x.NetOperator);
     return y;
 }
 
@@ -16064,7 +16064,7 @@ CThostFtdcLocalAddrConfigField Converter::LocalAddrConfigFieldToCpp(LocalAddrCon
     memset(&y, 0, sizeof(y));
     CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
     CTP_SET_FIELD(y.PeerAddr, x.PeerAddr.c_str());
-    memcpy(y.NetMask, x.NetMask.data(), x.NetMask.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.NetMask, x.NetMask);
     y.DRIdentityID = x.DRIdentityID;
     CTP_SET_FIELD(y.LocalAddress, x.LocalAddress.c_str());
     return y;
@@ -16126,12 +16126,12 @@ CThostFtdcReqQueryBankAccountBySecField Converter::ReqQueryBankAccountBySecField
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -16220,12 +16220,12 @@ CThostFtdcRspQueryBankAccountBySecField Converter::RspQueryBankAccountBySecField
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -16323,13 +16323,13 @@ CThostFtdcReqTransferBySecField Converter::ReqTransferBySecFieldToCpp(ReqTransfe
     y.FeePayFlag = x.FeePayFlag;
     y.CustFee = x.CustFee;
     y.BrokerFee = x.BrokerFee;
-    memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Message, x.Message);
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -16432,13 +16432,13 @@ CThostFtdcRspTransferBySecField Converter::RspTransferBySecFieldToCpp(RspTransfe
     y.FeePayFlag = x.FeePayFlag;
     y.CustFee = x.CustFee;
     y.BrokerFee = x.BrokerFee;
-    memcpy(y.Message, x.Message.data(), x.Message.size() * sizeof(uint8_t));
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Message, x.Message);
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -16540,12 +16540,12 @@ CThostFtdcNotifyQueryFutureAccountBySecField Converter::NotifyQueryFutureAccount
     CTP_SET_FIELD(y.UserID, x.UserID.c_str());
     y.VerifyCertNoFlag = x.VerifyCertNoFlag;
     CTP_SET_FIELD(y.CurrencyID, x.CurrencyID.c_str());
-    memcpy(y.Digest, x.Digest.data(), x.Digest.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.Digest, x.Digest);
     y.BankAccType = x.BankAccType;
     CTP_SET_FIELD(y.DeviceID, x.DeviceID.c_str());
     y.BankSecuAccType = x.BankSecuAccType;
-    memcpy(y.BrokerIDByBank, x.BrokerIDByBank.data(), x.BrokerIDByBank.size() * sizeof(uint8_t));
-    memcpy(y.BankSecuAcc, x.BankSecuAcc.data(), x.BankSecuAcc.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.BrokerIDByBank, x.BrokerIDByBank);
+    CTP_SET_BYTES(y.BankSecuAcc, x.BankSecuAcc);
     y.BankPwdFlag = x.BankPwdFlag;
     y.SecuPwdFlag = x.SecuPwdFlag;
     CTP_SET_FIELD(y.OperNo, x.OperNo.c_str());
@@ -16932,7 +16932,7 @@ CThostFtdcOffsetSettingField Converter::OffsetSettingFieldToCpp(OffsetSettingFie
     CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
     CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    memcpy(y.ExchangeSerialNo, x.ExchangeSerialNo.data(), x.ExchangeSerialNo.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.ExchangeSerialNo, x.ExchangeSerialNo);
     CTP_SET_FIELD(y.ExchangeProductID, x.ExchangeProductID.c_str());
     CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
     CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
@@ -17018,7 +17018,7 @@ CThostFtdcCancelOffsetSettingField Converter::CancelOffsetSettingFieldToCpp(Canc
     CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
     CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
     CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
-    memcpy(y.ExchangeSerialNo, x.ExchangeSerialNo.data(), x.ExchangeSerialNo.size() * sizeof(uint8_t));
+    CTP_SET_BYTES(y.ExchangeSerialNo, x.ExchangeSerialNo);
     CTP_SET_FIELD(y.ExchangeProductID, x.ExchangeProductID.c_str());
     CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
     y.InstallID = x.InstallID;
