@@ -503,6 +503,25 @@ struct InvestorDepartmentFlatField;
 struct QryDepartmentUserField;
 struct FrontInfoField;
 
+// CTP 6.7.13 新增结构(前向声明)
+struct AppAuthenticationCodeField;
+struct UserDRIBypassField;
+struct ReqGenSMSCodeField;
+struct RspGenSMSCodeField;
+struct SMSVerifyInfoFromSecField;
+struct SMSVerifyConfigField;
+struct SMSVerifyInfoField;
+struct InputSpdApplyField;
+struct InputHedgeCfmField;
+struct SpdApplyField;
+struct HedgeCfmField;
+struct QrySpdApplyField;
+struct QryHedgeCfmField;
+struct InputSpdApplyActionField;
+struct InputHedgeCfmActionField;
+struct SpdApplyActionField;
+struct HedgeCfmActionField;
+
 #include "ctp-rs/src/lib.rs.h"
 #include "rust/cxx.h"
 
@@ -1531,4 +1550,43 @@ public:
 #endif
     static CThostFtdcFrontInfoField FrontInfoFieldToCpp(FrontInfoField x);
     static FrontInfoField CThostFtdcFrontInfoFieldToRust(CThostFtdcFrontInfoField* x);
+
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    // CTP 6.7.13 新增结构的转换
+    static CThostFtdcAppAuthenticationCodeField AppAuthenticationCodeFieldToCpp(AppAuthenticationCodeField x);
+    static AppAuthenticationCodeField CThostFtdcAppAuthenticationCodeFieldToRust(CThostFtdcAppAuthenticationCodeField* x);
+    static CThostFtdcUserDRIBypassField UserDRIBypassFieldToCpp(UserDRIBypassField x);
+    static UserDRIBypassField CThostFtdcUserDRIBypassFieldToRust(CThostFtdcUserDRIBypassField* x);
+    static CThostFtdcReqGenSMSCodeField ReqGenSMSCodeFieldToCpp(ReqGenSMSCodeField x);
+    static ReqGenSMSCodeField CThostFtdcReqGenSMSCodeFieldToRust(CThostFtdcReqGenSMSCodeField* x);
+    static CThostFtdcRspGenSMSCodeField RspGenSMSCodeFieldToCpp(RspGenSMSCodeField x);
+    static RspGenSMSCodeField CThostFtdcRspGenSMSCodeFieldToRust(CThostFtdcRspGenSMSCodeField* x);
+    static CThostFtdcSMSVerifyInfoFromSecField SMSVerifyInfoFromSecFieldToCpp(SMSVerifyInfoFromSecField x);
+    static SMSVerifyInfoFromSecField CThostFtdcSMSVerifyInfoFromSecFieldToRust(CThostFtdcSMSVerifyInfoFromSecField* x);
+    static CThostFtdcSMSVerifyConfigField SMSVerifyConfigFieldToCpp(SMSVerifyConfigField x);
+    static SMSVerifyConfigField CThostFtdcSMSVerifyConfigFieldToRust(CThostFtdcSMSVerifyConfigField* x);
+    static CThostFtdcSMSVerifyInfoField SMSVerifyInfoFieldToCpp(SMSVerifyInfoField x);
+    static SMSVerifyInfoField CThostFtdcSMSVerifyInfoFieldToRust(CThostFtdcSMSVerifyInfoField* x);
+    static CThostFtdcInputSpdApplyField InputSpdApplyFieldToCpp(InputSpdApplyField x);
+    static InputSpdApplyField CThostFtdcInputSpdApplyFieldToRust(CThostFtdcInputSpdApplyField* x);
+    static CThostFtdcInputHedgeCfmField InputHedgeCfmFieldToCpp(InputHedgeCfmField x);
+    static InputHedgeCfmField CThostFtdcInputHedgeCfmFieldToRust(CThostFtdcInputHedgeCfmField* x);
+    static CThostFtdcSpdApplyField SpdApplyFieldToCpp(SpdApplyField x);
+    static SpdApplyField CThostFtdcSpdApplyFieldToRust(CThostFtdcSpdApplyField* x);
+    static CThostFtdcHedgeCfmField HedgeCfmFieldToCpp(HedgeCfmField x);
+    static HedgeCfmField CThostFtdcHedgeCfmFieldToRust(CThostFtdcHedgeCfmField* x);
+    static CThostFtdcQrySpdApplyField QrySpdApplyFieldToCpp(QrySpdApplyField x);
+    static QrySpdApplyField CThostFtdcQrySpdApplyFieldToRust(CThostFtdcQrySpdApplyField* x);
+    static CThostFtdcQryHedgeCfmField QryHedgeCfmFieldToCpp(QryHedgeCfmField x);
+    static QryHedgeCfmField CThostFtdcQryHedgeCfmFieldToRust(CThostFtdcQryHedgeCfmField* x);
+    static CThostFtdcInputSpdApplyActionField InputSpdApplyActionFieldToCpp(InputSpdApplyActionField x);
+    static InputSpdApplyActionField CThostFtdcInputSpdApplyActionFieldToRust(CThostFtdcInputSpdApplyActionField* x);
+    static CThostFtdcInputHedgeCfmActionField InputHedgeCfmActionFieldToCpp(InputHedgeCfmActionField x);
+    static InputHedgeCfmActionField CThostFtdcInputHedgeCfmActionFieldToRust(CThostFtdcInputHedgeCfmActionField* x);
+    static CThostFtdcSpdApplyActionField SpdApplyActionFieldToCpp(SpdApplyActionField x);
+    static SpdApplyActionField CThostFtdcSpdApplyActionFieldToRust(CThostFtdcSpdApplyActionField* x);
+    static CThostFtdcHedgeCfmActionField HedgeCfmActionFieldToCpp(HedgeCfmActionField x);
+    static HedgeCfmActionField CThostFtdcHedgeCfmActionFieldToRust(CThostFtdcHedgeCfmActionField* x);
+#endif
+
 };

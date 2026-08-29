@@ -494,6 +494,25 @@ struct InputOffsetSettingField;
 struct OffsetSettingField;
 struct CancelOffsetSettingField;
 struct QryOffsetSettingField;
+
+// CTP 6.7.13 新增结构
+struct AppAuthenticationCodeField;
+struct UserDRIBypassField;
+struct ReqGenSMSCodeField;
+struct RspGenSMSCodeField;
+struct SMSVerifyInfoFromSecField;
+struct SMSVerifyConfigField;
+struct SMSVerifyInfoField;
+struct InputSpdApplyField;
+struct InputHedgeCfmField;
+struct SpdApplyField;
+struct HedgeCfmField;
+struct QrySpdApplyField;
+struct QryHedgeCfmField;
+struct InputSpdApplyActionField;
+struct InputHedgeCfmActionField;
+struct SpdApplyActionField;
+struct HedgeCfmActionField;
 struct AddrAppIDRelationField;
 struct QryAddrAppIDRelationField;
 struct WechatUserSystemInfoField;
@@ -650,6 +669,16 @@ struct TraderApi {
     int32_t ReqOffsetSetting(InputOffsetSettingField pInputOffsetSetting, int32_t nRequestID) const;
     int32_t ReqCancelOffsetSetting(InputOffsetSettingField pInputOffsetSetting, int32_t nRequestID) const;
     int32_t ReqQryOffsetSetting(QryOffsetSettingField pQryOffsetSetting, int32_t nRequestID) const;
+
+    // CTP 6.7.13 新增请求接口。**不门控** —— Rust 桥对所有版本都声明,
+    // 低版本在 .cpp 里走 stub 返回 -10000。
+    int32_t ReqGenSMSCode(ReqGenSMSCodeField pReqGenSMSCode, int32_t nRequestID) const;
+    int32_t ReqSpdApply(InputSpdApplyField pInputSpdApply, int32_t nRequestID) const;
+    int32_t ReqSpdApplyAction(InputSpdApplyActionField pInputSpdApplyAction, int32_t nRequestID) const;
+    int32_t ReqQrySpdApply(QrySpdApplyField pQrySpdApply, int32_t nRequestID) const;
+    int32_t ReqHedgeCfm(InputHedgeCfmField pInputHedgeCfm, int32_t nRequestID) const;
+    int32_t ReqHedgeCfmAction(InputHedgeCfmActionField pInputHedgeCfmAction, int32_t nRequestID) const;
+    int32_t ReqQryHedgeCfm(QryHedgeCfmField pQryHedgeCfm, int32_t nRequestID) const;
 
     const TraderSpi &gateway;
     CThostFtdcTraderApi *api;

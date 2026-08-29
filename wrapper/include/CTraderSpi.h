@@ -180,6 +180,25 @@ public:
     void OnErrRtnCancelOffsetSetting(CThostFtdcCancelOffsetSettingField* pCancelOffsetSetting, CThostFtdcRspInfoField* pRspInfo) override;
     void OnRspQryOffsetSetting(CThostFtdcOffsetSettingField* pOffsetSetting, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) override;
 
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    // CTP 6.7.13 新增回调。低版本 SDK 的基类没有这些虚函数,
+    // 带 override 会编译失败,所以整段门控。
+    void OnRtnPrivateSeqNo(int32_t nSeqNo) override;
+    void OnRspGenSMSCode(CThostFtdcRspGenSMSCodeField* pRspGenSMSCode, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) override;
+    void OnRspSpdApply(CThostFtdcInputSpdApplyField* pInputSpdApply, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) override;
+    void OnRspSpdApplyAction(CThostFtdcInputSpdApplyActionField* pInputSpdApplyAction, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) override;
+    void OnRspQrySpdApply(CThostFtdcSpdApplyField* pSpdApply, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) override;
+    void OnRtnSpdApply(CThostFtdcSpdApplyField* pSpdApply) override;
+    void OnErrRtnSpdApply(CThostFtdcInputSpdApplyField* pInputSpdApply, CThostFtdcRspInfoField* pRspInfo) override;
+    void OnErrRtnSpdApplyAction(CThostFtdcSpdApplyActionField* pSpdApplyAction, CThostFtdcRspInfoField* pRspInfo) override;
+    void OnRspHedgeCfm(CThostFtdcInputHedgeCfmField* pInputHedgeCfm, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) override;
+    void OnRspHedgeCfmAction(CThostFtdcInputHedgeCfmActionField* pInputHedgeCfmAction, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) override;
+    void OnRspQryHedgeCfm(CThostFtdcHedgeCfmField* pHedgeCfm, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) override;
+    void OnRtnHedgeCfm(CThostFtdcHedgeCfmField* pHedgeCfm) override;
+    void OnErrRtnHedgeCfm(CThostFtdcInputHedgeCfmField* pInputHedgeCfm, CThostFtdcRspInfoField* pRspInfo) override;
+    void OnErrRtnHedgeCfmAction(CThostFtdcHedgeCfmActionField* pHedgeCfmAction, CThostFtdcRspInfoField* pRspInfo) override;
+#endif  // CTP_VERSION_NUM >= CTP_V6_7_13
+
 private:
     const TraderApi *gateway;
 };

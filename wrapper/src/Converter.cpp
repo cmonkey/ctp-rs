@@ -75,6 +75,10 @@ CThostFtdcReqUserLoginField Converter::ReqUserLoginFieldToCpp(ReqUserLoginField 
     CTP_SET_FIELD(y.LoginRemark, x.LoginRemark.c_str());
     y.ClientIPPort = x.ClientIPPort;
     CTP_SET_FIELD(y.ClientIPAddress, x.ClientIPAddress.c_str());
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    // 短信验证码(6.7.13 双因素认证) —— 6.7.11 及以下的 C 结构没有这个成员。
+    CTP_SET_FIELD(y.SMSCode, x.SMSCode.c_str());
+#endif
     return y;
 }
 
@@ -94,6 +98,10 @@ ReqUserLoginField Converter::CThostFtdcReqUserLoginFieldToRust(CThostFtdcReqUser
     y.LoginRemark = Converter::Gb2312ToRustString(x->LoginRemark);
     y.ClientIPPort = x->ClientIPPort;
     y.ClientIPAddress = Converter::Gb2312ToRustString(x->ClientIPAddress);
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    // 短信验证码(6.7.13 双因素认证);低版本下留 y{} 的默认空串,无需 #else。
+    y.SMSCode = Converter::Gb2312ToRustString(x->SMSCode);
+#endif
     return y;
 }
 
@@ -7769,6 +7777,10 @@ CThostFtdcContractBankField Converter::ContractBankFieldToCpp(ContractBankField 
     CTP_SET_FIELD(y.BankID, x.BankID.c_str());
     CTP_SET_FIELD(y.BankBrchID, x.BankBrchID.c_str());
     CTP_SET_FIELD(y.BankName, x.BankName.c_str());
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    // 上报 csrc 的银行代码(6.7.13) —— 6.7.11 及以下的 C 结构没有这个成员。
+    CTP_SET_FIELD(y.csrcBankID, x.csrcBankID.c_str());
+#endif
     return y;
 }
 
@@ -7780,6 +7792,10 @@ ContractBankField Converter::CThostFtdcContractBankFieldToRust(CThostFtdcContrac
     y.BankID = Converter::Gb2312ToRustString(x->BankID);
     y.BankBrchID = Converter::Gb2312ToRustString(x->BankBrchID);
     y.BankName = Converter::Gb2312ToRustString(x->BankName);
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    // 上报 csrc 的银行代码(6.7.13);低版本下留 y{} 的默认空串,无需 #else。
+    y.csrcBankID = Converter::Gb2312ToRustString(x->csrcBankID);
+#endif
     return y;
 }
 
@@ -12687,6 +12703,10 @@ CThostFtdcUserSystemInfoField Converter::UserSystemInfoFieldToCpp(UserSystemInfo
     CTP_SET_FIELD(y.ClientAppID, x.ClientAppID.c_str());
     CTP_SET_FIELD(y.ClientPublicIP, x.ClientPublicIP.c_str());
     CTP_SET_FIELD(y.ClientLoginRemark, x.ClientLoginRemark.c_str());
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    // 客户终端的 MAC 等标识(6.7.13 监管字段) —— 6.7.11 及以下的 C 结构没有这个成员。
+    CTP_SET_FIELD(y.MAC, x.MAC.c_str());
+#endif
     return y;
 }
 
@@ -12703,6 +12723,10 @@ UserSystemInfoField Converter::CThostFtdcUserSystemInfoFieldToRust(CThostFtdcUse
     y.ClientAppID = Converter::Gb2312ToRustString(x->ClientAppID);
     y.ClientPublicIP = Converter::Gb2312ToRustString(x->ClientPublicIP);
     y.ClientLoginRemark = Converter::Gb2312ToRustString(x->ClientLoginRemark);
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    // 客户终端的 MAC 等标识(6.7.13 监管字段);低版本下留 y{} 的默认空串,无需 #else。
+    y.MAC = Converter::Gb2312ToRustString(x->MAC);
+#endif
     return y;
 }
 
@@ -12828,6 +12852,10 @@ CThostFtdcReqUserLoginSMField Converter::ReqUserLoginSMFieldToCpp(ReqUserLoginSM
     CTP_SET_FIELD(y.AuthCode, x.AuthCode.c_str());
     CTP_SET_FIELD(y.AppID, x.AppID.c_str());
     CTP_SET_BYTES(y.PIN, x.PIN);
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    // 短信验证码(6.7.13 双因素认证) —— 6.7.11 及以下的 C 结构没有这个成员。
+    CTP_SET_FIELD(y.SMSCode, x.SMSCode.c_str());
+#endif
     return y;
 }
 
@@ -12852,6 +12880,10 @@ ReqUserLoginSMField Converter::CThostFtdcReqUserLoginSMFieldToRust(CThostFtdcReq
     y.AppID = Converter::Gb2312ToRustString(x->AppID);
     for (int i = 0; i < 41; i++)
         y.PIN.push_back(x->PIN[i]);
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    // 短信验证码(6.7.13 双因素认证);低版本下留 y{} 的默认空串,无需 #else。
+    y.SMSCode = Converter::Gb2312ToRustString(x->SMSCode);
+#endif
     return y;
 }
 
@@ -15940,6 +15972,10 @@ CThostFtdcIpAddrParamField Converter::IpAddrParamFieldToCpp(IpAddrParamField x) 
     CTP_SET_FIELD(y.Remark, x.Remark.c_str());
     CTP_SET_BYTES(y.Site, x.Site);
     CTP_SET_BYTES(y.NetOperator, x.NetOperator);
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    // 系统名称(6.7.13) —— 6.7.11 及以下的 C 结构没有这个成员。
+    CTP_SET_FIELD(y.SysName, x.SysName.c_str());
+#endif
     return y;
 }
 
@@ -15962,6 +15998,10 @@ IpAddrParamField Converter::CThostFtdcIpAddrParamFieldToRust(CThostFtdcIpAddrPar
         y.Site.push_back(x->Site[i]);
     for (int i = 0; i < 9; i++)
         y.NetOperator.push_back(x->NetOperator[i]);
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    // 系统名称(6.7.13);低版本下留 y{} 的默认空串,无需 #else。
+    y.SysName = Converter::Gb2312ToRustString(x->SysName);
+#endif
     return y;
 }
 
@@ -15997,6 +16037,10 @@ CThostFtdcTGIpAddrParamField Converter::TGIpAddrParamFieldToCpp(TGIpAddrParamFie
     CTP_SET_FIELD(y.Remark, x.Remark.c_str());
     CTP_SET_BYTES(y.Site, x.Site);
     CTP_SET_BYTES(y.NetOperator, x.NetOperator);
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    // 系统名称(6.7.13) —— 6.7.11 及以下的 C 结构没有这个成员。
+    CTP_SET_FIELD(y.SysName, x.SysName.c_str());
+#endif
     return y;
 }
 
@@ -16020,6 +16064,10 @@ TGIpAddrParamField Converter::CThostFtdcTGIpAddrParamFieldToRust(CThostFtdcTGIpA
         y.Site.push_back(x->Site[i]);
     for (int i = 0; i < 9; i++)
         y.NetOperator.push_back(x->NetOperator[i]);
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    // 系统名称(6.7.13);低版本下留 y{} 的默认空串,无需 #else。
+    y.SysName = Converter::Gb2312ToRustString(x->SysName);
+#endif
     return y;
 }
 
@@ -17241,3 +17289,634 @@ FrontInfoField Converter::CThostFtdcFrontInfoFieldToRust(CThostFtdcFrontInfoFiel
     y.FTDPkgFreq = x->FTDPkgFreq;
     return y;
 }
+
+// ═════════════════════════════════════════════════════════════════════════
+// CTP 6.7.13 新增结构的转换(2026-08-29)
+//
+// 字段列表逐个核对过官方头文件 sdk/v6.7.13/ThostFtdcUserApiStruct.h(17/17
+// 一致)。实现搬自上游 ctp-rs 1748959,但 **裸 strcpy/memcpy 全部换成了
+// CTP_SET_FIELD / CTP_SET_BYTES** —— 上游那边 142 处 strcpy + 1 处 memcpy
+// 写入定长 CThostFtdc*Field,在 fortify 下超长即 abort 整个进程,正是
+// 2026-08-28 22:04 杀死生产引擎的那一类。scripts/ci_ctp_field_copy_guard.py
+// 守着这条线。
+//
+// 整段按版本门控:6.7.11 及以下的 SDK 里没有这些 C 结构。
+// ═════════════════════════════════════════════════════════════════════════
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+
+CThostFtdcAppAuthenticationCodeField Converter::AppAuthenticationCodeFieldToCpp(AppAuthenticationCodeField x) {
+    CThostFtdcAppAuthenticationCodeField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.AppID, x.AppID.c_str());
+    CTP_SET_FIELD(y.AuthCode, x.AuthCode.c_str());
+    CTP_SET_FIELD(y.PreAuthCode, x.PreAuthCode.c_str());
+    y.AppType = x.AppType;
+    return y;
+}
+
+AppAuthenticationCodeField Converter::CThostFtdcAppAuthenticationCodeFieldToRust(CThostFtdcAppAuthenticationCodeField* x) {
+    if (x == nullptr)
+        return AppAuthenticationCodeField{.is_null = true};
+    AppAuthenticationCodeField y{};
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.AppID = Converter::Gb2312ToRustString(x->AppID);
+    y.AuthCode = Converter::Gb2312ToRustString(x->AuthCode);
+    y.PreAuthCode = Converter::Gb2312ToRustString(x->PreAuthCode);
+    y.AppType = x->AppType;
+    return y;
+}
+
+CThostFtdcUserDRIBypassField Converter::UserDRIBypassFieldToCpp(UserDRIBypassField x) {
+    CThostFtdcUserDRIBypassField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    y.DRIdentityID = x.DRIdentityID;
+    return y;
+}
+
+UserDRIBypassField Converter::CThostFtdcUserDRIBypassFieldToRust(CThostFtdcUserDRIBypassField* x) {
+    if (x == nullptr)
+        return UserDRIBypassField{.is_null = true};
+    UserDRIBypassField y{};
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.UserID = Converter::Gb2312ToRustString(x->UserID);
+    y.DRIdentityID = x->DRIdentityID;
+    return y;
+}
+
+CThostFtdcReqGenSMSCodeField Converter::ReqGenSMSCodeFieldToCpp(ReqGenSMSCodeField x) {
+    CThostFtdcReqGenSMSCodeField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.Mobile, x.Mobile.c_str());
+    return y;
+}
+
+ReqGenSMSCodeField Converter::CThostFtdcReqGenSMSCodeFieldToRust(CThostFtdcReqGenSMSCodeField* x) {
+    if (x == nullptr)
+        return ReqGenSMSCodeField{.is_null = true};
+    ReqGenSMSCodeField y{};
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.UserID = Converter::Gb2312ToRustString(x->UserID);
+    y.Mobile = Converter::Gb2312ToRustString(x->Mobile);
+    return y;
+}
+
+CThostFtdcRspGenSMSCodeField Converter::RspGenSMSCodeFieldToCpp(RspGenSMSCodeField x) {
+    CThostFtdcRspGenSMSCodeField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.GenTime, x.GenTime.c_str());
+    return y;
+}
+
+RspGenSMSCodeField Converter::CThostFtdcRspGenSMSCodeFieldToRust(CThostFtdcRspGenSMSCodeField* x) {
+    if (x == nullptr)
+        return RspGenSMSCodeField{.is_null = true};
+    RspGenSMSCodeField y{};
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.UserID = Converter::Gb2312ToRustString(x->UserID);
+    y.GenTime = Converter::Gb2312ToRustString(x->GenTime);
+    return y;
+}
+
+CThostFtdcSMSVerifyInfoFromSecField Converter::SMSVerifyInfoFromSecFieldToCpp(SMSVerifyInfoFromSecField x) {
+    CThostFtdcSMSVerifyInfoFromSecField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.BrokerAbbr, x.BrokerAbbr.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.Mobile, x.Mobile.c_str());
+    CTP_SET_FIELD(y.SMSCode, x.SMSCode.c_str());
+    CTP_SET_FIELD(y.CreateDate, x.CreateDate.c_str());
+    CTP_SET_FIELD(y.CreateTime, x.CreateTime.c_str());
+    y.IsUsed = x.IsUsed;
+    y.FromSec = x.FromSec;
+    return y;
+}
+
+SMSVerifyInfoFromSecField Converter::CThostFtdcSMSVerifyInfoFromSecFieldToRust(CThostFtdcSMSVerifyInfoFromSecField* x) {
+    if (x == nullptr)
+        return SMSVerifyInfoFromSecField{.is_null = true};
+    SMSVerifyInfoFromSecField y{};
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.BrokerAbbr = Converter::Gb2312ToRustString(x->BrokerAbbr);
+    y.UserID = Converter::Gb2312ToRustString(x->UserID);
+    y.Mobile = Converter::Gb2312ToRustString(x->Mobile);
+    y.SMSCode = Converter::Gb2312ToRustString(x->SMSCode);
+    y.CreateDate = Converter::Gb2312ToRustString(x->CreateDate);
+    y.CreateTime = Converter::Gb2312ToRustString(x->CreateTime);
+    y.IsUsed = x->IsUsed;
+    y.FromSec = x->FromSec;
+    return y;
+}
+
+CThostFtdcSMSVerifyConfigField Converter::SMSVerifyConfigFieldToCpp(SMSVerifyConfigField x) {
+    CThostFtdcSMSVerifyConfigField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.Mobile, x.Mobile.c_str());
+    y.UseSMSVerify = x.UseSMSVerify;
+    return y;
+}
+
+SMSVerifyConfigField Converter::CThostFtdcSMSVerifyConfigFieldToRust(CThostFtdcSMSVerifyConfigField* x) {
+    if (x == nullptr)
+        return SMSVerifyConfigField{.is_null = true};
+    SMSVerifyConfigField y{};
+    y.UserID = Converter::Gb2312ToRustString(x->UserID);
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.Mobile = Converter::Gb2312ToRustString(x->Mobile);
+    y.UseSMSVerify = x->UseSMSVerify;
+    return y;
+}
+
+CThostFtdcSMSVerifyInfoField Converter::SMSVerifyInfoFieldToCpp(SMSVerifyInfoField x) {
+    CThostFtdcSMSVerifyInfoField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.CreateTime, x.CreateTime.c_str());
+    CTP_SET_FIELD(y.Mobile, x.Mobile.c_str());
+    CTP_SET_BYTES(y.SMSContent, x.SMSContent);
+    return y;
+}
+
+SMSVerifyInfoField Converter::CThostFtdcSMSVerifyInfoFieldToRust(CThostFtdcSMSVerifyInfoField* x) {
+    if (x == nullptr)
+        return SMSVerifyInfoField{.is_null = true};
+    SMSVerifyInfoField y{};
+    y.CreateTime = Converter::Gb2312ToRustString(x->CreateTime);
+    y.Mobile = Converter::Gb2312ToRustString(x->Mobile);
+    for (int i = 0; i < 129; i++)
+        y.SMSContent.push_back(x->SMSContent[i]);
+    return y;
+}
+
+CThostFtdcInputSpdApplyField Converter::InputSpdApplyFieldToCpp(InputSpdApplyField x) {
+    CThostFtdcInputSpdApplyField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.FirstLegInstrumentID, x.FirstLegInstrumentID.c_str());
+    CTP_SET_FIELD(y.SecondLegInstrumentID, x.SecondLegInstrumentID.c_str());
+    y.Volume = x.Volume;
+    y.Direction = x.Direction;
+    y.CmbType = x.CmbType;
+    y.RequestID = x.RequestID;
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    return y;
+}
+
+InputSpdApplyField Converter::CThostFtdcInputSpdApplyFieldToRust(CThostFtdcInputSpdApplyField* x) {
+    if (x == nullptr)
+        return InputSpdApplyField{.is_null = true};
+    InputSpdApplyField y{};
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.UserID = Converter::Gb2312ToRustString(x->UserID);
+    y.InvestorID = Converter::Gb2312ToRustString(x->InvestorID);
+    y.ExchangeID = Converter::Gb2312ToRustString(x->ExchangeID);
+    y.FirstLegInstrumentID = Converter::Gb2312ToRustString(x->FirstLegInstrumentID);
+    y.SecondLegInstrumentID = Converter::Gb2312ToRustString(x->SecondLegInstrumentID);
+    y.Volume = x->Volume;
+    y.Direction = x->Direction;
+    y.CmbType = x->CmbType;
+    y.RequestID = x->RequestID;
+    y.OrderRef = Converter::Gb2312ToRustString(x->OrderRef);
+    y.IPAddress = Converter::Gb2312ToRustString(x->IPAddress);
+    y.MacAddress = Converter::Gb2312ToRustString(x->MacAddress);
+    return y;
+}
+
+CThostFtdcInputHedgeCfmField Converter::InputHedgeCfmFieldToCpp(InputHedgeCfmField x) {
+    CThostFtdcInputHedgeCfmField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    y.Volume = x.Volume;
+    y.Direction = x.Direction;
+    y.RequestID = x.RequestID;
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    return y;
+}
+
+InputHedgeCfmField Converter::CThostFtdcInputHedgeCfmFieldToRust(CThostFtdcInputHedgeCfmField* x) {
+    if (x == nullptr)
+        return InputHedgeCfmField{.is_null = true};
+    InputHedgeCfmField y{};
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.UserID = Converter::Gb2312ToRustString(x->UserID);
+    y.InvestorID = Converter::Gb2312ToRustString(x->InvestorID);
+    y.ExchangeID = Converter::Gb2312ToRustString(x->ExchangeID);
+    y.InstrumentID = Converter::Gb2312ToRustString(x->InstrumentID);
+    y.Volume = x->Volume;
+    y.Direction = x->Direction;
+    y.RequestID = x->RequestID;
+    y.OrderRef = Converter::Gb2312ToRustString(x->OrderRef);
+    y.IPAddress = Converter::Gb2312ToRustString(x->IPAddress);
+    y.MacAddress = Converter::Gb2312ToRustString(x->MacAddress);
+    return y;
+}
+
+CThostFtdcSpdApplyField Converter::SpdApplyFieldToCpp(SpdApplyField x) {
+    CThostFtdcSpdApplyField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.FirstLegInstrumentID, x.FirstLegInstrumentID.c_str());
+    CTP_SET_FIELD(y.SecondLegInstrumentID, x.SecondLegInstrumentID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    y.Volume = x.Volume;
+    y.Direction = x.Direction;
+    y.RequestID = x.RequestID;
+    y.FrontID = x.FrontID;
+    y.SessionID = x.SessionID;
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
+    CTP_SET_FIELD(y.ActiveUserID, x.ActiveUserID.c_str());
+    y.BrokerOrderSeq = x.BrokerOrderSeq;
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
+    y.ApplyStatus = x.ApplyStatus;
+    y.SequenceNo = x.SequenceNo;
+    CTP_SET_FIELD(y.InsertDate, x.InsertDate.c_str());
+    CTP_SET_FIELD(y.InsertTime, x.InsertTime.c_str());
+    CTP_SET_FIELD(y.CancelTime, x.CancelTime.c_str());
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
+    y.InstallID = x.InstallID;
+    y.OrderSubmitStatus = x.OrderSubmitStatus;
+    y.NotifySequence = x.NotifySequence;
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    y.SettlementID = x.SettlementID;
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    y.CmbType = x.CmbType;
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    return y;
+}
+
+SpdApplyField Converter::CThostFtdcSpdApplyFieldToRust(CThostFtdcSpdApplyField* x) {
+    if (x == nullptr)
+        return SpdApplyField{.is_null = true};
+    SpdApplyField y{};
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.InvestorID = Converter::Gb2312ToRustString(x->InvestorID);
+    y.FirstLegInstrumentID = Converter::Gb2312ToRustString(x->FirstLegInstrumentID);
+    y.SecondLegInstrumentID = Converter::Gb2312ToRustString(x->SecondLegInstrumentID);
+    y.UserID = Converter::Gb2312ToRustString(x->UserID);
+    y.Volume = x->Volume;
+    y.Direction = x->Direction;
+    y.RequestID = x->RequestID;
+    y.FrontID = x->FrontID;
+    y.SessionID = x->SessionID;
+    y.OrderRef = Converter::Gb2312ToRustString(x->OrderRef);
+    y.ActiveUserID = Converter::Gb2312ToRustString(x->ActiveUserID);
+    y.BrokerOrderSeq = x->BrokerOrderSeq;
+    y.OrderSysID = Converter::Gb2312ToRustString(x->OrderSysID);
+    y.ApplyStatus = x->ApplyStatus;
+    y.SequenceNo = x->SequenceNo;
+    y.InsertDate = Converter::Gb2312ToRustString(x->InsertDate);
+    y.InsertTime = Converter::Gb2312ToRustString(x->InsertTime);
+    y.CancelTime = Converter::Gb2312ToRustString(x->CancelTime);
+    y.OrderLocalID = Converter::Gb2312ToRustString(x->OrderLocalID);
+    y.ExchangeID = Converter::Gb2312ToRustString(x->ExchangeID);
+    y.ParticipantID = Converter::Gb2312ToRustString(x->ParticipantID);
+    y.ClientID = Converter::Gb2312ToRustString(x->ClientID);
+    y.ExchangeInstID = Converter::Gb2312ToRustString(x->ExchangeInstID);
+    y.TraderID = Converter::Gb2312ToRustString(x->TraderID);
+    y.InstallID = x->InstallID;
+    y.OrderSubmitStatus = x->OrderSubmitStatus;
+    y.NotifySequence = x->NotifySequence;
+    y.TradingDay = Converter::Gb2312ToRustString(x->TradingDay);
+    y.SettlementID = x->SettlementID;
+    y.IPAddress = Converter::Gb2312ToRustString(x->IPAddress);
+    y.MacAddress = Converter::Gb2312ToRustString(x->MacAddress);
+    y.CmbType = x->CmbType;
+    y.StatusMsg = Converter::Gb2312ToRustString(x->StatusMsg);
+    return y;
+}
+
+CThostFtdcHedgeCfmField Converter::HedgeCfmFieldToCpp(HedgeCfmField x) {
+    CThostFtdcHedgeCfmField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    y.Volume = x.Volume;
+    y.Direction = x.Direction;
+    y.RequestID = x.RequestID;
+    y.FrontID = x.FrontID;
+    y.SessionID = x.SessionID;
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
+    CTP_SET_FIELD(y.ActiveUserID, x.ActiveUserID.c_str());
+    y.BrokerOrderSeq = x.BrokerOrderSeq;
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
+    y.ApplyStatus = x.ApplyStatus;
+    y.SequenceNo = x.SequenceNo;
+    y.DealVolume = x.DealVolume;
+    CTP_SET_FIELD(y.InsertDate, x.InsertDate.c_str());
+    CTP_SET_FIELD(y.InsertTime, x.InsertTime.c_str());
+    CTP_SET_FIELD(y.CancelTime, x.CancelTime.c_str());
+    CTP_SET_FIELD(y.ReqDate, x.ReqDate.c_str());
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    CTP_SET_FIELD(y.ExchangeInstID, x.ExchangeInstID.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
+    y.InstallID = x.InstallID;
+    y.OrderSubmitStatus = x.OrderSubmitStatus;
+    y.NotifySequence = x.NotifySequence;
+    CTP_SET_FIELD(y.TradingDay, x.TradingDay.c_str());
+    y.SettlementID = x.SettlementID;
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    return y;
+}
+
+HedgeCfmField Converter::CThostFtdcHedgeCfmFieldToRust(CThostFtdcHedgeCfmField* x) {
+    if (x == nullptr)
+        return HedgeCfmField{.is_null = true};
+    HedgeCfmField y{};
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.InvestorID = Converter::Gb2312ToRustString(x->InvestorID);
+    y.InstrumentID = Converter::Gb2312ToRustString(x->InstrumentID);
+    y.UserID = Converter::Gb2312ToRustString(x->UserID);
+    y.Volume = x->Volume;
+    y.Direction = x->Direction;
+    y.RequestID = x->RequestID;
+    y.FrontID = x->FrontID;
+    y.SessionID = x->SessionID;
+    y.OrderRef = Converter::Gb2312ToRustString(x->OrderRef);
+    y.ActiveUserID = Converter::Gb2312ToRustString(x->ActiveUserID);
+    y.BrokerOrderSeq = x->BrokerOrderSeq;
+    y.OrderSysID = Converter::Gb2312ToRustString(x->OrderSysID);
+    y.ApplyStatus = x->ApplyStatus;
+    y.SequenceNo = x->SequenceNo;
+    y.DealVolume = x->DealVolume;
+    y.InsertDate = Converter::Gb2312ToRustString(x->InsertDate);
+    y.InsertTime = Converter::Gb2312ToRustString(x->InsertTime);
+    y.CancelTime = Converter::Gb2312ToRustString(x->CancelTime);
+    y.ReqDate = Converter::Gb2312ToRustString(x->ReqDate);
+    y.OrderLocalID = Converter::Gb2312ToRustString(x->OrderLocalID);
+    y.ExchangeID = Converter::Gb2312ToRustString(x->ExchangeID);
+    y.ParticipantID = Converter::Gb2312ToRustString(x->ParticipantID);
+    y.ClientID = Converter::Gb2312ToRustString(x->ClientID);
+    y.ExchangeInstID = Converter::Gb2312ToRustString(x->ExchangeInstID);
+    y.TraderID = Converter::Gb2312ToRustString(x->TraderID);
+    y.InstallID = x->InstallID;
+    y.OrderSubmitStatus = x->OrderSubmitStatus;
+    y.NotifySequence = x->NotifySequence;
+    y.TradingDay = Converter::Gb2312ToRustString(x->TradingDay);
+    y.SettlementID = x->SettlementID;
+    y.StatusMsg = Converter::Gb2312ToRustString(x->StatusMsg);
+    y.IPAddress = Converter::Gb2312ToRustString(x->IPAddress);
+    y.MacAddress = Converter::Gb2312ToRustString(x->MacAddress);
+    return y;
+}
+
+CThostFtdcQrySpdApplyField Converter::QrySpdApplyFieldToCpp(QrySpdApplyField x) {
+    CThostFtdcQrySpdApplyField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.FirstLegInstrumentID, x.FirstLegInstrumentID.c_str());
+    CTP_SET_FIELD(y.SecondLegInstrumentID, x.SecondLegInstrumentID.c_str());
+    return y;
+}
+
+QrySpdApplyField Converter::CThostFtdcQrySpdApplyFieldToRust(CThostFtdcQrySpdApplyField* x) {
+    if (x == nullptr)
+        return QrySpdApplyField{.is_null = true};
+    QrySpdApplyField y{};
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.InvestorID = Converter::Gb2312ToRustString(x->InvestorID);
+    y.ExchangeID = Converter::Gb2312ToRustString(x->ExchangeID);
+    y.OrderSysID = Converter::Gb2312ToRustString(x->OrderSysID);
+    y.FirstLegInstrumentID = Converter::Gb2312ToRustString(x->FirstLegInstrumentID);
+    y.SecondLegInstrumentID = Converter::Gb2312ToRustString(x->SecondLegInstrumentID);
+    return y;
+}
+
+CThostFtdcQryHedgeCfmField Converter::QryHedgeCfmFieldToCpp(QryHedgeCfmField x) {
+    CThostFtdcQryHedgeCfmField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.InstrumentID, x.InstrumentID.c_str());
+    return y;
+}
+
+QryHedgeCfmField Converter::CThostFtdcQryHedgeCfmFieldToRust(CThostFtdcQryHedgeCfmField* x) {
+    if (x == nullptr)
+        return QryHedgeCfmField{.is_null = true};
+    QryHedgeCfmField y{};
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.InvestorID = Converter::Gb2312ToRustString(x->InvestorID);
+    y.ExchangeID = Converter::Gb2312ToRustString(x->ExchangeID);
+    y.OrderSysID = Converter::Gb2312ToRustString(x->OrderSysID);
+    y.InstrumentID = Converter::Gb2312ToRustString(x->InstrumentID);
+    return y;
+}
+
+CThostFtdcInputSpdApplyActionField Converter::InputSpdApplyActionFieldToCpp(InputSpdApplyActionField x) {
+    CThostFtdcInputSpdApplyActionField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
+    y.FrontID = x.FrontID;
+    y.SessionID = x.SessionID;
+    y.RequestID = x.RequestID;
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    return y;
+}
+
+InputSpdApplyActionField Converter::CThostFtdcInputSpdApplyActionFieldToRust(CThostFtdcInputSpdApplyActionField* x) {
+    if (x == nullptr)
+        return InputSpdApplyActionField{.is_null = true};
+    InputSpdApplyActionField y{};
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.UserID = Converter::Gb2312ToRustString(x->UserID);
+    y.InvestorID = Converter::Gb2312ToRustString(x->InvestorID);
+    y.ExchangeID = Converter::Gb2312ToRustString(x->ExchangeID);
+    y.OrderSysID = Converter::Gb2312ToRustString(x->OrderSysID);
+    y.OrderRef = Converter::Gb2312ToRustString(x->OrderRef);
+    y.FrontID = x->FrontID;
+    y.SessionID = x->SessionID;
+    y.RequestID = x->RequestID;
+    y.IPAddress = Converter::Gb2312ToRustString(x->IPAddress);
+    y.MacAddress = Converter::Gb2312ToRustString(x->MacAddress);
+    return y;
+}
+
+CThostFtdcInputHedgeCfmActionField Converter::InputHedgeCfmActionFieldToCpp(InputHedgeCfmActionField x) {
+    CThostFtdcInputHedgeCfmActionField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
+    y.FrontID = x.FrontID;
+    y.SessionID = x.SessionID;
+    y.RequestID = x.RequestID;
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    return y;
+}
+
+InputHedgeCfmActionField Converter::CThostFtdcInputHedgeCfmActionFieldToRust(CThostFtdcInputHedgeCfmActionField* x) {
+    if (x == nullptr)
+        return InputHedgeCfmActionField{.is_null = true};
+    InputHedgeCfmActionField y{};
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.UserID = Converter::Gb2312ToRustString(x->UserID);
+    y.InvestorID = Converter::Gb2312ToRustString(x->InvestorID);
+    y.ExchangeID = Converter::Gb2312ToRustString(x->ExchangeID);
+    y.OrderSysID = Converter::Gb2312ToRustString(x->OrderSysID);
+    y.OrderRef = Converter::Gb2312ToRustString(x->OrderRef);
+    y.FrontID = x->FrontID;
+    y.SessionID = x->SessionID;
+    y.RequestID = x->RequestID;
+    y.IPAddress = Converter::Gb2312ToRustString(x->IPAddress);
+    y.MacAddress = Converter::Gb2312ToRustString(x->MacAddress);
+    return y;
+}
+
+CThostFtdcSpdApplyActionField Converter::SpdApplyActionFieldToCpp(SpdApplyActionField x) {
+    CThostFtdcSpdApplyActionField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ActionDate, x.ActionDate.c_str());
+    CTP_SET_FIELD(y.ActionTime, x.ActionTime.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
+    y.InstallID = x.InstallID;
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    y.OrderActionStatus = x.OrderActionStatus;
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
+    y.RequestID = x.RequestID;
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
+    y.FrontID = x.FrontID;
+    y.SessionID = x.SessionID;
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    return y;
+}
+
+SpdApplyActionField Converter::CThostFtdcSpdApplyActionFieldToRust(CThostFtdcSpdApplyActionField* x) {
+    if (x == nullptr)
+        return SpdApplyActionField{.is_null = true};
+    SpdApplyActionField y{};
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.InvestorID = Converter::Gb2312ToRustString(x->InvestorID);
+    y.ActionDate = Converter::Gb2312ToRustString(x->ActionDate);
+    y.ActionTime = Converter::Gb2312ToRustString(x->ActionTime);
+    y.TraderID = Converter::Gb2312ToRustString(x->TraderID);
+    y.InstallID = x->InstallID;
+    y.OrderLocalID = Converter::Gb2312ToRustString(x->OrderLocalID);
+    y.ActionLocalID = Converter::Gb2312ToRustString(x->ActionLocalID);
+    y.ParticipantID = Converter::Gb2312ToRustString(x->ParticipantID);
+    y.ClientID = Converter::Gb2312ToRustString(x->ClientID);
+    y.OrderActionStatus = x->OrderActionStatus;
+    y.UserID = Converter::Gb2312ToRustString(x->UserID);
+    y.ExchangeID = Converter::Gb2312ToRustString(x->ExchangeID);
+    y.OrderSysID = Converter::Gb2312ToRustString(x->OrderSysID);
+    y.RequestID = x->RequestID;
+    y.StatusMsg = Converter::Gb2312ToRustString(x->StatusMsg);
+    y.OrderRef = Converter::Gb2312ToRustString(x->OrderRef);
+    y.FrontID = x->FrontID;
+    y.SessionID = x->SessionID;
+    y.IPAddress = Converter::Gb2312ToRustString(x->IPAddress);
+    y.MacAddress = Converter::Gb2312ToRustString(x->MacAddress);
+    return y;
+}
+
+CThostFtdcHedgeCfmActionField Converter::HedgeCfmActionFieldToCpp(HedgeCfmActionField x) {
+    CThostFtdcHedgeCfmActionField y;
+    memset(&y, 0, sizeof(y));
+    CTP_SET_FIELD(y.BrokerID, x.BrokerID.c_str());
+    CTP_SET_FIELD(y.InvestorID, x.InvestorID.c_str());
+    CTP_SET_FIELD(y.ActionDate, x.ActionDate.c_str());
+    CTP_SET_FIELD(y.ActionTime, x.ActionTime.c_str());
+    CTP_SET_FIELD(y.TraderID, x.TraderID.c_str());
+    y.InstallID = x.InstallID;
+    CTP_SET_FIELD(y.OrderLocalID, x.OrderLocalID.c_str());
+    CTP_SET_FIELD(y.ActionLocalID, x.ActionLocalID.c_str());
+    CTP_SET_FIELD(y.ParticipantID, x.ParticipantID.c_str());
+    CTP_SET_FIELD(y.ClientID, x.ClientID.c_str());
+    y.OrderActionStatus = x.OrderActionStatus;
+    CTP_SET_FIELD(y.UserID, x.UserID.c_str());
+    CTP_SET_FIELD(y.ExchangeID, x.ExchangeID.c_str());
+    CTP_SET_FIELD(y.OrderSysID, x.OrderSysID.c_str());
+    y.RequestID = x.RequestID;
+    CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
+    CTP_SET_FIELD(y.OrderRef, x.OrderRef.c_str());
+    y.FrontID = x.FrontID;
+    y.SessionID = x.SessionID;
+    CTP_SET_FIELD(y.IPAddress, x.IPAddress.c_str());
+    CTP_SET_FIELD(y.MacAddress, x.MacAddress.c_str());
+    return y;
+}
+
+HedgeCfmActionField Converter::CThostFtdcHedgeCfmActionFieldToRust(CThostFtdcHedgeCfmActionField* x) {
+    if (x == nullptr)
+        return HedgeCfmActionField{.is_null = true};
+    HedgeCfmActionField y{};
+    y.BrokerID = Converter::Gb2312ToRustString(x->BrokerID);
+    y.InvestorID = Converter::Gb2312ToRustString(x->InvestorID);
+    y.ActionDate = Converter::Gb2312ToRustString(x->ActionDate);
+    y.ActionTime = Converter::Gb2312ToRustString(x->ActionTime);
+    y.TraderID = Converter::Gb2312ToRustString(x->TraderID);
+    y.InstallID = x->InstallID;
+    y.OrderLocalID = Converter::Gb2312ToRustString(x->OrderLocalID);
+    y.ActionLocalID = Converter::Gb2312ToRustString(x->ActionLocalID);
+    y.ParticipantID = Converter::Gb2312ToRustString(x->ParticipantID);
+    y.ClientID = Converter::Gb2312ToRustString(x->ClientID);
+    y.OrderActionStatus = x->OrderActionStatus;
+    y.UserID = Converter::Gb2312ToRustString(x->UserID);
+    y.ExchangeID = Converter::Gb2312ToRustString(x->ExchangeID);
+    y.OrderSysID = Converter::Gb2312ToRustString(x->OrderSysID);
+    y.RequestID = x->RequestID;
+    y.StatusMsg = Converter::Gb2312ToRustString(x->StatusMsg);
+    y.OrderRef = Converter::Gb2312ToRustString(x->OrderRef);
+    y.FrontID = x->FrontID;
+    y.SessionID = x->SessionID;
+    y.IPAddress = Converter::Gb2312ToRustString(x->IPAddress);
+    y.MacAddress = Converter::Gb2312ToRustString(x->MacAddress);
+    return y;
+}
+#endif  // CTP_VERSION_NUM >= CTP_V6_7_13

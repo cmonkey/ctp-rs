@@ -1055,3 +1055,109 @@ int32_t TraderApi::ReqQryOffsetSetting(QryOffsetSettingField pQryOffsetSetting, 
         nRequestID
     );
 }
+
+// ── CTP 6.7.13 新增请求接口 ──
+int32_t TraderApi::ReqGenSMSCode(ReqGenSMSCodeField pReqGenSMSCode, int32_t nRequestID) const {
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    CThostFtdcReqGenSMSCodeField req(Converter::ReqGenSMSCodeFieldToCpp(pReqGenSMSCode));
+    return api->ReqGenSMSCode(
+        &req,
+        nRequestID
+    );
+#else
+    // 低版本 SDK 没有这个接口 —— 与 ReqQryUserSession 同样的 stub 约定。
+    (void)pReqGenSMSCode;
+    (void)nRequestID;
+    return -10000; // API version does not support this request
+#endif
+}
+
+int32_t TraderApi::ReqSpdApply(InputSpdApplyField pInputSpdApply, int32_t nRequestID) const {
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    CThostFtdcInputSpdApplyField req(Converter::InputSpdApplyFieldToCpp(pInputSpdApply));
+    return api->ReqSpdApply(
+        &req,
+        nRequestID
+    );
+#else
+    // 低版本 SDK 没有这个接口 —— 与 ReqQryUserSession 同样的 stub 约定。
+    (void)pInputSpdApply;
+    (void)nRequestID;
+    return -10000; // API version does not support this request
+#endif
+}
+
+int32_t TraderApi::ReqSpdApplyAction(InputSpdApplyActionField pInputSpdApplyAction, int32_t nRequestID) const {
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    CThostFtdcInputSpdApplyActionField req(Converter::InputSpdApplyActionFieldToCpp(pInputSpdApplyAction));
+    return api->ReqSpdApplyAction(
+        &req,
+        nRequestID
+    );
+#else
+    // 低版本 SDK 没有这个接口 —— 与 ReqQryUserSession 同样的 stub 约定。
+    (void)pInputSpdApplyAction;
+    (void)nRequestID;
+    return -10000; // API version does not support this request
+#endif
+}
+
+int32_t TraderApi::ReqQrySpdApply(QrySpdApplyField pQrySpdApply, int32_t nRequestID) const {
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    CThostFtdcQrySpdApplyField req(Converter::QrySpdApplyFieldToCpp(pQrySpdApply));
+    return api->ReqQrySpdApply(
+        &req,
+        nRequestID
+    );
+#else
+    // 低版本 SDK 没有这个接口 —— 与 ReqQryUserSession 同样的 stub 约定。
+    (void)pQrySpdApply;
+    (void)nRequestID;
+    return -10000; // API version does not support this request
+#endif
+}
+
+int32_t TraderApi::ReqHedgeCfm(InputHedgeCfmField pInputHedgeCfm, int32_t nRequestID) const {
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    CThostFtdcInputHedgeCfmField req(Converter::InputHedgeCfmFieldToCpp(pInputHedgeCfm));
+    return api->ReqHedgeCfm(
+        &req,
+        nRequestID
+    );
+#else
+    // 低版本 SDK 没有这个接口 —— 与 ReqQryUserSession 同样的 stub 约定。
+    (void)pInputHedgeCfm;
+    (void)nRequestID;
+    return -10000; // API version does not support this request
+#endif
+}
+
+int32_t TraderApi::ReqHedgeCfmAction(InputHedgeCfmActionField pInputHedgeCfmAction, int32_t nRequestID) const {
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    CThostFtdcInputHedgeCfmActionField req(Converter::InputHedgeCfmActionFieldToCpp(pInputHedgeCfmAction));
+    return api->ReqHedgeCfmAction(
+        &req,
+        nRequestID
+    );
+#else
+    // 低版本 SDK 没有这个接口 —— 与 ReqQryUserSession 同样的 stub 约定。
+    (void)pInputHedgeCfmAction;
+    (void)nRequestID;
+    return -10000; // API version does not support this request
+#endif
+}
+
+int32_t TraderApi::ReqQryHedgeCfm(QryHedgeCfmField pQryHedgeCfm, int32_t nRequestID) const {
+#if CTP_VERSION_NUM >= CTP_V6_7_13
+    CThostFtdcQryHedgeCfmField req(Converter::QryHedgeCfmFieldToCpp(pQryHedgeCfm));
+    return api->ReqQryHedgeCfm(
+        &req,
+        nRequestID
+    );
+#else
+    // 低版本 SDK 没有这个接口 —— 与 ReqQryUserSession 同样的 stub 约定。
+    (void)pQryHedgeCfm;
+    (void)nRequestID;
+    return -10000; // API version does not support this request
+#endif
+}
