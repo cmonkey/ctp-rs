@@ -1356,13 +1356,13 @@ void CTraderSpi::OnRspQryOffsetSetting(CThostFtdcOffsetSettingField* pOffsetSett
 #if CTP_VERSION_NUM >= CTP_V6_7_13
 // CTP 6.7.13 新增回调实现
 void CTraderSpi::OnRtnPrivateSeqNo(int32_t nSeqNo) {
-    this->gateway->OnRtnPrivateSeqNo(
+    this->gateway->gateway.OnRtnPrivateSeqNo(
         nSeqNo
     );
 }
 
 void CTraderSpi::OnRspGenSMSCode(CThostFtdcRspGenSMSCodeField* pRspGenSMSCode, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) {
-    this->gateway->OnRspGenSMSCode(
+    this->gateway->gateway.OnRspGenSMSCode(
         Converter::CThostFtdcRspGenSMSCodeFieldToRust(pRspGenSMSCode),
         Converter::CThostFtdcRspInfoFieldToRust(pRspInfo),
         nRequestID,
@@ -1371,7 +1371,7 @@ void CTraderSpi::OnRspGenSMSCode(CThostFtdcRspGenSMSCodeField* pRspGenSMSCode, C
 }
 
 void CTraderSpi::OnRspSpdApply(CThostFtdcInputSpdApplyField* pInputSpdApply, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) {
-    this->gateway->OnRspSpdApply(
+    this->gateway->gateway.OnRspSpdApply(
         Converter::CThostFtdcInputSpdApplyFieldToRust(pInputSpdApply),
         Converter::CThostFtdcRspInfoFieldToRust(pRspInfo),
         nRequestID,
@@ -1380,7 +1380,7 @@ void CTraderSpi::OnRspSpdApply(CThostFtdcInputSpdApplyField* pInputSpdApply, CTh
 }
 
 void CTraderSpi::OnRspSpdApplyAction(CThostFtdcInputSpdApplyActionField* pInputSpdApplyAction, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) {
-    this->gateway->OnRspSpdApplyAction(
+    this->gateway->gateway.OnRspSpdApplyAction(
         Converter::CThostFtdcInputSpdApplyActionFieldToRust(pInputSpdApplyAction),
         Converter::CThostFtdcRspInfoFieldToRust(pRspInfo),
         nRequestID,
@@ -1389,7 +1389,7 @@ void CTraderSpi::OnRspSpdApplyAction(CThostFtdcInputSpdApplyActionField* pInputS
 }
 
 void CTraderSpi::OnRspQrySpdApply(CThostFtdcSpdApplyField* pSpdApply, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) {
-    this->gateway->OnRspQrySpdApply(
+    this->gateway->gateway.OnRspQrySpdApply(
         Converter::CThostFtdcSpdApplyFieldToRust(pSpdApply),
         Converter::CThostFtdcRspInfoFieldToRust(pRspInfo),
         nRequestID,
@@ -1398,27 +1398,27 @@ void CTraderSpi::OnRspQrySpdApply(CThostFtdcSpdApplyField* pSpdApply, CThostFtdc
 }
 
 void CTraderSpi::OnRtnSpdApply(CThostFtdcSpdApplyField* pSpdApply) {
-    this->gateway->OnRtnSpdApply(
+    this->gateway->gateway.OnRtnSpdApply(
         Converter::CThostFtdcSpdApplyFieldToRust(pSpdApply)
     );
 }
 
 void CTraderSpi::OnErrRtnSpdApply(CThostFtdcInputSpdApplyField* pInputSpdApply, CThostFtdcRspInfoField* pRspInfo) {
-    this->gateway->OnErrRtnSpdApply(
+    this->gateway->gateway.OnErrRtnSpdApply(
         Converter::CThostFtdcInputSpdApplyFieldToRust(pInputSpdApply),
         Converter::CThostFtdcRspInfoFieldToRust(pRspInfo)
     );
 }
 
 void CTraderSpi::OnErrRtnSpdApplyAction(CThostFtdcSpdApplyActionField* pSpdApplyAction, CThostFtdcRspInfoField* pRspInfo) {
-    this->gateway->OnErrRtnSpdApplyAction(
+    this->gateway->gateway.OnErrRtnSpdApplyAction(
         Converter::CThostFtdcSpdApplyActionFieldToRust(pSpdApplyAction),
         Converter::CThostFtdcRspInfoFieldToRust(pRspInfo)
     );
 }
 
 void CTraderSpi::OnRspHedgeCfm(CThostFtdcInputHedgeCfmField* pInputHedgeCfm, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) {
-    this->gateway->OnRspHedgeCfm(
+    this->gateway->gateway.OnRspHedgeCfm(
         Converter::CThostFtdcInputHedgeCfmFieldToRust(pInputHedgeCfm),
         Converter::CThostFtdcRspInfoFieldToRust(pRspInfo),
         nRequestID,
@@ -1427,7 +1427,7 @@ void CTraderSpi::OnRspHedgeCfm(CThostFtdcInputHedgeCfmField* pInputHedgeCfm, CTh
 }
 
 void CTraderSpi::OnRspHedgeCfmAction(CThostFtdcInputHedgeCfmActionField* pInputHedgeCfmAction, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) {
-    this->gateway->OnRspHedgeCfmAction(
+    this->gateway->gateway.OnRspHedgeCfmAction(
         Converter::CThostFtdcInputHedgeCfmActionFieldToRust(pInputHedgeCfmAction),
         Converter::CThostFtdcRspInfoFieldToRust(pRspInfo),
         nRequestID,
@@ -1436,7 +1436,7 @@ void CTraderSpi::OnRspHedgeCfmAction(CThostFtdcInputHedgeCfmActionField* pInputH
 }
 
 void CTraderSpi::OnRspQryHedgeCfm(CThostFtdcHedgeCfmField* pHedgeCfm, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) {
-    this->gateway->OnRspQryHedgeCfm(
+    this->gateway->gateway.OnRspQryHedgeCfm(
         Converter::CThostFtdcHedgeCfmFieldToRust(pHedgeCfm),
         Converter::CThostFtdcRspInfoFieldToRust(pRspInfo),
         nRequestID,
@@ -1445,20 +1445,20 @@ void CTraderSpi::OnRspQryHedgeCfm(CThostFtdcHedgeCfmField* pHedgeCfm, CThostFtdc
 }
 
 void CTraderSpi::OnRtnHedgeCfm(CThostFtdcHedgeCfmField* pHedgeCfm) {
-    this->gateway->OnRtnHedgeCfm(
+    this->gateway->gateway.OnRtnHedgeCfm(
         Converter::CThostFtdcHedgeCfmFieldToRust(pHedgeCfm)
     );
 }
 
 void CTraderSpi::OnErrRtnHedgeCfm(CThostFtdcInputHedgeCfmField* pInputHedgeCfm, CThostFtdcRspInfoField* pRspInfo) {
-    this->gateway->OnErrRtnHedgeCfm(
+    this->gateway->gateway.OnErrRtnHedgeCfm(
         Converter::CThostFtdcInputHedgeCfmFieldToRust(pInputHedgeCfm),
         Converter::CThostFtdcRspInfoFieldToRust(pRspInfo)
     );
 }
 
 void CTraderSpi::OnErrRtnHedgeCfmAction(CThostFtdcHedgeCfmActionField* pHedgeCfmAction, CThostFtdcRspInfoField* pRspInfo) {
-    this->gateway->OnErrRtnHedgeCfmAction(
+    this->gateway->gateway.OnErrRtnHedgeCfmAction(
         Converter::CThostFtdcHedgeCfmActionFieldToRust(pHedgeCfmAction),
         Converter::CThostFtdcRspInfoFieldToRust(pRspInfo)
     );
