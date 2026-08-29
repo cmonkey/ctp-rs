@@ -11,9 +11,26 @@ fn main() {
     // 都从这里推导,不需要再改。
     let (sdk_version, version_num) = select_ctp_version();
 
-    // Try sdk/{version} first, fall back to lib/ for backward compatibility
+    // ⚠️ 选定版本的 SDK 目录必须存在 —— 缺了就**硬失败**,不回退。
+    //
+    // 原先缺目录时静默退回 `lib/`,而 `lib/` 装的是上一次同步进去的版本。
+    // 2026-08-29 就吃过这个亏:二进制按 6.7.10 编、`lib/` 里是 6.7.11 的
+    // .so,链接期无异常,直到运行时才炸出
+    // `undefined symbol: CreateFtdcMdApi(char const*, bool, bool)`。
+    // 版本错配必须在构建时就响。
     let sdk_dir = Path::new(&root).join("sdk").join(sdk_version);
-    let lib_dir = if sdk_dir.exists() {
+    if !sdk_dir.exists() {
+        panic!(
+            "ctp-rs: 找不到 SDK 目录 {}\n\
+             选定版本是 {},但 sdk/ 下没有它。\n\
+             从 SimNow 下载对应版本(看穿式监管生产/评测版本,Linux)解压到该目录:\n\
+             需要 4 个头文件 + libthostmduserapi_se.so + libthosttraderapi_se.so + error.xml/dtd。\n\
+             https://www.simnow.com.cn/static/apiDownload.action",
+            sdk_dir.display(),
+            sdk_version,
+        );
+    }
+    let lib_dir = {
         // Copy SDK .so to lib/ so wrapper headers can find them
         let target_lib = Path::new(&root).join("lib");
         let so_ext = if cfg!(target_os = "windows") { "dll" } else { "so" };
@@ -38,8 +55,6 @@ fn main() {
             }
         }
         target_lib
-    } else {
-        Path::new(&root).join("lib")
     };
 
     println!("cargo:rustc-link-search={}", lib_dir.display());
@@ -125,6 +140,7 @@ fn select_ctp_version() -> (&'static str, u32) {
     // (Cargo feature 对应的环境变量, SDK 目录, 数值版本)
     // Cargo 把 feature 名转大写、`-` 换 `_`,前缀 CARGO_FEATURE_。
     const VERSIONS: &[(&str, &str, u32)] = &[
+        ("CARGO_FEATURE_CTP_6_7_13", "v6.7.13", 60713),
         ("CARGO_FEATURE_CTP_6_7_11", "v6.7.11", 60711),
         ("CARGO_FEATURE_CTP_6_7_10", "v6.7.10", 60710),
     ];

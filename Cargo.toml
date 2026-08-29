@@ -12,6 +12,9 @@ version = "6.7.11+refined.20251214"
 
 [features]
 default = ["ctp-6-7-11"]
+# ⚠️ default 仍是 6.7.11 —— 等 A4~A7(结构/回调/方法)补齐并跑通
+# 才切到 6.7.13。见 desgin/ctp-6-7-13-support-2026-08-29.md。
+ctp-6-7-13 = []
 ctp-6-7-11 = []
 ctp-6-7-10 = []
 
