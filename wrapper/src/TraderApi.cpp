@@ -4,7 +4,7 @@
 TraderApi::TraderApi(const TraderSpi &gateway, rust::String flow_path, bool is_production_mode) : gateway(gateway) {
     spi = new CTraderSpi(this);
     api = CThostFtdcTraderApi::CreateFtdcTraderApi(flow_path.c_str()
-#ifdef CTP_6_7_11
+#if CTP_VERSION_NUM >= CTP_V6_7_11
         , is_production_mode
 #endif
     );
@@ -394,7 +394,7 @@ int32_t TraderApi::ReqQryInstrumentCommissionRate(QryInstrumentCommissionRateFie
     );
 }
 
-#ifdef CTP_6_7_11
+#if CTP_VERSION_NUM >= CTP_V6_7_11
 int32_t TraderApi::ReqQryUserSession(QryUserSessionField pQryUserSession, int32_t nRequestID) const {
     CThostFtdcQryUserSessionField req(Converter::QryUserSessionFieldToCpp(pQryUserSession));
     return api->ReqQryUserSession(

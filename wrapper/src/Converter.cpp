@@ -117,7 +117,7 @@ CThostFtdcRspUserLoginField Converter::RspUserLoginFieldToCpp(RspUserLoginField 
     CTP_SET_FIELD(y.GFEXTime, x.GFEXTime.c_str());
     y.LoginDRIdentityID = x.LoginDRIdentityID;
     y.UserDRIdentityID = x.UserDRIdentityID;
-#ifdef CTP_6_7_11
+#if CTP_VERSION_NUM >= CTP_V6_7_11
     CTP_SET_FIELD(y.LastLoginTime, x.LastLoginTime.c_str());
     CTP_SET_FIELD(y.ReserveInfo, x.ReserveInfo.c_str());
 #endif
@@ -145,7 +145,7 @@ RspUserLoginField Converter::CThostFtdcRspUserLoginFieldToRust(CThostFtdcRspUser
     y.GFEXTime = Converter::Gb2312ToRustString(x->GFEXTime);
     y.LoginDRIdentityID = x->LoginDRIdentityID;
     y.UserDRIdentityID = x->UserDRIdentityID;
-#ifdef CTP_6_7_11
+#if CTP_VERSION_NUM >= CTP_V6_7_11
     y.LastLoginTime = Converter::Gb2312ToRustString(x->LastLoginTime);
     y.ReserveInfo = Converter::Gb2312ToRustString(x->ReserveInfo);
 #endif
@@ -2494,7 +2494,7 @@ TradeField Converter::CThostFtdcTradeFieldToRust(CThostFtdcTradeField* x) {
     return y;
 }
 
-#ifdef CTP_6_7_11
+#if CTP_VERSION_NUM >= CTP_V6_7_11
 CThostFtdcUserSessionField Converter::UserSessionFieldToCpp(UserSessionField x) {
     CThostFtdcUserSessionField y;
     memset(&y, 0, sizeof(y));
@@ -3339,7 +3339,7 @@ QrySuperUserFunctionField Converter::CThostFtdcQrySuperUserFunctionFieldToRust(C
     return y;
 }
 
-#ifdef CTP_6_7_11
+#if CTP_VERSION_NUM >= CTP_V6_7_11
 CThostFtdcQryUserSessionField Converter::QryUserSessionFieldToCpp(QryUserSessionField x) {
     CThostFtdcQryUserSessionField y;
     memset(&y, 0, sizeof(y));
@@ -16951,7 +16951,7 @@ CThostFtdcOffsetSettingField Converter::OffsetSettingFieldToCpp(OffsetSettingFie
     CTP_SET_FIELD(y.StatusMsg, x.StatusMsg.c_str());
     CTP_SET_FIELD(y.ActiveUserID, x.ActiveUserID.c_str());
     y.BrokerOffsetSettingSeq = x.BrokerOffsetSettingSeq;
-#ifdef CTP_6_7_11
+#if CTP_VERSION_NUM >= CTP_V6_7_11
     y.ApplySrc = x.ApplySrc;
 #endif
     return y;
@@ -16995,7 +16995,7 @@ OffsetSettingField Converter::CThostFtdcOffsetSettingFieldToRust(CThostFtdcOffse
     y.StatusMsg = Converter::Gb2312ToRustString(x->StatusMsg);
     y.ActiveUserID = Converter::Gb2312ToRustString(x->ActiveUserID);
     y.BrokerOffsetSettingSeq = x->BrokerOffsetSettingSeq;
-#ifdef CTP_6_7_11
+#if CTP_VERSION_NUM >= CTP_V6_7_11
     y.ApplySrc = x->ApplySrc;
 #endif
     return y;
@@ -17153,7 +17153,7 @@ WechatUserSystemInfoField Converter::CThostFtdcWechatUserSystemInfoFieldToRust(C
     return y;
 }
 
-#ifdef CTP_6_7_11
+#if CTP_VERSION_NUM >= CTP_V6_7_11
 CThostFtdcInvestorReserveInfoField Converter::InvestorReserveInfoFieldToCpp(InvestorReserveInfoField x) {
     CThostFtdcInvestorReserveInfoField y;
     memset(&y, 0, sizeof(y));

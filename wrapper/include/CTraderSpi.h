@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ctp-rs/wrapper/include/CtpVersion.h"
 #include "ctp-rs/lib/ThostFtdcMdApi.h"
 #include "ctp-rs/lib/ThostFtdcTraderApi.h"
 
@@ -48,7 +49,7 @@ public:
     void OnRspQryTradingCode(CThostFtdcTradingCodeField* pTradingCode, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) override;
     void OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateField* pInstrumentMarginRate, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) override;
     void OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateField* pInstrumentCommissionRate, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) override;
-#ifdef CTP_6_7_11
+#if CTP_VERSION_NUM >= CTP_V6_7_11
     void OnRspQryUserSession(CThostFtdcUserSessionField* pUserSession, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) override;
 #endif
     void OnRspQryExchange(CThostFtdcExchangeField* pExchange, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) override;

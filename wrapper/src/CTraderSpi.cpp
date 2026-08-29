@@ -317,7 +317,7 @@ void CTraderSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommission
     );
 }
 
-#ifdef CTP_6_7_11
+#if CTP_VERSION_NUM >= CTP_V6_7_11
 void CTraderSpi::OnRspQryUserSession(CThostFtdcUserSessionField* pUserSession, CThostFtdcRspInfoField* pRspInfo, int32_t nRequestID, bool bIsLast) {
     this->gateway->gateway.OnRspQryUserSession(
         Converter::CThostFtdcUserSessionFieldToRust(pUserSession),

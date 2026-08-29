@@ -506,6 +506,7 @@ struct FrontInfoField;
 #include "ctp-rs/src/lib.rs.h"
 #include "rust/cxx.h"
 
+#include "ctp-rs/wrapper/include/CtpVersion.h"
 #include "ctp-rs/wrapper/include/CtpFieldGuard.h"
 #include <cstring>
 #include <ctime>
@@ -644,7 +645,7 @@ public:
     static ExchangeTradeField CThostFtdcExchangeTradeFieldToRust(CThostFtdcExchangeTradeField* x);
     static CThostFtdcTradeField TradeFieldToCpp(TradeField x);
     static TradeField CThostFtdcTradeFieldToRust(CThostFtdcTradeField* x);
-#ifdef CTP_6_7_11
+#if CTP_VERSION_NUM >= CTP_V6_7_11
     static CThostFtdcUserSessionField UserSessionFieldToCpp(UserSessionField x);
     static UserSessionField CThostFtdcUserSessionFieldToRust(CThostFtdcUserSessionField* x);
 #endif
@@ -700,7 +701,7 @@ public:
     static QryTraderField CThostFtdcQryTraderFieldToRust(CThostFtdcQryTraderField* x);
     static CThostFtdcQrySuperUserFunctionField QrySuperUserFunctionFieldToCpp(QrySuperUserFunctionField x);
     static QrySuperUserFunctionField CThostFtdcQrySuperUserFunctionFieldToRust(CThostFtdcQrySuperUserFunctionField* x);
-#ifdef CTP_6_7_11
+#if CTP_VERSION_NUM >= CTP_V6_7_11
     static CThostFtdcQryUserSessionField QryUserSessionFieldToCpp(QryUserSessionField x);
     static QryUserSessionField CThostFtdcQryUserSessionFieldToRust(CThostFtdcQryUserSessionField* x);
 #endif
@@ -1518,7 +1519,7 @@ public:
     static QryAddrAppIDRelationField CThostFtdcQryAddrAppIDRelationFieldToRust(CThostFtdcQryAddrAppIDRelationField* x);
     static CThostFtdcWechatUserSystemInfoField WechatUserSystemInfoFieldToCpp(WechatUserSystemInfoField x);
     static WechatUserSystemInfoField CThostFtdcWechatUserSystemInfoFieldToRust(CThostFtdcWechatUserSystemInfoField* x);
-#ifdef CTP_6_7_11
+#if CTP_VERSION_NUM >= CTP_V6_7_11
     static CThostFtdcInvestorReserveInfoField InvestorReserveInfoFieldToCpp(InvestorReserveInfoField x);
     static InvestorReserveInfoField CThostFtdcInvestorReserveInfoFieldToRust(CThostFtdcInvestorReserveInfoField* x);
     static CThostFtdcQryInvestorDepartmentFlatField QryInvestorDepartmentFlatFieldToCpp(QryInvestorDepartmentFlatField x);

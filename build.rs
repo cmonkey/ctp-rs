@@ -6,12 +6,10 @@ use std::{
 fn main() {
     let root = env!("CARGO_MANIFEST_DIR");
 
-    // Select SDK version based on feature flag
-    let sdk_version = if cfg!(feature = "ctp-6-7-11") {
-        "v6.7.11"
-    } else {
-        "v6.7.10"
-    };
+    // ── CTP 版本真源 ────────────────────────────────────────────────
+    // 加一个新版本 = 在这张表里加一行。其余地方(C++ 门控、SDK 目录)
+    // 都从这里推导,不需要再改。
+    let (sdk_version, version_num) = select_ctp_version();
 
     // Try sdk/{version} first, fall back to lib/ for backward compatibility
     let sdk_dir = Path::new(&root).join("sdk").join(sdk_version);
@@ -61,6 +59,7 @@ fn main() {
         "wrapper/include/Converter.h",
         "wrapper/include/CtpFieldGuard.h",
         "wrapper/include/GbkDecode.h",
+        "wrapper/include/CtpVersion.h",
         "wrapper/include/CMdSpi.h",
         "wrapper/include/CTraderSpi.h",
         "wrapper/include/MdApi.h",
@@ -81,10 +80,11 @@ fn main() {
         .flag_if_supported("-std=c++20")
         .flag_if_supported("-w");
 
-    // Pass CTP version define to C++ code
-    if cfg!(feature = "ctp-6-7-11") {
-        build.define("CTP_6_7_11", None);
-    }
+    // C++ 侧门控用数值比较(`#if CTP_VERSION_NUM >= 60711`)而不是 #ifdef,
+    // 见 wrapper/include/CtpVersion.h 里的原因说明。
+    // 先绑定再取 &str —— 避免把临时 String 的借用直接塞进调用。
+    let version_define = version_num.to_string();
+    build.define("CTP_VERSION_NUM", version_define.as_str());
 
     build.files(cpp_files).compile("ctp_rs");
 
@@ -109,5 +109,48 @@ fn main() {
     };
     for file in files {
         fs::copy(lib_dir.join(file), out_dir.join(file)).expect(&format!("Copy {} failed", file));
+    }
+}
+
+/// 从启用的 Cargo feature 推导 CTP 版本 → (SDK 目录, 数值版本)。
+///
+/// 加新版本只改这张表。
+///
+/// 用 `CARGO_FEATURE_*` 环境变量而不是 `cfg!(feature = ...)`,是为了能表
+/// 驱动:`cfg!` 要求字面量,没法遍历。附带好处是把两个静默失败变成了硬
+/// 报错 —— 旧写法 `if cfg!(feature="ctp-6-7-11") { .. } else { v6.7.10 }`
+/// 在 feature 名打错时会**悄悄退到 6.7.10**,同时启用两个版本时会**悄悄
+/// 选一个**。
+fn select_ctp_version() -> (&'static str, u32) {
+    // (Cargo feature 对应的环境变量, SDK 目录, 数值版本)
+    // Cargo 把 feature 名转大写、`-` 换 `_`,前缀 CARGO_FEATURE_。
+    const VERSIONS: &[(&str, &str, u32)] = &[
+        ("CARGO_FEATURE_CTP_6_7_11", "v6.7.11", 60711),
+        ("CARGO_FEATURE_CTP_6_7_10", "v6.7.10", 60710),
+    ];
+
+    let enabled: Vec<&(&str, &str, u32)> = VERSIONS
+        .iter()
+        .filter(|(env, _, _)| std::env::var(env).is_ok())
+        .collect();
+
+    match enabled.as_slice() {
+        [(_, dir, num)] => (dir, *num),
+        [] => panic!(
+            "ctp-rs: 没有启用任何 CTP 版本 feature。\n\
+             可选:{}\n\
+             (Cargo.toml 的 default 里应当有一个)",
+            VERSIONS
+                .iter()
+                .map(|(e, d, _)| format!("{} ({})", e.trim_start_matches("CARGO_FEATURE_"), d))
+                .collect::<Vec<_>>()
+                .join(", ")
+        ),
+        many => panic!(
+            "ctp-rs: 同时启用了 {} 个 CTP 版本 feature:{}。\n\
+             只能选一个 —— 用 --no-default-features 再指定目标版本。",
+            many.len(),
+            many.iter().map(|(_, d, _)| *d).collect::<Vec<_>>().join(", ")
+        ),
     }
 }
