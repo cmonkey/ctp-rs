@@ -22,5 +22,10 @@ ctp-6-7-10 = []
 [dependencies]
 cxx = "1.0"
 
+# 只给 examples/private_seq_probe.rs 用(读 config.json 拿 7x24 凭据,
+# 不硬编码)。dev-dependency 不进生产二进制。
+[dev-dependencies]
+serde_json = "1"
+
 [build-dependencies]
 cxx-build = "1.0"
